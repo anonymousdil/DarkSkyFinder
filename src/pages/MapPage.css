@@ -130,6 +130,13 @@
   font-size: 0.9rem;
 }
 
+.error-message.tile-error {
+  background: rgba(255, 165, 0, 0.2);
+  border-color: rgba(255, 165, 0, 0.5);
+  color: #ffa500;
+  font-size: 0.85rem;
+}
+
 .map-container {
   flex: 1;
   position: relative;

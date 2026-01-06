@@ -32,8 +32,16 @@ function MapPage() {
   const [error, setError] = useState('');
   const [selectedLocation, setSelectedLocation] = useState(null);
   const [showSkyInfo, setShowSkyInfo] = useState(false);
+  const [tileError, setTileError] = useState(false);
 
   const mapRef = useRef();
+
+  // Handle tile loading errors
+  const handleTileError = () => {
+    setTileError(true);
+    // Auto-hide error message after 5 seconds
+    setTimeout(() => setTileError(false), 5000);
+  };
 
   // Function to search location by name or coordinates
   const handleSearch = async () => {
@@ -151,6 +159,11 @@ function MapPage() {
           </button>
         </div>
         {error && <div className="error-message">{error}</div>}
+        {tileError && (
+          <div className="error-message tile-error">
+            Map tiles are currently unavailable. The map may appear blank, but all functionality continues to work.
+          </div>
+        )}
       </div>
 
       <div className="map-container">
@@ -173,6 +186,9 @@ function MapPage() {
             <TileLayer
               attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
               url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+              eventHandlers={{
+                tileerror: handleTileError,
+              }}
             />
           )}
 
@@ -181,6 +197,9 @@ function MapPage() {
               attribution='&copy; <a href="https://www.esri.com/">Esri</a>'
               url="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}"
               maxZoom={19}
+              eventHandlers={{
+                tileerror: handleTileError,
+              }}
             />
           )}
           
@@ -189,6 +208,9 @@ function MapPage() {
               attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
               url="https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png"
               maxZoom={17}
+              eventHandlers={{
+                tileerror: handleTileError,
+              }}
             />
           )}
 
