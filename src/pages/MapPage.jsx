@@ -146,12 +146,6 @@ function MapPage() {
     setSearchInput('');
   };
 
-  const handleKeyPress = (e) => {
-    if (e.key === 'Enter') {
-      handleSearch();
-    }
-  };
-
   return (
     <div className="map-page-container">
       <div className="map-controls">

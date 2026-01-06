@@ -32,25 +32,29 @@ function AutocompleteInput({
 
     // Only fetch if input is at least 2 characters
     if (value && value.trim().length >= 2) {
-      setLoading(true);
-      
       // Debounce API calls
-      debounceTimer.current = setTimeout(async () => {
-        try {
-          const results = await getAutocompleteSuggestions(value, 8);
-          setSuggestions(results);
-          setShowSuggestions(results.length > 0);
-          setLoading(false);
-        } catch (error) {
-          console.error('Error fetching suggestions:', error);
-          setSuggestions([]);
-          setLoading(false);
-        }
+      debounceTimer.current = setTimeout(() => {
+        setLoading(true);
+        
+        getAutocompleteSuggestions(value, 8)
+          .then(results => {
+            setSuggestions(results);
+            setShowSuggestions(results.length > 0);
+            setLoading(false);
+          })
+          .catch(error => {
+            console.error('Error fetching suggestions:', error);
+            setSuggestions([]);
+            setLoading(false);
+          });
       }, 300); // 300ms debounce
     } else {
-      setSuggestions([]);
-      setShowSuggestions(false);
-      setLoading(false);
+      // Clear suggestions when input is too short
+      debounceTimer.current = setTimeout(() => {
+        setSuggestions([]);
+        setShowSuggestions(false);
+        setLoading(false);
+      }, 0);
     }
 
     return () => {
