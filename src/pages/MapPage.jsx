@@ -2,6 +2,8 @@ import { useState, useRef } from 'react';
 import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
 import L from 'leaflet';
 import axios from 'axios';
+import LayerSwitcher from '../components/LayerSwitcher';
+import SkyInfoPanel from '../components/SkyInfoPanel';
 import './MapPage.css';
 import 'leaflet/dist/leaflet.css';
 
@@ -25,9 +27,11 @@ function MapPage() {
   const [zoom, setZoom] = useState(2);
   const [markers, setMarkers] = useState([]);
   const [searchInput, setSearchInput] = useState('');
-  const [isLightPollutionMap, setIsLightPollutionMap] = useState(false);
+  const [currentLayer, setCurrentLayer] = useState('standard');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [selectedLocation, setSelectedLocation] = useState(null);
+  const [showSkyInfo, setShowSkyInfo] = useState(false);
 
   const mapRef = useRef();
 
@@ -114,6 +118,15 @@ function MapPage() {
     setIsLightPollutionMap(!isLightPollutionMap);
   };
 
+  const handleLayerChange = (layerId) => {
+    setCurrentLayer(layerId);
+  };
+
+  const handleMarkerClick = (marker) => {
+    setSelectedLocation(marker);
+    setShowSkyInfo(true);
+  };
+
   const handleKeyPress = (e) => {
     if (e.key === 'Enter') {
       handleSearch();
@@ -141,16 +154,17 @@ function MapPage() {
             {loading ? 'Searching...' : 'Search'}
           </button>
         </div>
-        <button 
-          className={`map-toggle-button ${isLightPollutionMap ? 'active' : ''}`}
-          onClick={toggleMapType}
-        >
-          {isLightPollutionMap ? 'Show Regular Map' : 'Show Light Pollution Map'}
-        </button>
         {error && <div className="error-message">{error}</div>}
       </div>
 
       <div className="map-container">
+        <div className="layer-switcher-container">
+          <LayerSwitcher
+            currentLayer={currentLayer}
+            onLayerChange={handleLayerChange}
+          />
+        </div>
+
         <MapContainer
           center={center}
           zoom={zoom}
@@ -159,12 +173,14 @@ function MapPage() {
         >
           <ChangeView center={center} zoom={zoom} />
           
-          {!isLightPollutionMap ? (
+          {currentLayer === 'standard' && (
             <TileLayer
               attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
               url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
             />
-          ) : (
+          )}
+          
+          {currentLayer === 'light-pollution' && (
             <TileLayer
               attribution='Light Pollution Map &copy; <a href="https://djlorenz.github.io/astronomy/lp2020/">DJ Lorenz</a>'
               url="https://tiles.lightpollutionmap.info/2020/{z}/{x}/{y}.png"
@@ -172,8 +188,22 @@ function MapPage() {
             />
           )}
 
+          {currentLayer === 'satellite' && (
+            <TileLayer
+              attribution='&copy; <a href="https://www.esri.com/">Esri</a>'
+              url="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}"
+              maxZoom={19}
+            />
+          )}
+
           {markers.map((marker) => (
-            <Marker key={marker.id} position={marker.position}>
+            <Marker 
+              key={marker.id} 
+              position={marker.position}
+              eventHandlers={{
+                click: () => handleMarkerClick(marker),
+              }}
+            >
               <Popup>
                 <div className="popup-content">
                   <h3>{marker.name}</h3>
@@ -186,12 +216,27 @@ function MapPage() {
                   <p className="coordinates">
                     Coordinates: {marker.position[0].toFixed(4)}, {marker.position[1].toFixed(4)}
                   </p>
+                  <button 
+                    className="view-sky-button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleMarkerClick(marker);
+                    }}
+                  >
+                    View Sky Conditions
+                  </button>
                 </div>
               </Popup>
             </Marker>
           ))}
         </MapContainer>
       </div>
+
+      <SkyInfoPanel
+        location={selectedLocation}
+        visible={showSkyInfo}
+        onClose={() => setShowSkyInfo(false)}
+      />
     </div>
   );
 }

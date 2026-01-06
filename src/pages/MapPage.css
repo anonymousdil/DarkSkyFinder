@@ -92,6 +92,32 @@
   border-color: #764ba2;
 }
 
+.layer-switcher-container {
+  position: absolute;
+  top: 1rem;
+  left: 1rem;
+  z-index: 1000;
+}
+
+.view-sky-button {
+  margin-top: 0.75rem;
+  padding: 0.5rem 1rem;
+  width: 100%;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.85rem;
+  font-weight: 500;
+  transition: all 0.3s ease;
+}
+
+.view-sky-button:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(102, 126, 234, 0.4);
+}
+
 .error-message {
   max-width: 800px;
   margin: 1rem auto 0;
@@ -157,5 +183,10 @@
   .map-toggle-button {
     font-size: 0.85rem;
     padding: 0.5rem 1rem;
+  }
+
+  .layer-switcher-container {
+    top: 0.5rem;
+    left: 0.5rem;
   }
 }
