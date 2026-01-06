@@ -3,7 +3,7 @@ import './LayerSwitcher.css';
 function LayerSwitcher({ currentLayer, onLayerChange }) {
   const layers = [
     { id: 'standard', name: 'Standard Map', icon: '🗺️' },
-    { id: 'light-pollution', name: 'Light Pollution', icon: '💡' },
+    { id: 'terrain', name: 'Terrain Map', icon: '🏔️' },
     { id: 'satellite', name: 'Satellite View', icon: '🛰️' }
   ];
 

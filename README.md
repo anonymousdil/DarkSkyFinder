@@ -7,7 +7,7 @@ The Ultimate Stargazing Companion!!
 - **Interactive Map**: World map powered by Leaflet with multiple layer options
 - **Location Search**: Search by location name or exact coordinates (lat, lon)
 - **AQI Display**: View Air Quality Index for each searched location on marker hover/click
-- **Light Pollution Map**: Toggle between regular map, light pollution overlay, and satellite view
+- **Multiple Map Layers**: Toggle between standard map, terrain view, and satellite imagery
 - **Sky Viewability Information**: Real-time astronomical weather conditions including:
   - Cloud cover percentage
   - Seeing conditions (atmospheric stability)
@@ -44,9 +44,9 @@ npm run build
 2. Search for a location by name (e.g., "New York") or coordinates (e.g., "40.7128, -74.0060")
 3. Click on markers to view AQI information and sky conditions
 4. Use the Layer Switcher to toggle between:
-   - Standard Map
-   - Light Pollution Map
-   - Satellite View
+   - Standard Map (OpenStreetMap)
+   - Terrain Map (OpenTopoMap)
+   - Satellite View (Esri World Imagery)
 5. Click "View Sky Conditions" to see detailed astronomical weather data
 
 ## API Configuration
@@ -81,9 +81,9 @@ For more detailed weather information, you can optionally configure OpenWeatherM
 - React Router DOM
 - Leaflet & React Leaflet
 - Axios
-- OpenStreetMap
-- Light Pollution Map by DJ Lorenz
-- Esri Satellite Imagery
+- OpenStreetMap (Standard Map Tiles)
+- OpenTopoMap (Terrain Map Tiles)
+- Esri World Imagery (Satellite View)
 - 7Timer! Astronomical Weather API
 
 ## Performance Optimizations
