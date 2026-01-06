@@ -27,11 +27,11 @@ export const getSkyViewability = async (lat, lon) => {
 
   try {
     // Use 7Timer! ASTRO API for astronomical weather
-    const response = await axios.get('http://www.7timer.info/bin/astro.php', {
+    const response = await axios.get('https://www.7timer.info/bin/astro.php', {
       params: {
         lon: lon.toFixed(2),
         lat: lat.toFixed(2),
-        ac: 0, // 0 = no cloud cover in percentage
+        ac: 0, // 0 = cloud cover on numerical scale (1-9)
         unit: 'metric',
         output: 'json',
         tzshift: 0
