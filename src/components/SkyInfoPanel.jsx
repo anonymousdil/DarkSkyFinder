@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import {
   getSkyViewability,
   interpretCloudCover,
@@ -13,13 +13,7 @@ function SkyInfoPanel({ location, visible, onClose }) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
-  useEffect(() => {
-    if (location && visible) {
-      fetchSkyData();
-    }
-  }, [location, visible]);
-
-  const fetchSkyData = async () => {
+  const fetchSkyData = useCallback(async () => {
     if (!location || !location.position) return;
 
     setLoading(true);
@@ -35,7 +29,13 @@ function SkyInfoPanel({ location, visible, onClose }) {
     } finally {
       setLoading(false);
     }
-  };
+  }, [location]);
+
+  useEffect(() => {
+    if (location && visible) {
+      fetchSkyData();
+    }
+  }, [location, visible, fetchSkyData]);
 
   if (!visible) return null;
 

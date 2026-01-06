@@ -114,10 +114,6 @@ function MapPage() {
     }
   };
 
-  const toggleMapType = () => {
-    setIsLightPollutionMap(!isLightPollutionMap);
-  };
-
   const handleLayerChange = (layerId) => {
     setCurrentLayer(layerId);
   };
