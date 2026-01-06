@@ -6,6 +6,34 @@ import './SearchResults.css';
  * Search Results Component
  * Displays multiple search results with ranking metadata
  */
+
+/**
+ * Sanitize and render fuzzy highlight safely
+ * Only allows <b> tags from fuzzysort
+ */
+const renderFuzzyHighlight = (highlight) => {
+  if (!highlight) return null;
+  
+  // Split by <b> and </b> tags and render as React elements
+  const parts = highlight.split(/(<b>|<\/b>)/);
+  const elements = [];
+  let inBold = false;
+  
+  parts.forEach((part, index) => {
+    if (part === '<b>') {
+      inBold = true;
+    } else if (part === '</b>') {
+      inBold = false;
+    } else if (part) {
+      elements.push(
+        inBold ? <b key={index}>{part}</b> : <span key={index}>{part}</span>
+      );
+    }
+  });
+  
+  return <>{elements}</>;
+};
+
 function SearchResults({ results, onSelectResult, visible, onClose }) {
   const [expandedResults, setExpandedResults] = useState(new Set());
 
@@ -153,10 +181,9 @@ function SearchResults({ results, onSelectResult, visible, onClose }) {
                       {metadata.fuzzyHighlight && (
                         <div className="fuzzy-match">
                           <h5>Fuzzy Match Highlight:</h5>
-                          <div 
-                            className="fuzzy-highlight"
-                            dangerouslySetInnerHTML={{ __html: metadata.fuzzyHighlight }}
-                          />
+                          <div className="fuzzy-highlight">
+                            {renderFuzzyHighlight(metadata.fuzzyHighlight)}
+                          </div>
                         </div>
                       )}
                     </div>

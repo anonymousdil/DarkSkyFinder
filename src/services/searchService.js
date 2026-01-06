@@ -158,6 +158,9 @@ export const getAutocompleteSuggestions = async (query, limit = 5) => {
   }
 };
 
+// Constants for ranking and normalization
+const MAX_DISTANCE_KM = 10000; // Maximum distance for proximity normalization
+
 /**
  * Rank search results based on multiple factors
  * @param {Array} results - Raw search results
@@ -196,8 +199,8 @@ const rankResults = (results, originalQuery, options = {}) => {
         userLat, userLon,
         parseFloat(result.lat), parseFloat(result.lon)
       );
-      // Normalize distance (closer = better, max 10000km for normalization)
-      const proximityScore = Math.max(0, 1 - distance / 10000);
+      // Normalize distance (closer = better, using MAX_DISTANCE_KM for normalization)
+      const proximityScore = Math.max(0, 1 - distance / MAX_DISTANCE_KM);
       score += proximityScore * 0.2;
       reasons.push({
         factor: 'proximity',
@@ -244,8 +247,8 @@ const calculateDistance = (lat1, lon1, lat2, lon2) => {
     Math.sin(dLat / 2) * Math.sin(dLat / 2) +
     Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
     Math.sin(dLon / 2) * Math.sin(dLon / 2);
-  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-  return R * c;
+  const centralAngle = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  return R * centralAngle;
 };
 
 /**
@@ -335,12 +338,23 @@ export const searchLocations = async (query, options = {}) => {
     const queryLower = query.toLowerCase();
     const fuzzyResults = rankedResults.map(result => {
       const nameLower = result.display_name.toLowerCase();
-      const fuzzyScore = fuzzysort.single(queryLower, nameLower);
+      let fuzzyScore = -10000;
+      let fuzzyHighlight = null;
+      
+      try {
+        const fuzzyMatch = fuzzysort.single(queryLower, nameLower);
+        if (fuzzyMatch) {
+          fuzzyScore = fuzzyMatch.score;
+          fuzzyHighlight = fuzzysort.highlight(fuzzyMatch, '<b>', '</b>');
+        }
+      } catch (error) {
+        console.warn('Fuzzy matching error for:', result.display_name, error);
+      }
       
       return {
         ...result,
-        fuzzyScore: fuzzyScore ? fuzzyScore.score : -10000,
-        fuzzyHighlight: fuzzyScore ? fuzzysort.highlight(fuzzyScore, '<b>', '</b>') : null
+        fuzzyScore,
+        fuzzyHighlight
       };
     });
 

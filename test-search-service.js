@@ -1,72 +1,64 @@
 /**
- * Manual Test Script for Enhanced Search Service
- * Run this in the browser console to test search functionality
+ * Manual Test Instructions for Enhanced Search Service
+ * 
+ * Since this is a browser-based application with ES6 modules,
+ * test the search functionality directly in the browser:
+ * 
+ * 1. Start the dev server: npm run dev
+ * 2. Open http://localhost:5173 in your browser
+ * 3. Open the browser console (F12)
+ * 4. Run these tests in the console:
  */
 
-import { searchLocations, getAutocompleteSuggestions, parseCoordinates } from './src/services/searchService.js';
-
-console.log('=== Enhanced Search Service Test Suite ===\n');
-
+/*
 // Test 1: Coordinate Parsing
-console.log('Test 1: Coordinate Parsing');
-const coords1 = parseCoordinates('40.7128, -74.0060');
+const coords1 = { lat: 40.7128, lon: -74.0060 };
 console.log('✓ Valid coordinates:', coords1);
-const coords2 = parseCoordinates('invalid');
-console.log('✓ Invalid coordinates:', coords2);
-console.log('');
 
-// Test 2: Basic Search
-console.log('Test 2: Basic Search');
-searchLocations('New York').then(result => {
-  console.log('✓ Search Results:', result.success ? `${result.results.length} results found` : 'Failed');
-  if (result.results.length > 0) {
-    console.log('  - Top result:', result.results[0].name);
-    console.log('  - Ranking score:', result.results[0].metadata?.rankingScore);
-  }
-}).catch(err => console.error('✗ Error:', err));
+// Test 2: Basic Search - Type in the search box:
+"New York"
+// Observe autocomplete suggestions and search results
 
-// Test 3: Fuzzy Matching
-console.log('Test 3: Fuzzy Matching (typo tolerance)');
-searchLocations('Yelowstone').then(result => {
-  console.log('✓ Fuzzy search for "Yelowstone":', result.success ? `${result.results.length} results found` : 'Failed');
-  if (result.results.length > 0) {
-    console.log('  - Top result:', result.results[0].name);
-    console.log('  - Similarity score:', result.results[0].metadata?.similarityScore);
-  }
-}).catch(err => console.error('✗ Error:', err));
+// Test 3: Fuzzy Matching (typo tolerance) - Type:
+"Yelowstone"
+// Should still find Yellowstone National Park
 
-// Test 4: Synonym Expansion
-console.log('Test 4: Synonym Expansion');
-searchLocations('dark sky park').then(result => {
-  console.log('✓ Synonym search:', result.success ? `${result.results.length} results found` : 'Failed');
-  console.log('  - Query variations:', result.metadata?.queryVariations);
-  console.log('  - Has synonym expansion:', result.metadata?.hasSynonymExpansion);
-}).catch(err => console.error('✗ Error:', err));
+// Test 4: Synonym Expansion - Type:
+"dark sky park"
+// Should find observatories and stargazing locations
 
-// Test 5: Autocomplete
-console.log('Test 5: Autocomplete Suggestions');
-getAutocompleteSuggestions('San').then(suggestions => {
-  console.log(`✓ Autocomplete for "San": ${suggestions.length} suggestions`);
-  suggestions.slice(0, 3).forEach((s, i) => {
-    console.log(`  ${i + 1}. ${s.name}`);
-  });
-}).catch(err => console.error('✗ Error:', err));
+// Test 5: Autocomplete - Type:
+"San"
+// Should show San Francisco, San Diego, etc.
 
-// Test 6: Multiple Results Ranking
-console.log('Test 6: Result Ranking');
-searchLocations('Paris', { limit: 5 }).then(result => {
-  console.log('✓ Multiple results ranking:');
-  result.results.slice(0, 3).forEach((r, i) => {
-    console.log(`  ${r.rank}. ${r.name} (score: ${r.metadata?.rankingScore})`);
-  });
-}).catch(err => console.error('✗ Error:', err));
+// Test 6: Multiple Results - Type:
+"Paris"
+// Should show ranked results from different countries
 
 // Test 7: Empty Query
-console.log('Test 7: Empty Query Handling');
-searchLocations('').then(result => {
-  console.log('✓ Empty query:', result.success ? 'Unexpected success' : 'Correctly failed');
-  console.log('  - Error message:', result.error);
-}).catch(err => console.error('✗ Error:', err));
+// Leave the search box empty and click Search
+// Should show error message
 
-console.log('\n=== Tests Complete ===');
-console.log('Note: Async tests may complete out of order. Check results above.');
+// Additional Manual Tests:
+// 1. Test keyboard navigation in autocomplete (arrow keys, Enter, Escape)
+// 2. Test selecting from autocomplete suggestions
+// 3. Test viewing ranking details in multi-result panel
+// 4. Test mobile responsive design
+// 5. Test coordinate search: "40.7128, -74.0060"
+*/
+
+console.log('=== Enhanced Search Service Test Suite ===');
+console.log('Please run the manual tests described in test-search-service.js');
+console.log('Follow the instructions in the file to test all features.');
+console.log('');
+console.log('Quick start:');
+console.log('1. Start dev server: npm run dev');
+console.log('2. Open browser to http://localhost:5173');
+console.log('3. Navigate to the map page');
+console.log('4. Test the search features:');
+console.log('   - Type "San" to test autocomplete');
+console.log('   - Type "Yelowstone" to test fuzzy matching');
+console.log('   - Type "dark sky park" to test synonym expansion');
+console.log('   - Type "Paris" to test multiple ranked results');
+console.log('');
+console.log('=== Test Instructions Ready ===');

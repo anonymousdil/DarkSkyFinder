@@ -7,6 +7,11 @@ import './AutocompleteInput.css';
  * Autocomplete Input Component
  * Provides real-time search suggestions as user types
  */
+
+// Constants
+const AUTOCOMPLETE_DEBOUNCE_MS = 300; // Debounce delay for autocomplete
+const MIN_QUERY_LENGTH = 2; // Minimum characters before showing suggestions
+
 function AutocompleteInput({ 
   value, 
   onChange, 
@@ -30,8 +35,8 @@ function AutocompleteInput({
       clearTimeout(debounceTimer.current);
     }
 
-    // Only fetch if input is at least 2 characters
-    if (value && value.trim().length >= 2) {
+    // Only fetch if input is at least MIN_QUERY_LENGTH characters
+    if (value && value.trim().length >= MIN_QUERY_LENGTH) {
       // Debounce API calls
       debounceTimer.current = setTimeout(() => {
         setLoading(true);
@@ -47,7 +52,7 @@ function AutocompleteInput({
             setSuggestions([]);
             setLoading(false);
           });
-      }, 300); // 300ms debounce
+      }, AUTOCOMPLETE_DEBOUNCE_MS);
     } else {
       // Clear suggestions when input is too short
       debounceTimer.current = setTimeout(() => {
