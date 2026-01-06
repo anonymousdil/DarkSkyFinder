@@ -1,0 +1,76 @@
+.layer-switcher {
+  background: rgba(45, 45, 68, 0.95);
+  border-radius: 12px;
+  padding: 1rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(102, 126, 234, 0.3);
+}
+
+.layer-switcher-title {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #e0e0e0;
+  margin-bottom: 0.75rem;
+  text-align: center;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.layer-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.layer-button {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem 1rem;
+  background: rgba(61, 61, 85, 0.8);
+  border: 2px solid transparent;
+  border-radius: 8px;
+  color: #e0e0e0;
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-align: left;
+}
+
+.layer-button:hover {
+  background: rgba(77, 77, 101, 0.9);
+  border-color: rgba(102, 126, 234, 0.5);
+  transform: translateX(4px);
+}
+
+.layer-button.active {
+  background: linear-gradient(135deg, rgba(102, 126, 234, 0.3) 0%, rgba(118, 75, 162, 0.3) 100%);
+  border-color: #667eea;
+  box-shadow: 0 0 10px rgba(102, 126, 234, 0.4);
+}
+
+.layer-icon {
+  font-size: 1.2rem;
+  flex-shrink: 0;
+}
+
+.layer-name {
+  flex: 1;
+  white-space: nowrap;
+}
+
+@media (max-width: 768px) {
+  .layer-switcher {
+    padding: 0.75rem;
+  }
+
+  .layer-button {
+    padding: 0.6rem 0.75rem;
+    font-size: 0.85rem;
+  }
+
+  .layer-icon {
+    font-size: 1rem;
+  }
+}
