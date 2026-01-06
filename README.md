@@ -5,7 +5,13 @@ The Ultimate Stargazing Companion!!
 
 - **Welcome Page**: Beautiful hero section with starry sky imagery and information about stargazing
 - **Interactive Map**: World map powered by Leaflet with multiple layer options
-- **Location Search**: Search by location name or exact coordinates (lat, lon)
+- **Enhanced Location Search**: Advanced search with multiple features:
+  - **Fuzzy Matching**: Find locations even with typos (e.g., "Yelowstone" finds "Yellowstone")
+  - **Autocomplete Suggestions**: Real-time suggestions as you type (2+ characters)
+  - **Synonym Matching**: Automatically expands searches (e.g., "park" also searches "nature reserve")
+  - **Result Ranking**: Intelligent ranking based on similarity, importance, proximity, and prefix match
+  - **Multiple Results**: Shows ranked results with detailed metadata when multiple matches exist
+  - **Coordinate Search**: Search by exact coordinates (lat, lon)
 - **AQI Display**: View Air Quality Index for each searched location on marker hover/click
 - **Multiple Map Layers**: Toggle between standard map, terrain view, and satellite imagery
 - **Sky Viewability Information**: Real-time astronomical weather conditions including:
@@ -41,13 +47,20 @@ npm run build
 ## Usage
 
 1. Open the application and click "Dive In" on the welcome page
-2. Search for a location by name (e.g., "New York") or coordinates (e.g., "40.7128, -74.0060")
+2. Search for a location using the enhanced search features:
+   - Type a location name and get autocomplete suggestions as you type
+   - Select from suggestions or press Enter to search
+   - For multiple matches, review ranked results with metadata
+   - Search by exact coordinates (e.g., "40.7128, -74.0060")
+   - The search is typo-tolerant and understands synonyms
 3. Click on markers to view AQI information and sky conditions
 4. Use the Layer Switcher to toggle between:
    - Standard Map (OpenStreetMap)
    - Terrain Map (OpenTopoMap)
    - Satellite View (Esri World Imagery)
 5. Click "View Sky Conditions" to see detailed astronomical weather data
+
+For detailed information about the enhanced search API, see [SEARCH_API_DOCUMENTATION.md](./SEARCH_API_DOCUMENTATION.md).
 
 ## API Configuration
 
