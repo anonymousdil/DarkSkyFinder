@@ -20,6 +20,11 @@
   max-width: 800px;
   margin-left: auto;
   margin-right: auto;
+  align-items: flex-start;
+}
+
+.search-container .autocomplete-container {
+  flex: 1;
 }
 
 .search-input {

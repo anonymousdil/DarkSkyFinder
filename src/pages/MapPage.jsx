@@ -1,9 +1,11 @@
 import { useState, useRef } from 'react';
 import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
 import L from 'leaflet';
-import axios from 'axios';
 import LayerSwitcher from '../components/LayerSwitcher';
 import SkyInfoPanel from '../components/SkyInfoPanel';
+import AutocompleteInput from '../components/AutocompleteInput';
+import SearchResults from '../components/SearchResults';
+import { searchLocations, parseCoordinates } from '../services/searchService';
 import './MapPage.css';
 import 'leaflet/dist/leaflet.css';
 
@@ -33,6 +35,8 @@ function MapPage() {
   const [selectedLocation, setSelectedLocation] = useState(null);
   const [showSkyInfo, setShowSkyInfo] = useState(false);
   const [tileError, setTileError] = useState(false);
+  const [searchResults, setSearchResults] = useState([]);
+  const [showSearchResults, setShowSearchResults] = useState(false);
 
   const mapRef = useRef();
 
@@ -55,32 +59,32 @@ function MapPage() {
 
     try {
       // Check if input is coordinates (lat, lon)
-      const coordPattern = /^(-?\d+\.?\d*),\s*(-?\d+\.?\d*)$/;
-      const coordMatch = searchInput.match(coordPattern);
+      const coords = parseCoordinates(searchInput);
 
-      if (coordMatch) {
+      if (coords) {
         // Input is coordinates
-        const lat = parseFloat(coordMatch[1]);
-        const lon = parseFloat(coordMatch[2]);
-        
-        if (lat >= -90 && lat <= 90 && lon >= -180 && lon <= 180) {
-          await addMarker(lat, lon, `Coordinates: ${lat}, ${lon}`);
-        } else {
-          setError('Invalid coordinates. Latitude must be between -90 and 90, longitude between -180 and 180.');
-        }
+        await addMarker(coords.lat, coords.lon, `Coordinates: ${coords.lat}, ${coords.lon}`);
+        setSearchInput('');
       } else {
-        // Input is a location name - use Nominatim API for geocoding
-        const response = await axios.get(
-          `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(searchInput)}`
-        );
+        // Input is a location name - use enhanced search service
+        const response = await searchLocations(searchInput, {
+          limit: 10,
+          includeMetadata: true
+        });
 
-        if (response.data && response.data.length > 0) {
-          const location = response.data[0];
-          const lat = parseFloat(location.lat);
-          const lon = parseFloat(location.lon);
-          await addMarker(lat, lon, location.display_name);
+        if (response.success && response.results.length > 0) {
+          if (response.results.length === 1) {
+            // Only one result, add marker directly
+            const location = response.results[0];
+            await addMarker(location.lat, location.lon, location.name);
+            setSearchInput('');
+          } else {
+            // Multiple results, show results panel
+            setSearchResults(response.results);
+            setShowSearchResults(true);
+          }
         } else {
-          setError('Location not found. Please try a different search.');
+          setError(response.error || 'Location not found. Please try a different search.');
         }
       }
     } catch (err) {
@@ -131,6 +135,17 @@ function MapPage() {
     setShowSkyInfo(true);
   };
 
+  const handleAutocompleteSelect = async (suggestion) => {
+    await addMarker(suggestion.lat, suggestion.lon, suggestion.name);
+    setSearchInput('');
+  };
+
+  const handleSearchResultSelect = async (result) => {
+    await addMarker(result.lat, result.lon, result.name);
+    setShowSearchResults(false);
+    setSearchInput('');
+  };
+
   const handleKeyPress = (e) => {
     if (e.key === 'Enter') {
       handleSearch();
@@ -141,13 +156,12 @@ function MapPage() {
     <div className="map-page-container">
       <div className="map-controls">
         <div className="search-container">
-          <input
-            type="text"
-            className="search-input"
-            placeholder="Search location or enter coordinates (lat, lon)"
+          <AutocompleteInput
             value={searchInput}
-            onChange={(e) => setSearchInput(e.target.value)}
-            onKeyPress={handleKeyPress}
+            onChange={setSearchInput}
+            onSelect={handleAutocompleteSelect}
+            onSearch={handleSearch}
+            placeholder="Search location or enter coordinates (lat, lon)"
             disabled={loading}
           />
           <button 
@@ -249,6 +263,13 @@ function MapPage() {
           ))}
         </MapContainer>
       </div>
+
+      <SearchResults
+        results={searchResults}
+        onSelectResult={handleSearchResultSelect}
+        visible={showSearchResults}
+        onClose={() => setShowSearchResults(false)}
+      />
 
       <SkyInfoPanel
         location={selectedLocation}
