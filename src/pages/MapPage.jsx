@@ -175,20 +175,20 @@ function MapPage() {
               url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
             />
           )}
-          
-          {currentLayer === 'light-pollution' && (
-            <TileLayer
-              attribution='Light Pollution Map &copy; <a href="https://djlorenz.github.io/astronomy/lp2020/">DJ Lorenz</a>'
-              url="https://tiles.lightpollutionmap.info/2020/{z}/{x}/{y}.png"
-              maxZoom={18}
-            />
-          )}
 
           {currentLayer === 'satellite' && (
             <TileLayer
               attribution='&copy; <a href="https://www.esri.com/">Esri</a>'
               url="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}"
               maxZoom={19}
+            />
+          )}
+          
+          {currentLayer === 'terrain' && (
+            <TileLayer
+              attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+              url="https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png"
+              maxZoom={17}
             />
           )}
 
