@@ -44,7 +44,7 @@ export const getAQI = async (lat, lon) => {
         no2: data.iaqi?.no2?.v || null,
         so2: data.iaqi?.so2?.v || null,
         co: data.iaqi?.co?.v || null,
-        dominant: data.dominentpol || 'unknown',
+        dominant: data.dominantpol || 'unknown',
         station: data.city?.name || 'Unknown',
         timestamp: Date.now(),
         source: 'WAQI'

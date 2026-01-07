@@ -12,7 +12,12 @@ The Ultimate Stargazing Companion!!
   - **Result Ranking**: Intelligent ranking based on similarity, importance, proximity, and prefix match
   - **Multiple Results**: Shows ranked results with detailed metadata when multiple matches exist
   - **Coordinate Search**: Search by exact coordinates (lat, lon)
-- **AQI Display**: View Air Quality Index for each searched location on marker hover/click
+- **Three Distinct Views**: Toggle between specialized views for comprehensive stargazing analysis:
+  - **AQI View**: Detailed air quality information with breathing quality indicators and health implications
+  - **Light Pollution View**: Bortle scale analysis with sky quality measurements and stargazing recommendations
+  - **Ultimate View**: Comprehensive report combining AQI, light pollution, and sky conditions into a single score
+- **AQI Display**: View Air Quality Index for each searched location with detailed pollutant breakdown
+- **Light Pollution Analysis**: Bortle scale classification with educational content and typical location examples
 - **Multiple Map Layers**: Toggle between standard map, terrain view, and satellite imagery
 - **Sky Viewability Information**: Real-time astronomical weather conditions including:
   - Cloud cover percentage
@@ -53,12 +58,16 @@ npm run build
    - For multiple matches, review ranked results with metadata
    - Search by exact coordinates (e.g., "40.7128, -74.0060")
    - The search is typo-tolerant and understands synonyms
-3. Click on markers to view AQI information and sky conditions
-4. Use the Layer Switcher to toggle between:
+3. Click on markers to view detailed information
+4. Select your preferred view using the view toggle:
+   - **AQI**: Air Quality Index with breathing quality and health recommendations
+   - **Light**: Light pollution analysis with Bortle scale and stargazing suitability
+   - **Ultimate**: Comprehensive stargazing report combining all metrics
+5. Use the Layer Switcher to toggle between:
    - Standard Map (OpenStreetMap)
    - Terrain Map (OpenTopoMap)
    - Satellite View (Esri World Imagery)
-5. Click "View Sky Conditions" to see detailed astronomical weather data
+6. View detailed sky conditions, air quality, and light pollution data for your selected location
 
 For detailed information about the enhanced search API, see [SEARCH_API_DOCUMENTATION.md](./SEARCH_API_DOCUMENTATION.md).
 
