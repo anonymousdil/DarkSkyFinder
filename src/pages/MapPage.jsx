@@ -1,6 +1,7 @@
 import { useState, useRef } from 'react';
-import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
+import { MapContainer, TileLayer, Marker, Popup, useMap, useMapEvents } from 'react-leaflet';
 import L from 'leaflet';
+import PropTypes from 'prop-types';
 import LayerSwitcher from '../components/LayerSwitcher';
 import SkyInfoPanel from '../components/SkyInfoPanel';
 import AQIView from '../components/AQIView';
@@ -9,7 +10,9 @@ import UltimateView from '../components/UltimateView';
 import ViewToggle from '../components/ViewToggle';
 import AutocompleteInput from '../components/AutocompleteInput';
 import SearchResults from '../components/SearchResults';
+import Board from '../components/Board';
 import { searchLocations, parseCoordinates } from '../services/searchService';
+import { getAQI, getAQICategory } from '../services/aqiService';
 import './MapPage.css';
 import 'leaflet/dist/leaflet.css';
 
@@ -21,6 +24,29 @@ L.Icon.Default.mergeOptions({
   shadowUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',
 });
 
+// Pinned location icon (star icon)
+const pinnedIcon = new L.Icon({
+  iconUrl: 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0iI0ZGRDcwMCIgd2lkdGg9IjM2cHgiIGhlaWdodD0iMzZweCI+PHBhdGggZD0iTTEyIDJsMyA3aDdsLTUuNSA0LjVMMTkgMjFsLTctNS03IDUtMi41LTcuNUwyIDlsNy0xek0xMiA1LjVMOS41IDEwSDVsNC41IDMuNS0xLjUgNS41TDEyIDE2bDMuNSAzIDEuNS01LjVMNSAxMGgzLjVMMTIgNS41eiIvPjwvc3ZnPg==',
+  iconSize: [36, 36],
+  iconAnchor: [18, 36],
+  popupAnchor: [0, -36],
+  shadowUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',
+  shadowSize: [41, 41],
+  shadowAnchor: [12, 41]
+});
+
+// Component to handle map clicks for pinning
+function MapClickHandler({ onMapClick }) {
+  useMapEvents({
+    click: onMapClick,
+  });
+  return null;
+}
+
+MapClickHandler.propTypes = {
+  onMapClick: PropTypes.func.isRequired
+};
+
 // Component to change map view
 function ChangeView({ center, zoom }) {
   const map = useMap();
@@ -28,10 +54,16 @@ function ChangeView({ center, zoom }) {
   return null;
 }
 
+ChangeView.propTypes = {
+  center: PropTypes.arrayOf(PropTypes.number).isRequired,
+  zoom: PropTypes.number.isRequired
+};
+
 function MapPage() {
   const [center, setCenter] = useState([20, 0]);
   const [zoom, setZoom] = useState(2);
   const [markers, setMarkers] = useState([]);
+  const [pinnedLocations, setPinnedLocations] = useState([]);
   const [searchInput, setSearchInput] = useState('');
   const [currentLayer, setCurrentLayer] = useState('standard');
   const [loading, setLoading] = useState(false);
@@ -42,6 +74,7 @@ function MapPage() {
   const [searchResults, setSearchResults] = useState([]);
   const [showSearchResults, setShowSearchResults] = useState(false);
   const [currentView, setCurrentView] = useState('ultimate');
+  const [showBoard, setShowBoard] = useState(false);
 
   const mapRef = useRef();
 
@@ -50,6 +83,21 @@ function MapPage() {
     setTileError(true);
     // Auto-hide error message after 5 seconds
     setTimeout(() => setTileError(false), 5000);
+  };
+
+  /**
+   * Helper function to fetch AQI data for a location
+   * @param {number} lat - Latitude
+   * @param {number} lon - Longitude
+   * @returns {Promise<Object|null>} AQI data object or null if fetch fails
+   */
+  const fetchLocationAQI = async (lat, lon) => {
+    try {
+      return await getAQI(lat, lon);
+    } catch (error) {
+      console.error('AQI fetch error:', error);
+      return null;
+    }
   };
 
   // Function to search location by name or coordinates
@@ -103,22 +151,14 @@ function MapPage() {
   // Function to add a marker and fetch AQI
   const addMarker = async (lat, lon, name) => {
     try {
-      // Fetch AQI data from OpenAQ API (or use a mock for demonstration)
-      let aqi = 'N/A';
-      try {
-        // Note: OpenAQ API might have rate limits or require authentication
-        // For demo purposes, we'll use a mock AQI value
-        // In production, replace with actual API call
-        aqi = Math.floor(Math.random() * 150) + 1; // Mock AQI between 1-150
-      } catch (aqiError) {
-        console.error('AQI fetch error:', aqiError);
-      }
+      const aqiData = await fetchLocationAQI(lat, lon);
 
       const newMarker = {
         id: Date.now(),
         position: [lat, lon],
         name: name,
-        aqi: aqi
+        aqi: aqiData ? aqiData.aqi : 'N/A',
+        aqiCategory: aqiData ? getAQICategory(aqiData.aqi) : null
       };
 
       setMarkers(prev => [...prev, newMarker]);
@@ -159,6 +199,64 @@ function MapPage() {
     setSearchInput('');
   };
 
+  // Handle map click to pin a location
+  const handleMapClick = async (e) => {
+    const { lat, lng } = e.latlng;
+    // Calculate location number based on current state
+    const locationNumber = pinnedLocations.length + 1;
+    await pinLocation(lat, lng, `Pinned Location ${locationNumber}`);
+  };
+
+  // Pin a location
+  const pinLocation = async (lat, lon, name) => {
+    try {
+      const aqiData = await fetchLocationAQI(lat, lon);
+
+      const newPin = {
+        id: Date.now(),
+        position: [lat, lon],
+        name: name,
+        aqi: aqiData ? aqiData.aqi : 'N/A',
+        aqiCategory: aqiData ? getAQICategory(aqiData.aqi) : null,
+        isPinned: true
+      };
+
+      setPinnedLocations(prev => [...prev, newPin]);
+    } catch (err) {
+      console.error('Error pinning location:', err);
+      setError('Error pinning location');
+    }
+  };
+
+  // Remove a pinned location
+  const removePinnedLocation = (id) => {
+    setPinnedLocations(prev => prev.filter(pin => pin.id !== id));
+    // If the removed pin was selected, close the info panel
+    if (selectedLocation && selectedLocation.id === id) {
+      setShowSkyInfo(false);
+      setSelectedLocation(null);
+    }
+  };
+
+  // Convert a search marker to a pinned location
+  const togglePinMarker = (marker) => {
+    // Search markers don't have isPinned property, so convert them to pinned
+    const pinnedMarker = { ...marker, isPinned: true };
+    setPinnedLocations(prev => [...prev, pinnedMarker]);
+    // Remove from regular markers
+    setMarkers(prev => prev.filter(m => m.id !== marker.id));
+  };
+
+  // Handle board location selection
+  const handleBoardLocationSelect = (location) => {
+    // Navigate to the location
+    setCenter(location.position);
+    setZoom(10);
+    // Select the location
+    setSelectedLocation(location);
+    setShowSkyInfo(true);
+  };
+
   return (
     <div className="map-page-container">
       <div className="map-controls">
@@ -180,10 +278,20 @@ function MapPage() {
           </button>
         </div>
         
-        <ViewToggle 
-          currentView={currentView}
-          onViewChange={handleViewChange}
-        />
+        <div className="controls-row">
+          <ViewToggle 
+            currentView={currentView}
+            onViewChange={handleViewChange}
+          />
+          
+          <button 
+            className="board-toggle-button"
+            onClick={() => setShowBoard(!showBoard)}
+            title="Toggle Pinned Locations Board"
+          >
+            📌 Board ({pinnedLocations.length})
+          </button>
+        </div>
         
         {error && <div className="error-message">{error}</div>}
         {tileError && (
@@ -241,6 +349,8 @@ function MapPage() {
             />
           )}
 
+          <MapClickHandler onMapClick={handleMapClick} />
+
           {markers.map((marker) => (
             <Marker 
               key={marker.id} 
@@ -253,11 +363,11 @@ function MapPage() {
                 <div className="popup-content">
                   <h3>{marker.name}</h3>
                   <p><strong>AQI:</strong> {marker.aqi}</p>
-                  <p className="aqi-description">
-                    {marker.aqi !== 'N/A' && marker.aqi <= 50 && 'Good air quality'}
-                    {marker.aqi !== 'N/A' && marker.aqi > 50 && marker.aqi <= 100 && 'Moderate air quality'}
-                    {marker.aqi !== 'N/A' && marker.aqi > 100 && 'Unhealthy air quality'}
-                  </p>
+                  {marker.aqiCategory && (
+                    <p className="aqi-description" style={{ color: marker.aqiCategory.color }}>
+                      {marker.aqiCategory.level}
+                    </p>
+                  )}
                   <p className="coordinates">
                     Coordinates: {marker.position[0].toFixed(4)}, {marker.position[1].toFixed(4)}
                   </p>
@@ -269,6 +379,60 @@ function MapPage() {
                     }}
                   >
                     View Sky Conditions
+                  </button>
+                  <button 
+                    className="pin-button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      togglePinMarker(marker);
+                    }}
+                  >
+                    📌 Pin Location
+                  </button>
+                </div>
+              </Popup>
+            </Marker>
+          ))}
+
+          {pinnedLocations.map((pin) => (
+            <Marker 
+              key={pin.id} 
+              position={pin.position}
+              icon={pinnedIcon}
+              eventHandlers={{
+                click: () => handleMarkerClick(pin),
+              }}
+            >
+              <Popup>
+                <div className="popup-content">
+                  <h3>{pin.name}</h3>
+                  <p className="pinned-badge">📌 Pinned Location</p>
+                  <p><strong>AQI:</strong> {pin.aqi}</p>
+                  {pin.aqiCategory && (
+                    <p className="aqi-description" style={{ color: pin.aqiCategory.color }}>
+                      {pin.aqiCategory.level}
+                    </p>
+                  )}
+                  <p className="coordinates">
+                    Coordinates: {pin.position[0].toFixed(4)}, {pin.position[1].toFixed(4)}
+                  </p>
+                  <button 
+                    className="view-sky-button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleMarkerClick(pin);
+                    }}
+                  >
+                    View Sky Conditions
+                  </button>
+                  <button 
+                    className="unpin-button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      removePinnedLocation(pin.id);
+                    }}
+                  >
+                    🗑️ Remove Pin
                   </button>
                 </div>
               </Popup>
@@ -282,6 +446,14 @@ function MapPage() {
         onSelectResult={handleSearchResultSelect}
         visible={showSearchResults}
         onClose={() => setShowSearchResults(false)}
+      />
+
+      <Board
+        pinnedLocations={pinnedLocations}
+        onSelectLocation={handleBoardLocationSelect}
+        onRemovePin={removePinnedLocation}
+        visible={showBoard}
+        onClose={() => setShowBoard(false)}
       />
 
       {currentView === 'sky' && (
