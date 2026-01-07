@@ -85,7 +85,12 @@ function MapPage() {
     setTimeout(() => setTileError(false), 5000);
   };
 
-  // Helper function to fetch AQI data for a location
+  /**
+   * Helper function to fetch AQI data for a location
+   * @param {number} lat - Latitude
+   * @param {number} lon - Longitude
+   * @returns {Promise<Object|null>} AQI data object or null if fetch fails
+   */
   const fetchLocationAQI = async (lat, lon) => {
     try {
       return await getAQI(lat, lon);
@@ -197,7 +202,9 @@ function MapPage() {
   // Handle map click to pin a location
   const handleMapClick = async (e) => {
     const { lat, lng } = e.latlng;
-    await pinLocation(lat, lng, `Pinned Location ${pinnedLocations.length + 1}`);
+    // Calculate location number based on current state
+    const locationNumber = pinnedLocations.length + 1;
+    await pinLocation(lat, lng, `Pinned Location ${locationNumber}`);
   };
 
   // Pin a location
@@ -231,17 +238,13 @@ function MapPage() {
     }
   };
 
-  // Toggle pin status of a marker
+  // Convert a search marker to a pinned location
   const togglePinMarker = (marker) => {
-    if (marker.isPinned) {
-      removePinnedLocation(marker.id);
-    } else {
-      // Convert marker to pinned location
-      const pinnedMarker = { ...marker, isPinned: true };
-      setPinnedLocations(prev => [...prev, pinnedMarker]);
-      // Remove from regular markers
-      setMarkers(prev => prev.filter(m => m.id !== marker.id));
-    }
+    // Search markers don't have isPinned property, so convert them to pinned
+    const pinnedMarker = { ...marker, isPinned: true };
+    setPinnedLocations(prev => [...prev, pinnedMarker]);
+    // Remove from regular markers
+    setMarkers(prev => prev.filter(m => m.id !== marker.id));
   };
 
   // Handle board location selection
