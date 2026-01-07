@@ -3,6 +3,10 @@ import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
 import L from 'leaflet';
 import LayerSwitcher from '../components/LayerSwitcher';
 import SkyInfoPanel from '../components/SkyInfoPanel';
+import AQIView from '../components/AQIView';
+import LightPollutionView from '../components/LightPollutionView';
+import UltimateView from '../components/UltimateView';
+import ViewToggle from '../components/ViewToggle';
 import AutocompleteInput from '../components/AutocompleteInput';
 import SearchResults from '../components/SearchResults';
 import { searchLocations, parseCoordinates } from '../services/searchService';
@@ -37,6 +41,7 @@ function MapPage() {
   const [tileError, setTileError] = useState(false);
   const [searchResults, setSearchResults] = useState([]);
   const [showSearchResults, setShowSearchResults] = useState(false);
+  const [currentView, setCurrentView] = useState('ultimate');
 
   const mapRef = useRef();
 
@@ -135,6 +140,14 @@ function MapPage() {
     setShowSkyInfo(true);
   };
 
+  const handleViewChange = (viewId) => {
+    setCurrentView(viewId);
+    // If a location is selected, keep the panel open with the new view
+    if (selectedLocation) {
+      setShowSkyInfo(true);
+    }
+  };
+
   const handleAutocompleteSelect = async (suggestion) => {
     await addMarker(suggestion.lat, suggestion.lon, suggestion.name);
     setSearchInput('');
@@ -166,6 +179,12 @@ function MapPage() {
             {loading ? 'Searching...' : 'Search'}
           </button>
         </div>
+        
+        <ViewToggle 
+          currentView={currentView}
+          onViewChange={handleViewChange}
+        />
+        
         {error && <div className="error-message">{error}</div>}
         {tileError && (
           <div className="error-message tile-error">
@@ -265,11 +284,37 @@ function MapPage() {
         onClose={() => setShowSearchResults(false)}
       />
 
-      <SkyInfoPanel
-        location={selectedLocation}
-        visible={showSkyInfo}
-        onClose={() => setShowSkyInfo(false)}
-      />
+      {currentView === 'sky' && (
+        <SkyInfoPanel
+          location={selectedLocation}
+          visible={showSkyInfo}
+          onClose={() => setShowSkyInfo(false)}
+        />
+      )}
+
+      {currentView === 'aqi' && (
+        <AQIView
+          location={selectedLocation}
+          visible={showSkyInfo}
+          onClose={() => setShowSkyInfo(false)}
+        />
+      )}
+
+      {currentView === 'light' && (
+        <LightPollutionView
+          location={selectedLocation}
+          visible={showSkyInfo}
+          onClose={() => setShowSkyInfo(false)}
+        />
+      )}
+
+      {currentView === 'ultimate' && (
+        <UltimateView
+          location={selectedLocation}
+          visible={showSkyInfo}
+          onClose={() => setShowSkyInfo(false)}
+        />
+      )}
     </div>
   );
 }
