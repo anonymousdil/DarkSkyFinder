@@ -10,6 +10,7 @@ import ViewToggle from '../components/ViewToggle';
 import AutocompleteInput from '../components/AutocompleteInput';
 import SearchResults from '../components/SearchResults';
 import { searchLocations, parseCoordinates } from '../services/searchService';
+import { getAQI, getAQICategory } from '../services/aqiService';
 import './MapPage.css';
 import 'leaflet/dist/leaflet.css';
 
@@ -103,13 +104,10 @@ function MapPage() {
   // Function to add a marker and fetch AQI
   const addMarker = async (lat, lon, name) => {
     try {
-      // Fetch AQI data from OpenAQ API (or use a mock for demonstration)
-      let aqi = 'N/A';
+      // Fetch AQI data from the AQI service
+      let aqiData = null;
       try {
-        // Note: OpenAQ API might have rate limits or require authentication
-        // For demo purposes, we'll use a mock AQI value
-        // In production, replace with actual API call
-        aqi = Math.floor(Math.random() * 150) + 1; // Mock AQI between 1-150
+        aqiData = await getAQI(lat, lon);
       } catch (aqiError) {
         console.error('AQI fetch error:', aqiError);
       }
@@ -118,7 +116,8 @@ function MapPage() {
         id: Date.now(),
         position: [lat, lon],
         name: name,
-        aqi: aqi
+        aqi: aqiData ? aqiData.aqi : 'N/A',
+        aqiCategory: aqiData ? getAQICategory(aqiData.aqi) : null
       };
 
       setMarkers(prev => [...prev, newMarker]);
@@ -253,11 +252,11 @@ function MapPage() {
                 <div className="popup-content">
                   <h3>{marker.name}</h3>
                   <p><strong>AQI:</strong> {marker.aqi}</p>
-                  <p className="aqi-description">
-                    {marker.aqi !== 'N/A' && marker.aqi <= 50 && 'Good air quality'}
-                    {marker.aqi !== 'N/A' && marker.aqi > 50 && marker.aqi <= 100 && 'Moderate air quality'}
-                    {marker.aqi !== 'N/A' && marker.aqi > 100 && 'Unhealthy air quality'}
-                  </p>
+                  {marker.aqiCategory && (
+                    <p className="aqi-description" style={{ color: marker.aqiCategory.color }}>
+                      {marker.aqiCategory.level}
+                    </p>
+                  )}
                   <p className="coordinates">
                     Coordinates: {marker.position[0].toFixed(4)}, {marker.position[1].toFixed(4)}
                   </p>
