@@ -65,23 +65,26 @@ const calculatePM25AQI = (pm25) => {
 
 /**
  * Determine dominant pollutant from components
+ * Uses relative concentrations to estimate which pollutant is most significant
  * @param {Object} components - Air quality components
  * @returns {string} Dominant pollutant code
  */
 const getDominantPollutantFromComponents = (components) => {
-  const pollutantAQIs = {};
+  const pollutantScores = {};
   
-  if (components.pm2_5) pollutantAQIs.pm25 = calculatePM25AQI(components.pm2_5);
-  if (components.pm10) pollutantAQIs.pm10 = components.pm10 * 0.5; // Simplified conversion
-  if (components.o3) pollutantAQIs.o3 = components.o3 * 0.4;
-  if (components.no2) pollutantAQIs.no2 = components.no2 * 0.3;
-  if (components.so2) pollutantAQIs.so2 = components.so2 * 0.2;
-  if (components.co) pollutantAQIs.co = components.co * 0.001;
+  // Calculate approximate AQI contribution for each pollutant
+  // Note: These are simplified estimations for determining dominance
+  if (components.pm2_5) pollutantScores.pm25 = calculatePM25AQI(components.pm2_5);
+  if (components.pm10) pollutantScores.pm10 = components.pm10 * 0.5;
+  if (components.o3) pollutantScores.o3 = components.o3 * 0.4;
+  if (components.no2) pollutantScores.no2 = components.no2 * 0.3;
+  if (components.so2) pollutantScores.so2 = components.so2 * 0.2;
+  if (components.co) pollutantScores.co = components.co * 0.001;
 
   let maxPollutant = 'pm25';
   let maxValue = 0;
   
-  for (const [pollutant, value] of Object.entries(pollutantAQIs)) {
+  for (const [pollutant, value] of Object.entries(pollutantScores)) {
     if (value > maxValue) {
       maxValue = value;
       maxPollutant = pollutant;
@@ -106,13 +109,13 @@ export const getAQI = async (lat, lon) => {
     return cachedData.data;
   }
 
-  try {
+    try {
     // Use OpenWeatherMap Air Pollution API
     const response = await axios.get('https://api.openweathermap.org/data/2.5/air_pollution', {
       params: {
         lat: lat,
         lon: lon,
-        appid: API_KEY || 'demo'
+        appid: API_KEY
       },
       timeout: 10000
     });
@@ -132,7 +135,7 @@ export const getAQI = async (lat, lon) => {
         o3: components.o3 ? Math.round(components.o3) : null,
         no2: components.no2 ? Math.round(components.no2) : null,
         so2: components.so2 ? Math.round(components.so2) : null,
-        co: components.co ? Math.round(components.co / 100) / 10 : null, // Convert to ppm
+        co: components.co ? Math.round(components.co / 1145 * 10) / 10 : null, // Convert μg/m³ to ppm
         dominant: dominant,
         station: `${lat.toFixed(2)}°, ${lon.toFixed(2)}°`,
         timestamp: Date.now(),
