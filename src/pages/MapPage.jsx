@@ -85,6 +85,16 @@ function MapPage() {
     setTimeout(() => setTileError(false), 5000);
   };
 
+  // Helper function to fetch AQI data for a location
+  const fetchLocationAQI = async (lat, lon) => {
+    try {
+      return await getAQI(lat, lon);
+    } catch (error) {
+      console.error('AQI fetch error:', error);
+      return null;
+    }
+  };
+
   // Function to search location by name or coordinates
   const handleSearch = async () => {
     if (!searchInput.trim()) {
@@ -136,13 +146,7 @@ function MapPage() {
   // Function to add a marker and fetch AQI
   const addMarker = async (lat, lon, name) => {
     try {
-      // Fetch AQI data from the AQI service
-      let aqiData = null;
-      try {
-        aqiData = await getAQI(lat, lon);
-      } catch (aqiError) {
-        console.error('AQI fetch error:', aqiError);
-      }
+      const aqiData = await fetchLocationAQI(lat, lon);
 
       const newMarker = {
         id: Date.now(),
@@ -199,13 +203,7 @@ function MapPage() {
   // Pin a location
   const pinLocation = async (lat, lon, name) => {
     try {
-      // Fetch AQI data for the pinned location
-      let aqiData = null;
-      try {
-        aqiData = await getAQI(lat, lon);
-      } catch (aqiError) {
-        console.error('AQI fetch error:', aqiError);
-      }
+      const aqiData = await fetchLocationAQI(lat, lon);
 
       const newPin = {
         id: Date.now(),

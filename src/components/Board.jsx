@@ -25,7 +25,7 @@ function Board({ pinnedLocations, onSelectLocation, onRemovePin, visible, onClos
             <div className="empty-icon">📍</div>
             <p>No pinned locations yet</p>
             <p className="empty-hint">
-              Click on the map or pin a search result to add locations to your board
+              Click on the map or pin markers from the popup to add locations to your board
             </p>
           </div>
         ) : (
