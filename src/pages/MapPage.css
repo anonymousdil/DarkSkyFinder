@@ -72,6 +72,34 @@
   cursor: not-allowed;
 }
 
+.controls-row {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  align-items: center;
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.board-toggle-button {
+  padding: 0.6rem 1.5rem;
+  font-size: 0.9rem;
+  font-weight: 500;
+  background: #3d3d55;
+  color: #e0e0e0;
+  border: 2px solid #667eea;
+  border-radius: 20px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  white-space: nowrap;
+}
+
+.board-toggle-button:hover {
+  background: #4d4d65;
+  border-color: #764ba2;
+  transform: translateY(-2px);
+}
+
 .map-toggle-button {
   display: block;
   margin: 0 auto;
@@ -176,6 +204,46 @@
   margin-top: 0.5rem;
   padding-top: 0.5rem;
   border-top: 1px solid #ddd;
+}
+
+.popup-content .pinned-badge {
+  color: #FFD700;
+  font-weight: 600;
+  font-size: 0.9rem;
+  margin: 0.25rem 0;
+}
+
+.popup-content .pin-button,
+.popup-content .unpin-button {
+  margin-top: 0.5rem;
+  padding: 0.5rem 1rem;
+  width: 100%;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.85rem;
+  font-weight: 500;
+  transition: all 0.3s ease;
+}
+
+.popup-content .pin-button {
+  background: #4CAF50;
+  color: white;
+}
+
+.popup-content .pin-button:hover {
+  background: #45a049;
+  transform: translateY(-1px);
+}
+
+.popup-content .unpin-button {
+  background: #f44336;
+  color: white;
+}
+
+.popup-content .unpin-button:hover {
+  background: #da190b;
+  transform: translateY(-1px);
 }
 
 @media (max-width: 768px) {
