@@ -17,8 +17,9 @@ The application now supports three distinct view modes that users can toggle bet
 ### Services
 
 #### AQI Service (`aqiService.js`)
-- Fetches air quality data from WAQI API
-- Provides fallback mock data when API is unavailable
+- Fetches real-time air quality data from OpenWeatherMap Air Pollution API
+- Provides fallback mock data when API is unavailable or not configured
+- Converts OpenWeatherMap data to US EPA Air Quality Index standard
 - Calculates AQI categories and health implications
 - Includes detailed pollutant information (PM2.5, PM10, O₃, NO₂, SO₂, CO)
 
@@ -222,9 +223,9 @@ All views adapt to mobile screens:
 
 Potential improvements for future iterations:
 
-1. **Real API Integration**:
-   - Integrate with actual light pollution APIs (e.g., Light Pollution Map)
-   - Use production AQI API with authentication
+1. **Additional Data Sources**:
+   - Integrate with additional light pollution APIs (e.g., Light Pollution Map)
+   - Add multiple AQI data sources for redundancy
 
 2. **Additional Metrics**:
    - Moon phase and position

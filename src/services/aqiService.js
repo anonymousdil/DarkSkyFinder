@@ -2,12 +2,97 @@ import axios from 'axios';
 
 /**
  * Service for fetching Air Quality Index (AQI) data
- * Uses OpenAQ API and WAQI (World Air Quality Index) as fallback
+ * Uses OpenWeatherMap Air Pollution API for real-time air quality data
  */
 
 // Cache for API responses
 const cache = new Map();
 const CACHE_DURATION = 3600000; // 1 hour in milliseconds
+
+// Get API key from environment variables
+const API_KEY = import.meta.env.VITE_OPENWEATHER_API_KEY;
+
+/**
+ * Convert OpenWeatherMap AQI (1-5) to US EPA AQI (0-500)
+ * @param {number} owmAqi - OpenWeatherMap AQI (1-5)
+ * @param {Object} components - Air quality components
+ * @returns {number} US EPA AQI value
+ */
+const convertToUSAQI = (owmAqi, components) => {
+  // If we have PM2.5, calculate precise AQI from it
+  if (components.pm2_5) {
+    return calculatePM25AQI(components.pm2_5);
+  }
+  
+  // Otherwise map OpenWeatherMap's 1-5 scale to US EPA scale
+  const aqiMap = {
+    1: 25,   // Good (0-50)
+    2: 75,   // Fair (51-100)
+    3: 125,  // Moderate (101-150)
+    4: 175,  // Poor (151-200)
+    5: 250   // Very Poor (201-300)
+  };
+  return aqiMap[owmAqi] || 50;
+};
+
+/**
+ * Calculate US EPA AQI from PM2.5 concentration
+ * @param {number} pm25 - PM2.5 concentration in μg/m³
+ * @returns {number} US EPA AQI value
+ */
+const calculatePM25AQI = (pm25) => {
+  // US EPA breakpoints for PM2.5
+  const breakpoints = [
+    { cLow: 0.0, cHigh: 12.0, iLow: 0, iHigh: 50 },
+    { cLow: 12.1, cHigh: 35.4, iLow: 51, iHigh: 100 },
+    { cLow: 35.5, cHigh: 55.4, iLow: 101, iHigh: 150 },
+    { cLow: 55.5, cHigh: 150.4, iLow: 151, iHigh: 200 },
+    { cLow: 150.5, cHigh: 250.4, iLow: 201, iHigh: 300 },
+    { cLow: 250.5, cHigh: 350.4, iLow: 301, iHigh: 400 },
+    { cLow: 350.5, cHigh: 500.4, iLow: 401, iHigh: 500 }
+  ];
+
+  for (const bp of breakpoints) {
+    if (pm25 >= bp.cLow && pm25 <= bp.cHigh) {
+      const aqi = ((bp.iHigh - bp.iLow) / (bp.cHigh - bp.cLow)) * (pm25 - bp.cLow) + bp.iLow;
+      return Math.round(aqi);
+    }
+  }
+
+  // If concentration is above all breakpoints
+  return 500;
+};
+
+/**
+ * Determine dominant pollutant from components
+ * Uses relative concentrations to estimate which pollutant is most significant
+ * @param {Object} components - Air quality components
+ * @returns {string} Dominant pollutant code
+ */
+const getDominantPollutantFromComponents = (components) => {
+  const pollutantScores = {};
+  
+  // Calculate approximate AQI contribution for each pollutant
+  // Note: These are simplified estimations for determining dominance
+  if (components.pm2_5) pollutantScores.pm25 = calculatePM25AQI(components.pm2_5);
+  if (components.pm10) pollutantScores.pm10 = components.pm10 * 0.5;
+  if (components.o3) pollutantScores.o3 = components.o3 * 0.4;
+  if (components.no2) pollutantScores.no2 = components.no2 * 0.3;
+  if (components.so2) pollutantScores.so2 = components.so2 * 0.2;
+  if (components.co) pollutantScores.co = components.co * 0.001;
+
+  let maxPollutant = 'pm25';
+  let maxValue = 0;
+  
+  for (const [pollutant, value] of Object.entries(pollutantScores)) {
+    if (value > maxValue) {
+      maxValue = value;
+      maxPollutant = pollutant;
+    }
+  }
+  
+  return maxPollutant;
+};
 
 /**
  * Get AQI data for a location
@@ -24,30 +109,37 @@ export const getAQI = async (lat, lon) => {
     return cachedData.data;
   }
 
-  try {
-    // Try WAQI API (World Air Quality Index) - free tier available
-    // Note: For production, you might need an API token
-    const response = await axios.get(`https://api.waqi.info/feed/geo:${lat};${lon}/`, {
+    try {
+    // Use OpenWeatherMap Air Pollution API
+    const response = await axios.get('https://api.openweathermap.org/data/2.5/air_pollution', {
       params: {
-        token: 'demo' // Replace with actual token in production
+        lat: lat,
+        lon: lon,
+        appid: API_KEY
       },
       timeout: 10000
     });
 
-    if (response.data && response.data.status === 'ok' && response.data.data) {
-      const data = response.data.data;
+    if (response.data && response.data.list && response.data.list.length > 0) {
+      const data = response.data.list[0];
+      const components = data.components;
+      
+      // Calculate US EPA AQI from the data
+      const usAqi = convertToUSAQI(data.main.aqi, components);
+      const dominant = getDominantPollutantFromComponents(components);
+      
       const aqiData = {
-        aqi: data.aqi || 'N/A',
-        pm25: data.iaqi?.pm25?.v || null,
-        pm10: data.iaqi?.pm10?.v || null,
-        o3: data.iaqi?.o3?.v || null,
-        no2: data.iaqi?.no2?.v || null,
-        so2: data.iaqi?.so2?.v || null,
-        co: data.iaqi?.co?.v || null,
-        dominant: data.dominantpol || 'unknown',
-        station: data.city?.name || 'Unknown',
+        aqi: usAqi,
+        pm25: components.pm2_5 ? Math.round(components.pm2_5) : null,
+        pm10: components.pm10 ? Math.round(components.pm10) : null,
+        o3: components.o3 ? Math.round(components.o3) : null,
+        no2: components.no2 ? Math.round(components.no2) : null,
+        so2: components.so2 ? Math.round(components.so2) : null,
+        co: components.co ? Math.round(components.co / 1145 * 10) / 10 : null, // Convert μg/m³ to ppm
+        dominant: dominant,
+        station: `${lat.toFixed(2)}°, ${lon.toFixed(2)}°`,
         timestamp: Date.now(),
-        source: 'WAQI'
+        source: 'OpenWeatherMap'
       };
 
       // Cache the result
@@ -59,7 +151,7 @@ export const getAQI = async (lat, lon) => {
       return aqiData;
     }
 
-    throw new Error('Invalid response from WAQI');
+    throw new Error('Invalid response from OpenWeatherMap');
   } catch (error) {
     console.warn('Error fetching real AQI data, using mock data:', error.message);
     
