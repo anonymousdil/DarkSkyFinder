@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { processQuery, getGreeting } from '../services/staryService';
 import './Stary.css';
 
-function Stary({ onNavigate }) {
+function Stary({ onNavigate, isVisible, onClose }) {
   const [messages, setMessages] = useState([]);
   const [inputValue, setInputValue] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -174,6 +174,8 @@ function Stary({ onNavigate }) {
       .replace(/\n/g, '<br />');
   };
 
+  if (!isVisible) return null;
+
   return (
     <div className={`stary-container ${isMinimized ? 'minimized' : ''}`}>
       <div className="stary-header" onClick={() => setIsMinimized(!isMinimized)}>
@@ -182,9 +184,23 @@ function Stary({ onNavigate }) {
           <h3>Stary</h3>
           <span className="subtitle">Your Stargazing Companion</span>
         </div>
-        <button className="minimize-button" aria-label={isMinimized ? 'Expand' : 'Minimize'}>
-          {isMinimized ? '▲' : '▼'}
-        </button>
+        <div className="header-buttons">
+          {onClose && (
+            <button 
+              className="close-button" 
+              onClick={(e) => {
+                e.stopPropagation();
+                onClose();
+              }}
+              aria-label="Close chat"
+            >
+              ✕
+            </button>
+          )}
+          <button className="minimize-button" aria-label={isMinimized ? 'Expand' : 'Minimize'}>
+            {isMinimized ? '▲' : '▼'}
+          </button>
+        </div>
       </div>
 
       {!isMinimized && (
@@ -233,7 +249,9 @@ function Stary({ onNavigate }) {
 }
 
 Stary.propTypes = {
-  onNavigate: PropTypes.func
+  onNavigate: PropTypes.func,
+  isVisible: PropTypes.bool,
+  onClose: PropTypes.func
 };
 
 export default Stary;
