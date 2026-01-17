@@ -325,6 +325,8 @@ function MapPage() {
           zoom={zoom}
           style={{ height: '100%', width: '100%' }}
           ref={mapRef}
+          scrollWheelZoom={true}
+          wheelPxPerZoomLevel={120}
         >
           <ChangeView center={center} zoom={zoom} />
           

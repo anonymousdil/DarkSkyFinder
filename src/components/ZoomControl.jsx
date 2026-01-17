@@ -1,5 +1,6 @@
 import { useMap } from 'react-leaflet';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
+import L from 'leaflet';
 import './ZoomControl.css';
 
 /**
@@ -10,6 +11,7 @@ import './ZoomControl.css';
 function ZoomControl() {
   const map = useMap();
   const [zoomScale, setZoomScale] = useState(0);
+  const containerRef = useRef(null);
 
   // Leaflet zoom range: 0 (world view) to 18 (street level)
   const MIN_LEAFLET_ZOOM = 0;
@@ -46,6 +48,13 @@ function ZoomControl() {
     };
   }, [map, MAX_LEAFLET_ZOOM, MAX_SCALE]);
 
+  // Disable click propagation on the zoom control container
+  useEffect(() => {
+    if (containerRef.current) {
+      L.DomEvent.disableClickPropagation(containerRef.current);
+    }
+  }, []);
+
   /**
    * Convert 0-100x scale to Leaflet zoom level
    * @param {number} scale - Zoom scale (0-100x)
@@ -55,14 +64,16 @@ function ZoomControl() {
     return Math.round((scale / MAX_SCALE) * MAX_LEAFLET_ZOOM);
   };
 
-  const handleZoomIn = () => {
+  const handleZoomIn = (e) => {
+    e.stopPropagation();
     const currentLeafletZoom = map.getZoom();
     if (currentLeafletZoom < MAX_LEAFLET_ZOOM) {
       map.setZoom(currentLeafletZoom + 1);
     }
   };
 
-  const handleZoomOut = () => {
+  const handleZoomOut = (e) => {
+    e.stopPropagation();
     const currentLeafletZoom = map.getZoom();
     if (currentLeafletZoom > MIN_LEAFLET_ZOOM) {
       map.setZoom(currentLeafletZoom - 1);
@@ -75,8 +86,21 @@ function ZoomControl() {
     map.setZoom(newLeafletZoom);
   };
 
+  const handleContainerClick = (e) => {
+    e.stopPropagation();
+  };
+
+  const handleContainerMouseDown = (e) => {
+    e.stopPropagation();
+  };
+
   return (
-    <div className="zoom-control">
+    <div 
+      ref={containerRef}
+      className="zoom-control" 
+      onClick={handleContainerClick}
+      onMouseDown={handleContainerMouseDown}
+    >
       <div className="zoom-control-title">Zoom Control</div>
       
       <div className="zoom-buttons">
