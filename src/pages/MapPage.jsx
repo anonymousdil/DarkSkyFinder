@@ -3,13 +3,13 @@ import { MapContainer, TileLayer, Marker, CircleMarker, Popup, useMap, useMapEve
 import L from 'leaflet';
 import PropTypes from 'prop-types';
 import LayerSwitcher from '../components/LayerSwitcher';
+import ZoomControl from '../components/ZoomControl';
 import SkyInfoPanel from '../components/SkyInfoPanel';
 import AQIView from '../components/AQIView';
 import LightPollutionView from '../components/LightPollutionView';
 import UltimateView from '../components/UltimateView';
 import ViewToggle from '../components/ViewToggle';
 import AutocompleteInput from '../components/AutocompleteInput';
-import SearchResults from '../components/SearchResults';
 import Board from '../components/Board';
 import LightPollutionOverlay from '../components/LightPollutionOverlay';
 import { searchLocations, parseCoordinates } from '../services/searchService';
@@ -88,8 +88,6 @@ function MapPage() {
   const [selectedLocation, setSelectedLocation] = useState(null);
   const [showSkyInfo, setShowSkyInfo] = useState(false);
   const [tileError, setTileError] = useState(false);
-  const [searchResults, setSearchResults] = useState([]);
-  const [showSearchResults, setShowSearchResults] = useState(false);
   const [currentView, setCurrentView] = useState('ultimate');
   const [showBoard, setShowBoard] = useState(false);
   const [overlayCenter, setOverlayCenter] = useState(null); // Center for light pollution overlay
@@ -144,16 +142,10 @@ function MapPage() {
         });
 
         if (response.success && response.results.length > 0) {
-          if (response.results.length === 1) {
-            // Only one result, add marker directly
-            const location = response.results[0];
-            await addMarker(location.lat, location.lon, location.name);
-            setSearchInput('');
-          } else {
-            // Multiple results, show results panel
-            setSearchResults(response.results);
-            setShowSearchResults(true);
-          }
+          // Always navigate directly to the first/best result
+          const location = response.results[0];
+          await addMarker(location.lat, location.lon, location.name);
+          setSearchInput('');
         } else {
           setError(response.error || 'Location not found. Please try a different search.');
         }
@@ -212,12 +204,6 @@ function MapPage() {
 
   const handleAutocompleteSelect = async (suggestion) => {
     await addMarker(suggestion.lat, suggestion.lon, suggestion.name);
-    setSearchInput('');
-  };
-
-  const handleSearchResultSelect = async (result) => {
-    await addMarker(result.lat, result.lon, result.name);
-    setShowSearchResults(false);
     setSearchInput('');
   };
 
@@ -376,6 +362,9 @@ function MapPage() {
 
           <MapClickHandler onMapClick={handleMapClick} />
 
+          {/* Zoom Control Component */}
+          <ZoomControl />
+
           {markers.map((marker) => (
             <CircleMarker 
               key={marker.id} 
@@ -486,13 +475,6 @@ function MapPage() {
           />
         </MapContainer>
       </div>
-
-      <SearchResults
-        results={searchResults}
-        onSelectResult={handleSearchResultSelect}
-        visible={showSearchResults}
-        onClose={() => setShowSearchResults(false)}
-      />
 
       <Board
         pinnedLocations={pinnedLocations}
