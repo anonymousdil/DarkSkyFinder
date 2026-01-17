@@ -2,7 +2,7 @@ import axios from 'axios';
 
 /**
  * Service for fetching Air Quality Index (AQI) data
- * Uses OpenWeatherMap Air Pollution API for real-time air quality data
+ * Uses Aqicn.org (WAQI) API for real-time air quality data
  */
 
 // Cache for API responses
@@ -10,36 +10,13 @@ const cache = new Map();
 const CACHE_DURATION = 3600000; // 1 hour in milliseconds
 
 // Get API key from environment variables
-const API_KEY = import.meta.env.VITE_OPENWEATHER_API_KEY;
+const API_KEY = import.meta.env.VITE_AQICN_API_TOKEN;
 
 // API configuration
 const API_CONFIG = {
   timeout: 10000, // 10 seconds
   maxRetries: 3,
   retryDelay: 1000, // Initial retry delay in ms
-};
-
-/**
- * Convert OpenWeatherMap AQI (1-5) to US EPA AQI (0-500)
- * @param {number} owmAqi - OpenWeatherMap AQI (1-5)
- * @param {Object} components - Air quality components
- * @returns {number} US EPA AQI value
- */
-const convertToUSAQI = (owmAqi, components) => {
-  // If we have PM2.5, calculate precise AQI from it
-  if (components.pm2_5) {
-    return calculatePM25AQI(components.pm2_5);
-  }
-  
-  // Otherwise map OpenWeatherMap's 1-5 scale to US EPA scale
-  const aqiMap = {
-    1: 25,   // Good (0-50)
-    2: 75,   // Fair (51-100)
-    3: 125,  // Moderate (101-150)
-    4: 175,  // Poor (151-200)
-    5: 250   // Very Poor (201-300)
-  };
-  return aqiMap[owmAqi] || 50;
 };
 
 /**
@@ -347,26 +324,44 @@ export const getAQI = async (lat, lon) => {
       return getMockAQI(lat, lon);
     }
 
-    // Use OpenWeatherMap Air Pollution API with retry logic
+    // Use Aqicn.org (WAQI) API with retry logic
     const response = await fetchWithRetry(
-      'https://api.openweathermap.org/data/2.5/air_pollution',
+      `https://api.waqi.info/feed/geo:${lat};${lon}/`,
       {
         params: {
-          lat: lat,
-          lon: lon,
-          appid: API_KEY
+          token: API_KEY
         },
         timeout: API_CONFIG.timeout
       }
     );
 
-    if (response.data && response.data.list && response.data.list.length > 0) {
-      const data = response.data.list[0];
-      const components = data.components;
+    if (response.data && response.data.status === 'ok' && response.data.data) {
+      const data = response.data.data;
       
-      // Calculate US EPA AQI from the data
-      const usAqi = convertToUSAQI(data.main.aqi, components);
+      // Extract AQI value (already in US EPA scale)
+      const usAqi = data.aqi;
+      
+      // Extract individual pollutant concentrations from iaqi
+      const iaqi = data.iaqi || {};
+      
+      // WAQI returns concentrations that vary by pollutant:
+      // PM2.5 and PM10 are in μg/m³
+      // Gases (O3, NO2, SO2, CO) may be in ppb or ppm
+      // We need to normalize to the format our app expects
+      const components = {
+        pm2_5: iaqi.pm25 ? iaqi.pm25.v : null,
+        pm10: iaqi.pm10 ? iaqi.pm10.v : null,
+        o3: iaqi.o3 ? iaqi.o3.v : null,
+        no2: iaqi.no2 ? iaqi.no2.v : null,
+        so2: iaqi.so2 ? iaqi.so2.v : null,
+        co: iaqi.co ? iaqi.co.v : null
+      };
+      
+      // Determine dominant pollutant from available components
       const dominant = getDominantPollutantFromComponents(components);
+      
+      // Get station name from city data
+      const stationName = data.city && data.city.name ? data.city.name : `${lat.toFixed(2)}°, ${lon.toFixed(2)}°`;
       
       const aqiData = {
         aqi: usAqi,
@@ -375,11 +370,11 @@ export const getAQI = async (lat, lon) => {
         o3: components.o3 ? Math.round(components.o3) : null,
         no2: components.no2 ? Math.round(components.no2) : null,
         so2: components.so2 ? Math.round(components.so2) : null,
-        co: components.co ? Math.round(components.co / 1145 * 10) / 10 : null, // Convert μg/m³ to ppm
+        co: components.co ? Math.round(components.co * 10) / 10 : null,
         dominant: dominant,
-        station: `${lat.toFixed(2)}°, ${lon.toFixed(2)}°`,
+        station: stationName,
         timestamp: Date.now(),
-        source: 'OpenWeatherMap',
+        source: 'Aqicn.org (WAQI)',
         isMockData: false
       };
 
@@ -389,11 +384,11 @@ export const getAQI = async (lat, lon) => {
         timestamp: Date.now()
       });
 
-      console.log('[AQI Service] Successfully fetched real-time AQI data');
+      console.log('[AQI Service] Successfully fetched real-time AQI data from Aqicn.org');
       return aqiData;
     }
 
-    throw new Error('Invalid response from OpenWeatherMap');
+    throw new Error('Invalid response from Aqicn.org API');
   } catch (error) {
     console.warn('[AQI Service] Error fetching real AQI data, using fallback mock data:', error.message);
     

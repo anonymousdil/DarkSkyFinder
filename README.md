@@ -75,22 +75,23 @@ For detailed information about the enhanced search API, see [SEARCH_API_DOCUMENT
 
 ### Air Quality Index (AQI) Data
 
-The application uses the **OpenWeatherMap Air Pollution API** for real-time air quality data. To enable real-time AQI data:
+The application uses the **Aqicn.org API (WAQI - World Air Quality Index)** for real-time air quality data. To enable real-time AQI data:
 
-1. Get a free API key from [OpenWeatherMap](https://openweathermap.org/api)
+1. Get a free API token from [Aqicn.org Data Platform](https://aqicn.org/data-platform/token/)
 2. Copy `.env.example` to `.env`
-3. Add your API key:
+3. Add your API token:
    ```
-   VITE_OPENWEATHER_API_KEY=your_api_key_here
+   VITE_AQICN_API_TOKEN=your_api_token_here
    ```
 
 **API Features:**
-- Real-time air quality data from monitoring stations worldwide
+- Real-time air quality data from over 12,000+ monitoring stations worldwide
 - Detailed pollutant measurements (PM2.5, PM10, O₃, NO₂, SO₂, CO)
-- US EPA Air Quality Index calculations
-- 1,000 free API calls per day
+- US EPA Air Quality Index (already calculated)
+- Free tier with unlimited API calls (rate-limited)
+- Data from trusted sources including EPA, DEFRA, and local environmental agencies
 
-**Note**: The app will work with mock data if the API key is not configured, but real-time data is recommended for accurate air quality information.
+**Note**: The app will work with mock data if the API token is not configured, but real-time data is recommended for accurate air quality information.
 
 ### Sky Viewability Data
 
