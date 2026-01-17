@@ -1,5 +1,5 @@
 import { useState, useRef } from 'react';
-import { MapContainer, TileLayer, Marker, Popup, useMap, useMapEvents } from 'react-leaflet';
+import { MapContainer, TileLayer, Marker, CircleMarker, Popup, useMap, useMapEvents } from 'react-leaflet';
 import L from 'leaflet';
 import PropTypes from 'prop-types';
 import LayerSwitcher from '../components/LayerSwitcher';
@@ -13,6 +13,7 @@ import SearchResults from '../components/SearchResults';
 import Board from '../components/Board';
 import { searchLocations, parseCoordinates } from '../services/searchService';
 import { getAQI, getAQICategory } from '../services/aqiService';
+import { getLightPollution } from '../services/lightPollutionService';
 import './MapPage.css';
 import 'leaflet/dist/leaflet.css';
 
@@ -34,6 +35,18 @@ const pinnedIcon = new L.Icon({
   shadowSize: [41, 41],
   shadowAnchor: [12, 41]
 });
+
+/**
+ * Function to determine marker color based on pollution index (Bortle class)
+ * @param {number} index - Light pollution index (Bortle class 1-9)
+ * @returns {string} Color for the marker
+ */
+const getColorByPollutionIndex = (index) => {
+  if (index <= 3) return "green"; // Low pollution
+  if (index <= 6) return "yellow"; // Medium pollution
+  if (index <= 9) return "orange"; // High pollution
+  return "red"; // Extreme pollution (10+)
+};
 
 // Component to handle map clicks for pinning
 function MapClickHandler({ onMapClick }) {
@@ -148,17 +161,20 @@ function MapPage() {
     }
   };
 
-  // Function to add a marker and fetch AQI
+  // Function to add a marker and fetch AQI and light pollution data
   const addMarker = async (lat, lon, name) => {
     try {
       const aqiData = await fetchLocationAQI(lat, lon);
+      const lightData = await getLightPollution(lat, lon);
 
       const newMarker = {
         id: Date.now(),
         position: [lat, lon],
         name: name,
         aqi: aqiData ? aqiData.aqi : 'N/A',
-        aqiCategory: aqiData ? getAQICategory(aqiData.aqi) : null
+        aqiCategory: aqiData ? getAQICategory(aqiData.aqi) : null,
+        lightPollution: lightData,
+        pollutionIndex: lightData ? lightData.bortleClass : 5
       };
 
       setMarkers(prev => [...prev, newMarker]);
@@ -211,6 +227,7 @@ function MapPage() {
   const pinLocation = async (lat, lon, name) => {
     try {
       const aqiData = await fetchLocationAQI(lat, lon);
+      const lightData = await getLightPollution(lat, lon);
 
       const newPin = {
         id: Date.now(),
@@ -218,6 +235,8 @@ function MapPage() {
         name: name,
         aqi: aqiData ? aqiData.aqi : 'N/A',
         aqiCategory: aqiData ? getAQICategory(aqiData.aqi) : null,
+        lightPollution: lightData,
+        pollutionIndex: lightData ? lightData.bortleClass : 5,
         isPinned: true
       };
 
@@ -352,9 +371,17 @@ function MapPage() {
           <MapClickHandler onMapClick={handleMapClick} />
 
           {markers.map((marker) => (
-            <Marker 
+            <CircleMarker 
               key={marker.id} 
-              position={marker.position}
+              center={marker.position}
+              radius={8}
+              pathOptions={{
+                fillColor: getColorByPollutionIndex(marker.pollutionIndex),
+                color: "#000",
+                weight: 1,
+                opacity: 1,
+                fillOpacity: 0.8
+              }}
               eventHandlers={{
                 click: () => handleMarkerClick(marker),
               }}
@@ -362,6 +389,9 @@ function MapPage() {
               <Popup>
                 <div className="popup-content">
                   <h3>{marker.name}</h3>
+                  {marker.lightPollution && (
+                    <p><strong>Light Pollution Index:</strong> {marker.pollutionIndex} (Bortle Class)</p>
+                  )}
                   <p><strong>AQI:</strong> {marker.aqi}</p>
                   {marker.aqiCategory && (
                     <p className="aqi-description" style={{ color: marker.aqiCategory.color }}>
@@ -391,7 +421,7 @@ function MapPage() {
                   </button>
                 </div>
               </Popup>
-            </Marker>
+            </CircleMarker>
           ))}
 
           {pinnedLocations.map((pin) => (
@@ -407,6 +437,9 @@ function MapPage() {
                 <div className="popup-content">
                   <h3>{pin.name}</h3>
                   <p className="pinned-badge">📌 Pinned Location</p>
+                  {pin.lightPollution && (
+                    <p><strong>Light Pollution Index:</strong> {pin.pollutionIndex} (Bortle Class)</p>
+                  )}
                   <p><strong>AQI:</strong> {pin.aqi}</p>
                   {pin.aqiCategory && (
                     <p className="aqi-description" style={{ color: pin.aqiCategory.color }}>
