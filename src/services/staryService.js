@@ -80,7 +80,7 @@ const analyzeLocation = async (lat, lon, locationName) => {
     const message = generateMessage(locationName, lightData, skyData, suitability);
     
     // Generate alternatives if location is not ideal
-    const alternatives = suitability.score < 6 ? generateAlternatives(lat, lon) : null;
+    const alternatives = suitability.score < 6 ? generateAlternatives(lat) : null;
 
     return {
       type: 'analysis',
@@ -130,7 +130,9 @@ const determineSuitability = (lightData, skyData) => {
   const factors = [];
 
   // Light pollution score (0-10, where 10 is best)
-  const lightScore = (10 - lightData.bortleClass) * 1.11; // Maps 1-9 to 10-0
+  // Bortle scale ranges from 1-9. Multiplier converts to 0-10 scale: (10-1)*1.11=9.99 ≈ 10
+  const BORTLE_TO_SCORE_MULTIPLIER = 10 / 9; // 1.11
+  const lightScore = (10 - lightData.bortleClass) * BORTLE_TO_SCORE_MULTIPLIER;
   score += lightScore * 0.6; // 60% weight
   factors.push({
     name: 'Light Pollution',

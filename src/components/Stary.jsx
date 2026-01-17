@@ -159,8 +159,17 @@ function Stary({ onNavigate }) {
   };
 
   const formatMessageContent = (content) => {
-    // Convert markdown-style formatting to HTML
-    return content
+    // First escape any HTML to prevent XSS (content comes from our service, but being extra safe)
+    const escapeHtml = (text) => {
+      const div = document.createElement('div');
+      div.textContent = text;
+      return div.innerHTML;
+    };
+    
+    const escaped = escapeHtml(content);
+    
+    // Then convert our markdown-style formatting to HTML
+    return escaped
       .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
       .replace(/\n/g, '<br />');
   };

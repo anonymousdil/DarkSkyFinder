@@ -147,7 +147,10 @@ function MapPage() {
       const latitude = parseFloat(lat);
       const longitude = parseFloat(lon);
       
-      if (!isNaN(latitude) && !isNaN(longitude)) {
+      // Validate coordinate ranges
+      if (!isNaN(latitude) && !isNaN(longitude) && 
+          latitude >= -90 && latitude <= 90 && 
+          longitude >= -180 && longitude <= 180) {
         addMarker(latitude, longitude, `Location: ${latitude}, ${longitude}`);
       }
     }
