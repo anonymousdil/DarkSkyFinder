@@ -1,6 +1,5 @@
 import { useMap } from 'react-leaflet';
 import { useState, useEffect } from 'react';
-import PropTypes from 'prop-types';
 import './ZoomControl.css';
 
 /**
@@ -20,26 +19,17 @@ function ZoomControl() {
   const MIN_SCALE = 0;
   const MAX_SCALE = 100;
 
-  /**
-   * Convert Leaflet zoom level to 0-100x scale
-   * @param {number} leafletZoom - Leaflet zoom level (0-18)
-   * @returns {number} Zoom scale (0-100x)
-   */
-  const leafletToScale = (leafletZoom) => {
-    return Math.round((leafletZoom / MAX_LEAFLET_ZOOM) * MAX_SCALE);
-  };
-
-  /**
-   * Convert 0-100x scale to Leaflet zoom level
-   * @param {number} scale - Zoom scale (0-100x)
-   * @returns {number} Leaflet zoom level (0-18)
-   */
-  const scaleToLeaflet = (scale) => {
-    return Math.round((scale / MAX_SCALE) * MAX_LEAFLET_ZOOM);
-  };
-
   // Sync zoom scale with map zoom level
   useEffect(() => {
+    /**
+     * Convert Leaflet zoom level to 0-100x scale
+     * @param {number} leafletZoom - Leaflet zoom level (0-18)
+     * @returns {number} Zoom scale (0-100x)
+     */
+    const leafletToScale = (leafletZoom) => {
+      return Math.round((leafletZoom / MAX_LEAFLET_ZOOM) * MAX_SCALE);
+    };
+
     const updateZoomScale = () => {
       const currentZoom = map.getZoom();
       setZoomScale(leafletToScale(currentZoom));
@@ -54,7 +44,16 @@ function ZoomControl() {
     return () => {
       map.off('zoomend', updateZoomScale);
     };
-  }, [map]);
+  }, [map, MAX_LEAFLET_ZOOM, MAX_SCALE]);
+
+  /**
+   * Convert 0-100x scale to Leaflet zoom level
+   * @param {number} scale - Zoom scale (0-100x)
+   * @returns {number} Leaflet zoom level (0-18)
+   */
+  const scaleToLeaflet = (scale) => {
+    return Math.round((scale / MAX_SCALE) * MAX_LEAFLET_ZOOM);
+  };
 
   const handleZoomIn = () => {
     const currentLeafletZoom = map.getZoom();
@@ -118,7 +117,5 @@ function ZoomControl() {
     </div>
   );
 }
-
-ZoomControl.propTypes = {};
 
 export default ZoomControl;
