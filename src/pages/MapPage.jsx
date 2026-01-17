@@ -36,9 +36,12 @@ const pinnedIcon = new L.Icon({
   shadowAnchor: [12, 41]
 });
 
+// Default Bortle class when light pollution data is unavailable (middle of scale)
+const DEFAULT_BORTLE_CLASS = 5;
+
 /**
  * Function to determine marker color based on pollution index (Bortle class)
- * @param {number} index - Light pollution index (Bortle class 1-9)
+ * @param {number} index - Light pollution index (Bortle class 1-10+)
  * @returns {string} Color for the marker
  */
 const getColorByPollutionIndex = (index) => {
@@ -174,7 +177,7 @@ function MapPage() {
         aqi: aqiData ? aqiData.aqi : 'N/A',
         aqiCategory: aqiData ? getAQICategory(aqiData.aqi) : null,
         lightPollution: lightData,
-        pollutionIndex: lightData ? lightData.bortleClass : 5
+        pollutionIndex: lightData ? lightData.bortleClass : DEFAULT_BORTLE_CLASS
       };
 
       setMarkers(prev => [...prev, newMarker]);
@@ -236,7 +239,7 @@ function MapPage() {
         aqi: aqiData ? aqiData.aqi : 'N/A',
         aqiCategory: aqiData ? getAQICategory(aqiData.aqi) : null,
         lightPollution: lightData,
-        pollutionIndex: lightData ? lightData.bortleClass : 5,
+        pollutionIndex: lightData ? lightData.bortleClass : DEFAULT_BORTLE_CLASS,
         isPinned: true
       };
 
