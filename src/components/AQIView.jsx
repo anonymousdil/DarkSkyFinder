@@ -64,6 +64,21 @@ function AQIView({ location, visible, onClose }) {
 
       {!loading && !error && aqiData && category && (
         <div className="aqi-view-content">
+          {aqiData.isMockData && (
+            <div className="mock-data-warning" style={{
+              backgroundColor: '#fff3cd',
+              border: '1px solid #ffc107',
+              borderRadius: '8px',
+              padding: '12px',
+              marginBottom: '16px',
+              color: '#856404',
+              fontSize: '14px'
+            }}>
+              <strong>⚠️ Notice:</strong> Real-time AQI data is currently unavailable. 
+              Displaying estimated fallback data. For accurate air quality information, 
+              please configure the OpenWeatherMap API key.
+            </div>
+          )}
           <div className="location-info">
             <h4>{location.name}</h4>
             <p className="coordinates">
@@ -219,7 +234,14 @@ function AQIView({ location, visible, onClose }) {
           </div>
 
           <div className="data-source">
-            <small>Data source: {aqiData.source}</small>
+            <small>
+              Data source: {aqiData.source}
+              {aqiData.isMockData && (
+                <span style={{ color: '#ff7e00', fontWeight: 'bold' }}>
+                  {' '}⚠️ Using fallback data - Real-time data unavailable
+                </span>
+              )}
+            </small>
           </div>
 
           <button onClick={fetchAQIData} className="refresh-button">
