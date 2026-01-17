@@ -4,19 +4,27 @@ The Ultimate Stargazing Companion!!
 ## Features
 
 - **Welcome Page**: Beautiful hero section with starry sky imagery and information about stargazing
-- **Interactive Map**: World map powered by Leaflet with multiple layer options
-- **Enhanced Location Search**: Advanced search with multiple features:
+- **Interactive Map**: World map powered by Leaflet with multiple layer options and advanced zoom controls
+- **Enhanced Location Search**: Advanced search with direct navigation:
+  - **Direct Navigation**: Automatically navigates to the best matching location
   - **Fuzzy Matching**: Find locations even with typos (e.g., "Yelowstone" finds "Yellowstone")
   - **Autocomplete Suggestions**: Real-time suggestions as you type (2+ characters)
   - **Synonym Matching**: Automatically expands searches (e.g., "park" also searches "nature reserve")
   - **Result Ranking**: Intelligent ranking based on similarity, importance, proximity, and prefix match
-  - **Multiple Results**: Shows ranked results with detailed metadata when multiple matches exist
   - **Coordinate Search**: Search by exact coordinates (lat, lon)
+- **Advanced Zoom Controls**: Seamless 0-100x zoom scale with:
+  - Interactive zoom slider for precise control
+  - Zoom in/out buttons for quick adjustments
+  - Real-time zoom level indicator
+  - Smooth zoom transitions
 - **Three Distinct Views**: Toggle between specialized views for comprehensive stargazing analysis:
   - **AQI View**: Detailed air quality information with breathing quality indicators and health implications
   - **Light Pollution View**: Bortle scale analysis with sky quality measurements and stargazing recommendations
   - **Ultimate View**: Comprehensive report combining AQI, light pollution, and sky conditions into a single score
-- **AQI Display**: View Air Quality Index for each searched location with detailed pollutant breakdown
+- **Real-time AQI Data**: Live Air Quality Index from Aqicn.org (WAQI) API with:
+  - Real-time data from 12,000+ monitoring stations worldwide
+  - Detailed pollutant breakdown (PM2.5, PM10, O₃, NO₂, SO₂, CO)
+  - Graceful fallback to mock data when API is unavailable
 - **Light Pollution Analysis**: Bortle scale classification with educational content and typical location examples
 - **Multiple Map Layers**: Toggle between standard map, terrain view, and satellite imagery
 - **Sky Viewability Information**: Real-time astronomical weather conditions including:
@@ -28,6 +36,19 @@ The Ultimate Stargazing Companion!!
 - **Responsive Design**: Works on desktop and mobile devices
 
 ## Getting Started
+
+### Prerequisites
+
+To enable real-time Air Quality Index (AQI) data, you'll need an API token from Aqicn.org:
+
+1. Get a free API token from [Aqicn.org Data Platform](https://aqicn.org/data-platform/token/)
+2. Copy `.env.example` to `.env`
+3. Add your API token to the `.env` file:
+   ```
+   VITE_AQICN_API_TOKEN=your_api_token_here
+   ```
+
+**Note**: The app will work with fallback mock data if the API token is not configured, but real-time data is recommended for accurate air quality information.
 
 ### Installation
 
@@ -55,19 +76,25 @@ npm run build
 2. Search for a location using the enhanced search features:
    - Type a location name and get autocomplete suggestions as you type
    - Select from suggestions or press Enter to search
-   - For multiple matches, review ranked results with metadata
+   - The search automatically navigates to the best matching location
    - Search by exact coordinates (e.g., "40.7128, -74.0060")
    - The search is typo-tolerant and understands synonyms
-3. Click on markers to view detailed information
-4. Select your preferred view using the view toggle:
+3. Use the **Zoom Control** (bottom right) to adjust map view:
+   - Click **+** to zoom in or **−** to zoom out
+   - Use the slider for precise zoom control
+   - Zoom scale ranges from **0x** (world view) to **100x** (street level)
+   - Current zoom level is displayed in real-time
+4. Click on markers to view detailed information
+5. Select your preferred view using the view toggle:
    - **AQI**: Air Quality Index with breathing quality and health recommendations
    - **Light**: Light pollution analysis with Bortle scale and stargazing suitability
    - **Ultimate**: Comprehensive stargazing report combining all metrics
-5. Use the Layer Switcher to toggle between:
+6. Use the Layer Switcher to toggle between:
    - Standard Map (OpenStreetMap)
    - Terrain Map (OpenTopoMap)
    - Satellite View (Esri World Imagery)
-6. View detailed sky conditions, air quality, and light pollution data for your selected location
+7. View detailed sky conditions, air quality, and light pollution data for your selected location
+8. Pin locations by clicking anywhere on the map to save them to your board
 
 For detailed information about the enhanced search API, see [SEARCH_API_DOCUMENTATION.md](./SEARCH_API_DOCUMENTATION.md).
 
