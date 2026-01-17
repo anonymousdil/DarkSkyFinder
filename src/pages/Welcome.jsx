@@ -1,9 +1,11 @@
 import { useNavigate } from 'react-router-dom';
+import { useState } from 'react';
 import Stary from '../components/Stary';
 import './Welcome.css';
 
 function Welcome() {
   const navigate = useNavigate();
+  const [isStaryVisible, setIsStaryVisible] = useState(false);
 
   const handleDiveIn = () => {
     navigate('/map');
@@ -46,8 +48,24 @@ function Welcome() {
         </div>
       </div>
 
+      {/* Open Chat Button */}
+      {!isStaryVisible && (
+        <button 
+          className="open-chat-button"
+          onClick={() => setIsStaryVisible(true)}
+          aria-label="Open Stary Chat"
+        >
+          <span className="chat-icon">💬</span>
+          <span className="chat-text">Open Stary Chat</span>
+        </button>
+      )}
+
       {/* Stary Chatbot */}
-      <Stary onNavigate={handleStaryNavigate} />
+      <Stary 
+        onNavigate={handleStaryNavigate} 
+        isVisible={isStaryVisible}
+        onClose={() => setIsStaryVisible(false)}
+      />
     </div>
   );
 }

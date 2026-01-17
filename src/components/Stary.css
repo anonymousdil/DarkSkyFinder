@@ -70,7 +70,14 @@
   margin-left: auto;
 }
 
-.minimize-button {
+.header-buttons {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.minimize-button,
+.close-button {
   background: rgba(255, 255, 255, 0.2);
   border: none;
   color: white;
@@ -85,9 +92,19 @@
   transition: all 0.2s ease;
 }
 
-.minimize-button:hover {
+.minimize-button:hover,
+.close-button:hover {
   background: rgba(255, 255, 255, 0.3);
   transform: scale(1.05);
+}
+
+.close-button {
+  font-size: 1.1rem;
+  font-weight: 600;
+}
+
+.close-button:hover {
+  background: rgba(255, 100, 100, 0.3);
 }
 
 .stary-messages {
