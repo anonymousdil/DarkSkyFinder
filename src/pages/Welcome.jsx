@@ -1,4 +1,5 @@
 import { useNavigate } from 'react-router-dom';
+import Stary from '../components/Stary';
 import './Welcome.css';
 
 function Welcome() {
@@ -6,6 +7,11 @@ function Welcome() {
 
   const handleDiveIn = () => {
     navigate('/map');
+  };
+
+  const handleStaryNavigate = (lat, lon) => {
+    // Navigate to map page with location
+    navigate(`/map?lat=${lat}&lon=${lon}`);
   };
 
   return (
@@ -39,6 +45,9 @@ function Welcome() {
           </p>
         </div>
       </div>
+
+      {/* Stary Chatbot */}
+      <Stary onNavigate={handleStaryNavigate} />
     </div>
   );
 }
