@@ -120,7 +120,8 @@ const calculateO3AQI = (o3) => {
     return null;
   }
 
-  // Convert μg/m³ to ppb (at 25°C and 1 atm: 1 ppb ≈ 2.0 μg/m³)
+  // Convert μg/m³ to ppb (at 25°C and 1 atm)
+  // For O3: 1 ppb ≈ 2.0 μg/m³
   const o3ppb = o3 / 2.0;
 
   const breakpoints = [
@@ -138,7 +139,7 @@ const calculateO3AQI = (o3) => {
     }
   }
 
-  return o3ppb > 200 ? 500 : 50;
+  return o3ppb > 200 ? 500 : 0;
 };
 
 /**
@@ -151,7 +152,8 @@ const calculateNO2AQI = (no2) => {
     return null;
   }
 
-  // Convert μg/m³ to ppb (at 25°C and 1 atm: 1 ppb ≈ 1.88 μg/m³)
+  // Convert μg/m³ to ppb (at 25°C and 1 atm)
+  // For NO2: 1 ppb ≈ 1.88 μg/m³
   const no2ppb = no2 / 1.88;
 
   const breakpoints = [
@@ -184,7 +186,8 @@ const calculateSO2AQI = (so2) => {
     return null;
   }
 
-  // Convert μg/m³ to ppb (at 25°C and 1 atm: 1 ppb ≈ 2.62 μg/m³)
+  // Convert μg/m³ to ppb (at 25°C and 1 atm)
+  // For SO2: 1 ppb ≈ 2.62 μg/m³
   const so2ppb = so2 / 2.62;
 
   const breakpoints = [
@@ -217,7 +220,8 @@ const calculateCOAQI = (co) => {
     return null;
   }
 
-  // Convert μg/m³ to ppm (at 25°C and 1 atm: 1 ppm ≈ 1145 μg/m³)
+  // Convert μg/m³ to ppm (at 25°C and 1 atm)
+  // For CO: 1 ppm ≈ 1145 μg/m³
   const coppm = co / 1145;
 
   const breakpoints = [
@@ -416,22 +420,22 @@ const getMockAQI = (lat, lon) => {
   const baseAQI = Math.floor((seed % 80) + 20); // Range: 20-100
   
   // Calculate realistic pollutant concentrations based on AQI
-  // Using approximate inverse of AQI formulas
+  // All values stored in μg/m³ (as expected by the API and calculation functions)
   let pm25, pm10, o3, no2, so2, co;
   
   if (baseAQI <= 50) {
     pm25 = Math.floor(baseAQI * 0.24); // 0-12 μg/m³
     pm10 = Math.floor(baseAQI * 1.08); // 0-54 μg/m³
-    o3 = Math.floor(baseAQI * 2.16); // 0-108 μg/m³
-    no2 = Math.floor(baseAQI * 1.88 * 0.53); // 0-50 ppb equivalent
-    so2 = Math.floor(baseAQI * 2.62 * 0.35); // 0-35 ppb equivalent
+    o3 = Math.floor(baseAQI * 2.16); // 0-108 μg/m³ (≈0-54 ppb)
+    no2 = Math.floor(baseAQI * 1.88 * 0.53); // 0-50 μg/m³ (≈0-27 ppb)
+    so2 = Math.floor(baseAQI * 2.62 * 0.35); // 0-46 μg/m³ (≈0-18 ppb)
     co = (baseAQI * 0.088).toFixed(1); // 0-4.4 ppm
   } else {
     pm25 = Math.floor(12 + (baseAQI - 50) * 0.47); // 12-35 μg/m³
     pm10 = Math.floor(54 + (baseAQI - 50) * 2); // 54-154 μg/m³
-    o3 = Math.floor(108 + (baseAQI - 50) * 0.64); // 108-140 μg/m³
-    no2 = Math.floor(100 + (baseAQI - 50) * 0.94); // 50-100 ppb equivalent
-    so2 = Math.floor(92 + (baseAQI - 50) * 1.05); // 35-75 ppb equivalent
+    o3 = Math.floor(108 + (baseAQI - 50) * 0.64); // 108-140 μg/m³ (≈54-70 ppb)
+    no2 = Math.floor(100 + (baseAQI - 50) * 0.94); // 100-147 μg/m³ (≈53-78 ppb)
+    so2 = Math.floor(92 + (baseAQI - 50) * 1.05); // 92-144 μg/m³ (≈35-55 ppb)
     co = (4.4 + (baseAQI - 50) * 0.1).toFixed(1); // 4.4-9.4 ppm
   }
   
