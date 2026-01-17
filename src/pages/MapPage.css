@@ -246,9 +246,128 @@
   transform: translateY(-1px);
 }
 
+/* Home Button */
+.home-button {
+  position: fixed;
+  top: 1rem;
+  left: 1rem;
+  padding: 0.75rem 1.5rem;
+  font-size: 1rem;
+  font-weight: 600;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border: none;
+  border-radius: 25px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 10px rgba(102, 126, 234, 0.4);
+  z-index: 1100;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.home-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(102, 126, 234, 0.6);
+}
+
+/* Mobile Controls Toggle Button */
+.mobile-controls-toggle {
+  position: fixed;
+  top: 1rem;
+  right: 1rem;
+  width: 50px;
+  height: 50px;
+  padding: 0;
+  font-size: 1.5rem;
+  font-weight: 600;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border: none;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 10px rgba(102, 126, 234, 0.4);
+  z-index: 1100;
+  display: none; /* Hidden by default, shown on mobile */
+  align-items: center;
+  justify-content: center;
+}
+
+.mobile-controls-toggle:hover {
+  transform: scale(1.05);
+  box-shadow: 0 4px 15px rgba(102, 126, 234, 0.6);
+}
+
+/* Starry Chat Button Overlay */
+.starry-chat-button {
+  position: fixed;
+  bottom: 2rem;
+  right: 2rem;
+  padding: 1rem 1.5rem;
+  font-size: 1rem;
+  font-weight: 600;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border: none;
+  border-radius: 30px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 20px rgba(102, 126, 234, 0.5);
+  z-index: 999;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  animation: pulse-glow 2s ease-in-out infinite;
+}
+
+@keyframes pulse-glow {
+  0%, 100% {
+    box-shadow: 0 4px 20px rgba(102, 126, 234, 0.5);
+  }
+  50% {
+    box-shadow: 0 4px 25px rgba(102, 126, 234, 0.8);
+  }
+}
+
+.starry-chat-button:hover {
+  transform: translateY(-2px) scale(1.05);
+  box-shadow: 0 6px 25px rgba(102, 126, 234, 0.7);
+}
+
+.starry-chat-button .chat-icon {
+  font-size: 1.25rem;
+}
+
+.starry-chat-button .chat-text {
+  font-weight: 700;
+}
+
 @media (max-width: 768px) {
+  /* Show mobile controls toggle button */
+  .mobile-controls-toggle {
+    display: flex;
+  }
+
+  /* Hide controls by default on mobile */
   .map-controls {
+    position: fixed;
+    top: 5rem;
+    left: 0;
+    right: 0;
+    max-height: 0;
+    overflow: hidden;
+    padding: 0;
+    transition: all 0.3s ease;
+    z-index: 1050;
+  }
+
+  /* Show controls when visible class is added */
+  .map-controls.visible {
+    max-height: 60vh;
     padding: 1rem;
+    overflow-y: auto;
   }
 
   .search-container {
@@ -268,5 +387,23 @@
   .layer-switcher-container {
     top: 0.5rem;
     left: 0.5rem;
+  }
+
+  /* Adjust Starry Chat button for mobile */
+  .starry-chat-button {
+    bottom: 1rem;
+    right: 1rem;
+    padding: 0.875rem 1.25rem;
+    font-size: 0.9rem;
+  }
+
+  .starry-chat-button .chat-text {
+    display: none; /* Hide text on mobile, show only icon */
+  }
+
+  /* Adjust home button for mobile */
+  .home-button {
+    padding: 0.625rem 1rem;
+    font-size: 0.9rem;
   }
 }

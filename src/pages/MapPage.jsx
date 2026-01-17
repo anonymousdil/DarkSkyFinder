@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
 import { MapContainer, TileLayer, Marker, CircleMarker, Popup, useMap, useMapEvents } from 'react-leaflet';
-import { useSearchParams } from 'react-router-dom';
+import { useSearchParams, useNavigate } from 'react-router-dom';
 import L from 'leaflet';
 import PropTypes from 'prop-types';
 import LayerSwitcher from '../components/LayerSwitcher';
@@ -13,6 +13,7 @@ import ViewToggle from '../components/ViewToggle';
 import AutocompleteInput from '../components/AutocompleteInput';
 import Board from '../components/Board';
 import LightPollutionOverlay from '../components/LightPollutionOverlay';
+import Stary from '../components/Stary';
 import { searchLocations, parseCoordinates } from '../services/searchService';
 import { getAQI, getAQICategory } from '../services/aqiService';
 import { getLightPollution } from '../services/lightPollutionService';
@@ -79,6 +80,7 @@ ChangeView.propTypes = {
 
 function MapPage() {
   const [searchParams] = useSearchParams();
+  const navigate = useNavigate();
   const [center, setCenter] = useState([20, 0]);
   const [zoom, setZoom] = useState(2);
   const [markers, setMarkers] = useState([]);
@@ -93,6 +95,8 @@ function MapPage() {
   const [currentView, setCurrentView] = useState('ultimate');
   const [showBoard, setShowBoard] = useState(false);
   const [overlayCenter, setOverlayCenter] = useState(null); // Center for light pollution overlay
+  const [showMobileControls, setShowMobileControls] = useState(false); // Mobile controls visibility
+  const [isStaryVisible, setIsStaryVisible] = useState(false); // Stary chatbot visibility
 
   const mapRef = useRef();
 
@@ -288,9 +292,34 @@ function MapPage() {
     setShowSkyInfo(true);
   };
 
+  // Handle Stary navigation
+  const handleStaryNavigate = (lat, lon) => {
+    addMarker(lat, lon, `Location: ${lat}, ${lon}`);
+  };
+
   return (
     <div className="map-page-container">
-      <div className="map-controls">
+      {/* Home Button */}
+      <button 
+        className="home-button"
+        onClick={() => navigate('/')}
+        title="Go to Home"
+        aria-label="Go to Home"
+      >
+        🏠 Home
+      </button>
+
+      {/* Mobile Controls Toggle Button */}
+      <button 
+        className="mobile-controls-toggle"
+        onClick={() => setShowMobileControls(!showMobileControls)}
+        title={showMobileControls ? 'Hide Controls' : 'Show Controls'}
+        aria-label={showMobileControls ? 'Hide Controls' : 'Show Controls'}
+      >
+        {showMobileControls ? '✕' : '☰'}
+      </button>
+
+      <div className={`map-controls ${showMobileControls ? 'visible' : ''}`}>
         <div className="search-container">
           <AutocompleteInput
             value={searchInput}
@@ -537,6 +566,26 @@ function MapPage() {
           onClose={() => setShowSkyInfo(false)}
         />
       )}
+
+      {/* Starry Chat Button - Overlay on Map */}
+      {!isStaryVisible && (
+        <button 
+          className="starry-chat-button"
+          onClick={() => setIsStaryVisible(true)}
+          title="Open Starry Chat"
+          aria-label="Open Starry Chat"
+        >
+          <span className="chat-icon">💬</span>
+          <span className="chat-text">Stary</span>
+        </button>
+      )}
+
+      {/* Stary Chatbot */}
+      <Stary 
+        onNavigate={handleStaryNavigate} 
+        isVisible={isStaryVisible}
+        onClose={() => setIsStaryVisible(false)}
+      />
     </div>
   );
 }
