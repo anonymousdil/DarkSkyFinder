@@ -1,5 +1,6 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect, useCallback } from 'react';
 import { MapContainer, TileLayer, Marker, CircleMarker, Popup, useMap, useMapEvents } from 'react-leaflet';
+import { useSearchParams } from 'react-router-dom';
 import L from 'leaflet';
 import PropTypes from 'prop-types';
 import LayerSwitcher from '../components/LayerSwitcher';
@@ -77,6 +78,7 @@ ChangeView.propTypes = {
 };
 
 function MapPage() {
+  const [searchParams] = useSearchParams();
   const [center, setCenter] = useState([20, 0]);
   const [zoom, setZoom] = useState(2);
   const [markers, setMarkers] = useState([]);
@@ -94,13 +96,6 @@ function MapPage() {
 
   const mapRef = useRef();
 
-  // Handle tile loading errors
-  const handleTileError = () => {
-    setTileError(true);
-    // Auto-hide error message after 5 seconds
-    setTimeout(() => setTileError(false), 5000);
-  };
-
   /**
    * Helper function to fetch AQI data for a location
    * @param {number} lat - Latitude
@@ -114,6 +109,58 @@ function MapPage() {
       console.error('AQI fetch error:', error);
       return null;
     }
+  };
+
+  // Function to add a marker and fetch AQI and light pollution data
+  const addMarker = useCallback(async (lat, lon, name) => {
+    try {
+      const aqiData = await fetchLocationAQI(lat, lon);
+      const lightData = await getLightPollution(lat, lon);
+
+      const newMarker = {
+        id: Date.now(),
+        position: [lat, lon],
+        name: name,
+        aqi: aqiData ? aqiData.aqi : 'N/A',
+        aqiCategory: aqiData ? getAQICategory(aqiData.aqi) : null,
+        lightPollution: lightData,
+        pollutionIndex: lightData ? lightData.bortleClass : DEFAULT_BORTLE_CLASS
+      };
+
+      setMarkers(prev => [...prev, newMarker]);
+      setCenter([lat, lon]);
+      setZoom(10);
+      setOverlayCenter([lat, lon]); // Set overlay center for light pollution overlay
+      setSearchInput('');
+    } catch (err) {
+      console.error('Error adding marker:', err);
+      setError('Error adding marker to map');
+    }
+  }, []);
+
+  // Handle navigation from Stary chatbot
+  useEffect(() => {
+    const lat = searchParams.get('lat');
+    const lon = searchParams.get('lon');
+    
+    if (lat && lon) {
+      const latitude = parseFloat(lat);
+      const longitude = parseFloat(lon);
+      
+      // Validate coordinate ranges
+      if (!isNaN(latitude) && !isNaN(longitude) && 
+          latitude >= -90 && latitude <= 90 && 
+          longitude >= -180 && longitude <= 180) {
+        addMarker(latitude, longitude, `Location: ${latitude}, ${longitude}`);
+      }
+    }
+  }, [searchParams, addMarker]);
+
+  // Handle tile loading errors
+  const handleTileError = () => {
+    setTileError(true);
+    // Auto-hide error message after 5 seconds
+    setTimeout(() => setTileError(false), 5000);
   };
 
   // Function to search location by name or coordinates
@@ -155,33 +202,6 @@ function MapPage() {
       setError('An error occurred while searching. Please try again.');
     } finally {
       setLoading(false);
-    }
-  };
-
-  // Function to add a marker and fetch AQI and light pollution data
-  const addMarker = async (lat, lon, name) => {
-    try {
-      const aqiData = await fetchLocationAQI(lat, lon);
-      const lightData = await getLightPollution(lat, lon);
-
-      const newMarker = {
-        id: Date.now(),
-        position: [lat, lon],
-        name: name,
-        aqi: aqiData ? aqiData.aqi : 'N/A',
-        aqiCategory: aqiData ? getAQICategory(aqiData.aqi) : null,
-        lightPollution: lightData,
-        pollutionIndex: lightData ? lightData.bortleClass : DEFAULT_BORTLE_CLASS
-      };
-
-      setMarkers(prev => [...prev, newMarker]);
-      setCenter([lat, lon]);
-      setZoom(10);
-      setOverlayCenter([lat, lon]); // Set overlay center for light pollution overlay
-      setSearchInput('');
-    } catch (err) {
-      console.error('Error adding marker:', err);
-      setError('Error adding marker to map');
     }
   };
 
