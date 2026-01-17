@@ -42,6 +42,14 @@ function Board({ pinnedLocations, onSelectLocation, onRemovePin, visible, onClos
                     <span className="pinned-coords">
                       {location.position[0].toFixed(4)}°, {location.position[1].toFixed(4)}°
                     </span>
+                    {location.lightPollution && location.pollutionIndex != null && (
+                      <>
+                        <span className="pinned-separator">•</span>
+                        <span className="pinned-light">
+                          Bortle: {location.pollutionIndex}
+                        </span>
+                      </>
+                    )}
                     {location.aqiCategory && (
                       <>
                         <span className="pinned-separator">•</span>
@@ -87,6 +95,8 @@ Board.propTypes = {
     name: PropTypes.string.isRequired,
     aqi: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
     aqiCategory: PropTypes.object,
+    lightPollution: PropTypes.object,
+    pollutionIndex: PropTypes.number,
     isPinned: PropTypes.bool
   })).isRequired,
   onSelectLocation: PropTypes.func.isRequired,
