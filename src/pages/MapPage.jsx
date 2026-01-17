@@ -392,7 +392,7 @@ function MapPage() {
               <Popup>
                 <div className="popup-content">
                   <h3>{marker.name}</h3>
-                  {marker.lightPollution && (
+                  {marker.lightPollution && marker.pollutionIndex != null && (
                     <p><strong>Light Pollution Index:</strong> {marker.pollutionIndex} (Bortle Class)</p>
                   )}
                   <p><strong>AQI:</strong> {marker.aqi}</p>
@@ -440,7 +440,7 @@ function MapPage() {
                 <div className="popup-content">
                   <h3>{pin.name}</h3>
                   <p className="pinned-badge">📌 Pinned Location</p>
-                  {pin.lightPollution && (
+                  {pin.lightPollution && pin.pollutionIndex != null && (
                     <p><strong>Light Pollution Index:</strong> {pin.pollutionIndex} (Bortle Class)</p>
                   )}
                   <p><strong>AQI:</strong> {pin.aqi}</p>
