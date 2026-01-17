@@ -10,7 +10,7 @@ import { getLightPollution } from './lightPollutionService';
  * @param {number} centerLat - Center latitude
  * @param {number} centerLon - Center longitude
  * @param {number} radiusKm - Radius in kilometers (default: 1000)
- * @param {number} gridSize - Number of grid points per side (default: 15)
+ * @param {number} gridSize - Number of grid points per side (default: 15, use lower values for better performance)
  * @returns {Promise<Array>} Array of grid points with light pollution data
  */
 export const generateLightPollutionGrid = async (centerLat, centerLon, radiusKm = 1000, gridSize = 15) => {

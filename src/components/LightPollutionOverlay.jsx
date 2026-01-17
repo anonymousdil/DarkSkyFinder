@@ -3,6 +3,9 @@ import { CircleMarker, useMap } from 'react-leaflet';
 import PropTypes from 'prop-types';
 import { generateSimplifiedGrid } from '../services/lightPollutionOverlayService';
 
+// Opacity multiplier for overlay visibility
+const OVERLAY_OPACITY_MULTIPLIER = 0.8;
+
 /**
  * Component to render light pollution overlay on the map
  * Shows color-coded circles representing light pollution levels
@@ -69,7 +72,7 @@ function LightPollutionOverlay({ center, radius = 1000, visible = true }) {
             fillColor: point.color,
             color: point.color,
             weight: 0,
-            fillOpacity: point.intensity * 0.8, // Increased opacity for better visibility
+            fillOpacity: point.intensity * OVERLAY_OPACITY_MULTIPLIER,
             interactive: false // Don't interfere with map interactions
           }}
         />
