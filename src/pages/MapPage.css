@@ -353,7 +353,7 @@
   /* Hide controls by default on mobile */
   .map-controls {
     position: fixed;
-    top: 4.5rem;
+    top: 5rem;
     left: 0;
     right: 0;
     max-height: 0;
@@ -365,7 +365,7 @@
 
   /* Show controls when visible class is added */
   .map-controls.visible {
-    max-height: 500px;
+    max-height: 60vh;
     padding: 1rem;
     overflow-y: auto;
   }
