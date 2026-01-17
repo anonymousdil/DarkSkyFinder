@@ -137,40 +137,98 @@
 }
 
 @media (max-width: 768px) {
+  .hero-section {
+    background-attachment: scroll;
+  }
+
+  .hero-overlay {
+    padding: 2rem 1.5rem;
+  }
+
   .hero-title {
-    font-size: 2.5rem;
+    font-size: 2.25rem;
   }
   
   .hero-subtitle {
-    font-size: 1.2rem;
+    font-size: 1.125rem;
+    margin: 0 0 1.75rem 0;
   }
   
   .dive-in-button {
-    padding: 0.8rem 2rem;
+    padding: 0.875rem 2rem;
     font-size: 1rem;
+    min-height: 48px;
+  }
+
+  .about-section {
+    padding: 3rem 1.5rem;
   }
   
   .about-section h2 {
-    font-size: 2rem;
+    font-size: 1.875rem;
+    margin-bottom: 1.75rem;
+  }
+
+  .about-content {
+    font-size: 1rem;
+  }
+
+  .about-content p {
+    margin-bottom: 1.25rem;
   }
 
   .open-chat-button {
-    bottom: 1rem;
-    right: 1rem;
+    bottom: 1.25rem;
+    right: 1.25rem;
     padding: 0.875rem 1.25rem;
     font-size: 0.95rem;
+    min-height: 48px;
   }
 
   .chat-text {
     font-size: 0.95rem;
   }
+
+  .chat-icon {
+    font-size: 1.125rem;
+  }
 }
 
 @media (max-width: 480px) {
+  .hero-overlay {
+    padding: 1.5rem 1rem;
+  }
+
+  .hero-title {
+    font-size: 2rem;
+  }
+
+  .hero-subtitle {
+    font-size: 1rem;
+  }
+
+  .dive-in-button {
+    padding: 0.75rem 1.75rem;
+    font-size: 0.9375rem;
+  }
+
+  .about-section {
+    padding: 2.5rem 1.25rem;
+  }
+
+  .about-section h2 {
+    font-size: 1.625rem;
+  }
+
+  .about-content {
+    font-size: 0.9375rem;
+  }
+
   .open-chat-button {
     bottom: 1rem;
     left: 1rem;
     right: 1rem;
     justify-content: center;
+    padding: 0.875rem 1.125rem;
   }
 }

@@ -371,19 +371,107 @@
     }
   }
 
-  .summary-cards {
-    grid-template-columns: 1fr;
+  .ultimate-view-header {
+    padding: 1rem 1.125rem;
+  }
+
+  .ultimate-view-header h3 {
+    font-size: 1.125rem;
+  }
+
+  .ultimate-view-content {
+    padding: 1rem;
+  }
+
+  .ultimate-score-display {
+    padding: 1.75rem 1.5rem;
+    margin-bottom: 1.25rem;
+  }
+
+  .score-icon {
+    font-size: 3rem;
   }
 
   .score-value {
-    font-size: 4rem;
+    font-size: 3.5rem;
+  }
+
+  .score-max {
+    font-size: 1.75rem;
   }
 
   .score-rating {
-    font-size: 1.5rem;
+    font-size: 1.375rem;
+    letter-spacing: 1px;
+  }
+
+  .score-description {
+    font-size: 0.875rem;
+  }
+
+  .summary-cards {
+    grid-template-columns: 1fr;
+    gap: 0.625rem;
+    margin-bottom: 1.25rem;
+  }
+
+  .summary-card {
+    padding: 0.875rem;
+  }
+
+  .score-breakdown {
+    padding: 1rem;
+    margin-bottom: 1.25rem;
+  }
+
+  .breakdown-item {
+    margin-bottom: 1rem;
   }
 
   .breakdown-label {
     font-size: 0.85rem;
+  }
+
+  .metrics-group {
+    padding: 0.875rem;
+    margin-bottom: 0.875rem;
+  }
+
+  .recommendation-box {
+    padding: 1rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .ultimate-view-panel {
+    max-height: 80vh;
+  }
+
+  .ultimate-view-header {
+    padding: 0.875rem 1rem;
+  }
+
+  .ultimate-view-content {
+    padding: 0.875rem;
+  }
+
+  .ultimate-score-display {
+    padding: 1.5rem 1.25rem;
+  }
+
+  .score-value {
+    font-size: 3rem;
+  }
+
+  .score-rating {
+    font-size: 1.25rem;
+  }
+
+  .summary-card {
+    padding: 0.75rem;
+  }
+
+  .summary-value {
+    font-size: 1.25rem;
   }
 }

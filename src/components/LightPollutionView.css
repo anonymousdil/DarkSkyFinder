@@ -378,8 +378,25 @@
     }
   }
 
-  .metrics-grid {
-    grid-template-columns: 1fr;
+  .light-pollution-header {
+    padding: 1rem 1.125rem;
+  }
+
+  .light-pollution-header h3 {
+    font-size: 1.125rem;
+  }
+
+  .light-pollution-content {
+    padding: 1rem;
+  }
+
+  .bortle-main-display {
+    padding: 1.5rem;
+    margin-bottom: 1.25rem;
+  }
+
+  .bortle-icon {
+    font-size: 2.75rem;
   }
 
   .bortle-class {
@@ -390,8 +407,89 @@
     font-size: 1.25rem;
   }
 
+  .info-button {
+    padding: 0.5rem 0.875rem;
+    font-size: 0.8125rem;
+    min-height: 44px;
+  }
+
+  .metrics-grid {
+    grid-template-columns: 1fr;
+    gap: 0.625rem;
+  }
+
+  .metric-card {
+    padding: 0.875rem;
+  }
+
+  .bortle-details {
+    padding: 1rem;
+    margin-bottom: 1.25rem;
+  }
+
+  .detail-item {
+    padding: 0.625rem 0;
+  }
+
   .detail-value {
     max-width: 55%;
     font-size: 0.85rem;
+  }
+
+  .detail-label {
+    font-size: 0.85rem;
+  }
+
+  .location-examples {
+    padding: 1rem;
+    margin-bottom: 1.25rem;
+  }
+
+  .stargazing-recommendations {
+    padding: 1rem;
+    margin-bottom: 1.25rem;
+  }
+
+  .location-description {
+    padding: 1rem;
+    margin-bottom: 1.25rem;
+  }
+
+  .bortle-info-modal {
+    padding: 1.25rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .light-pollution-panel {
+    max-height: 75vh;
+  }
+
+  .light-pollution-header {
+    padding: 0.875rem 1rem;
+  }
+
+  .light-pollution-content {
+    padding: 0.875rem;
+  }
+
+  .bortle-main-display {
+    padding: 1.25rem;
+  }
+
+  .bortle-class {
+    font-size: 2.25rem;
+  }
+
+  .bortle-name {
+    font-size: 1.125rem;
+  }
+
+  .bortle-icon {
+    font-size: 2.5rem;
+  }
+
+  .metric-value {
+    font-size: 1.25rem;
   }
 }

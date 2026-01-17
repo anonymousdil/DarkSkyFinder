@@ -286,8 +286,30 @@
     }
   }
 
+  .aqi-view-header {
+    padding: 1rem 1.125rem;
+  }
+
+  .aqi-view-header h3 {
+    font-size: 1.125rem;
+  }
+
+  .aqi-view-content {
+    padding: 1rem;
+  }
+
+  .aqi-main-display {
+    padding: 1.5rem;
+    margin-bottom: 1.25rem;
+  }
+
   .pollutant-grid {
     grid-template-columns: repeat(2, 1fr);
+    gap: 0.625rem;
+  }
+
+  .pollutant-card {
+    padding: 0.625rem;
   }
 
   .aqi-value {
@@ -296,5 +318,54 @@
 
   .aqi-level {
     font-size: 1.25rem;
+  }
+
+  .aqi-icon {
+    font-size: 2.5rem;
+  }
+
+  .breathing-quality {
+    padding: 1rem;
+    margin-bottom: 1.25rem;
+  }
+
+  .stargazing-impact {
+    padding: 1rem;
+    margin-bottom: 1.25rem;
+  }
+
+  .health-recommendations {
+    padding: 1rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .aqi-view-panel {
+    max-height: 75vh;
+  }
+
+  .aqi-view-header {
+    padding: 0.875rem 1rem;
+  }
+
+  .aqi-view-content {
+    padding: 0.875rem;
+  }
+
+  .aqi-main-display {
+    padding: 1.25rem;
+  }
+
+  .aqi-value {
+    font-size: 2.5rem;
+  }
+
+  .aqi-level {
+    font-size: 1.125rem;
+  }
+
+  .pollutant-grid {
+    grid-template-columns: 1fr;
+    gap: 0.5rem;
   }
 }

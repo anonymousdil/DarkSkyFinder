@@ -147,23 +147,54 @@
 /* Mobile responsive */
 @media (max-width: 768px) {
   .autocomplete-input {
-    font-size: 14px;
-    padding: 10px 40px 10px 12px;
+    font-size: 15px;
+    padding: 0.75rem 40px 0.75rem 0.875rem;
   }
 
   .suggestion-item {
-    padding: 10px 12px;
+    padding: 0.75rem 0.875rem;
+    min-height: 44px;
+  }
+
+  .suggestion-icon {
+    font-size: 1.125rem;
+    margin-right: 0.75rem;
   }
 
   .suggestion-name {
-    font-size: 13px;
+    font-size: 0.8125rem;
   }
 
   .suggestion-type {
-    font-size: 11px;
+    font-size: 0.6875rem;
   }
 
   .autocomplete-suggestions {
-    max-height: 300px;
+    max-height: 280px;
+  }
+}
+
+@media (max-width: 480px) {
+  .autocomplete-input {
+    font-size: 14px;
+    padding: 0.6875rem 36px 0.6875rem 0.75rem;
+  }
+
+  .autocomplete-loading {
+    right: 0.75rem;
+  }
+
+  .spinner {
+    width: 18px;
+    height: 18px;
+    border-width: 2px;
+  }
+
+  .suggestion-item {
+    padding: 0.6875rem 0.75rem;
+  }
+
+  .autocomplete-suggestions {
+    max-height: 250px;
   }
 }

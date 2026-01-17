@@ -442,11 +442,15 @@
 /* Mobile Responsive Design */
 @media (max-width: 768px) {
   .stary-container {
-    bottom: 1rem;
-    right: 1rem;
-    left: 1rem;
+    bottom: 0.875rem;
+    right: 0.875rem;
+    left: 0.875rem;
     width: auto;
-    max-height: 500px;
+    max-height: 60vh;
+  }
+
+  .stary-container.minimized {
+    max-height: 60px;
   }
 
   .stary-header {
@@ -454,7 +458,7 @@
   }
 
   .stary-header h3 {
-    font-size: 1.1rem;
+    font-size: 1rem;
   }
 
   .subtitle {
@@ -462,12 +466,45 @@
   }
 
   .stary-messages {
-    max-height: 350px;
+    max-height: calc(60vh - 130px);
+    padding: 0.875rem;
   }
 
   .message-bubble {
     max-width: 90%;
-    font-size: 0.9rem;
+    padding: 0.75rem 0.875rem;
+  }
+
+  .message-text {
+    font-size: 0.875rem;
+  }
+
+  .stary-input-form {
+    padding: 0.875rem;
+  }
+
+  .stary-input {
+    padding: 0.75rem 0.875rem;
+    font-size: 0.875rem;
+  }
+
+  .stary-send-button {
+    width: 40px;
+    height: 40px;
+    min-width: 40px;
+    min-height: 40px;
+  }
+
+  .explore-button {
+    padding: 0.625rem 1rem;
+    font-size: 0.85rem;
+    min-height: 44px;
+  }
+
+  .suitability-card,
+  .alternatives-section,
+  .suggestions {
+    padding: 0.625rem;
   }
 }
 
@@ -476,15 +513,43 @@
     bottom: 0;
     right: 0;
     left: 0;
-    border-radius: 20px 20px 0 0;
+    border-radius: 16px 16px 0 0;
     max-height: 70vh;
   }
 
   .stary-container.minimized {
-    max-height: 60px;
+    max-height: 56px;
+  }
+
+  .stary-header {
+    padding: 0.75rem 0.875rem;
   }
 
   .stary-messages {
-    max-height: calc(70vh - 130px);
+    max-height: calc(70vh - 120px);
+    padding: 0.75rem;
+  }
+
+  .message-bubble {
+    padding: 0.625rem 0.75rem;
+  }
+
+  .stary-input-form {
+    padding: 0.75rem;
+  }
+
+  .stary-send-button {
+    width: 44px;
+    height: 44px;
+    min-width: 44px;
+    min-height: 44px;
+  }
+
+  .minimize-button,
+  .close-button {
+    width: 36px;
+    height: 36px;
+    min-width: 36px;
+    min-height: 36px;
   }
 }
