@@ -96,9 +96,9 @@ export const getAQI = async (lat, lon) => {
       const iaqi = data.iaqi || {};
       
       // Since WAQI provides AQI sub-indices rather than raw concentrations,
-      // we'll use these values directly for display. The values are already
-      // calculated AQI values per pollutant.
-      // Note: For precise concentration values, a different API endpoint would be needed
+      // we'll use these values directly. Note: These are AQI values (0-500 scale),
+      // not actual concentration measurements. This maintains UI compatibility
+      // but users should be aware these are not precise concentration values.
       const components = {
         pm2_5: iaqi.pm25 ? iaqi.pm25.v : null,
         pm10: iaqi.pm10 ? iaqi.pm10.v : null,
@@ -108,22 +108,23 @@ export const getAQI = async (lat, lon) => {
         co: iaqi.co ? iaqi.co.v : null
       };
       
+      // Mapping for converting component keys to pollutant codes
+      const POLLUTANT_KEY_MAP = {
+        'pm2_5': 'pm25',
+        'pm10': 'pm10',
+        'o3': 'o3',
+        'no2': 'no2',
+        'so2': 'so2',
+        'co': 'co'
+      };
+      
       // Find the dominant pollutant (the one with highest sub-AQI)
       let dominant = 'pm25';
       let maxValue = 0;
       for (const [key, value] of Object.entries(components)) {
         if (value !== null && value > maxValue) {
           maxValue = value;
-          // Convert component key to expected format
-          const pollutantMap = {
-            'pm2_5': 'pm25',
-            'pm10': 'pm10',
-            'o3': 'o3',
-            'no2': 'no2',
-            'so2': 'so2',
-            'co': 'co'
-          };
-          dominant = pollutantMap[key] || key;
+          dominant = POLLUTANT_KEY_MAP[key] || key;
         }
       }
       
@@ -132,9 +133,10 @@ export const getAQI = async (lat, lon) => {
       
       const aqiData = {
         aqi: usAqi,
-        // WAQI iaqi values are AQI sub-indices, displayed as approximate concentrations
-        // for UI consistency. For precise concentration values, consider using
-        // supplementary endpoints or data sources.
+        // Note: These values are AQI sub-indices (0-500 scale) from WAQI,
+        // NOT actual concentration measurements. They are displayed for
+        // UI consistency but do not represent precise μg/m³, ppb, or ppm values.
+        // For accurate concentration data, a different data source would be required.
         pm25: components.pm2_5 ? Math.round(components.pm2_5) : null,
         pm10: components.pm10 ? Math.round(components.pm10) : null,
         o3: components.o3 ? Math.round(components.o3) : null,
