@@ -11,6 +11,7 @@ import ViewToggle from '../components/ViewToggle';
 import AutocompleteInput from '../components/AutocompleteInput';
 import SearchResults from '../components/SearchResults';
 import Board from '../components/Board';
+import LightPollutionOverlay from '../components/LightPollutionOverlay';
 import { searchLocations, parseCoordinates } from '../services/searchService';
 import { getAQI, getAQICategory } from '../services/aqiService';
 import { getLightPollution } from '../services/lightPollutionService';
@@ -91,6 +92,7 @@ function MapPage() {
   const [showSearchResults, setShowSearchResults] = useState(false);
   const [currentView, setCurrentView] = useState('ultimate');
   const [showBoard, setShowBoard] = useState(false);
+  const [overlayCenter, setOverlayCenter] = useState(null); // Center for light pollution overlay
 
   const mapRef = useRef();
 
@@ -183,6 +185,7 @@ function MapPage() {
       setMarkers(prev => [...prev, newMarker]);
       setCenter([lat, lon]);
       setZoom(10);
+      setOverlayCenter([lat, lon]); // Set overlay center for light pollution overlay
       setSearchInput('');
     } catch (err) {
       console.error('Error adding marker:', err);
@@ -474,6 +477,13 @@ function MapPage() {
               </Popup>
             </Marker>
           ))}
+
+          {/* Light Pollution Overlay - only visible in light view mode */}
+          <LightPollutionOverlay
+            center={overlayCenter}
+            radius={1000}
+            visible={currentView === 'light' && overlayCenter !== null}
+          />
         </MapContainer>
       </div>
 
