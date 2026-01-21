@@ -15,6 +15,7 @@ import Board from '../components/Board';
 import LightPollutionOverlay from '../components/LightPollutionOverlay';
 import Stary from '../components/Stary';
 import NearbyLocations from '../components/NearbyLocations';
+import HelpTooltip from '../components/HelpTooltip';
 import { searchLocations, parseCoordinates } from '../services/searchService';
 import { getAQI, getAQICategory } from '../services/aqiService';
 import { getLightPollution } from '../services/lightPollutionService';
@@ -99,6 +100,7 @@ function MapPage() {
   const [showMobileControls, setShowMobileControls] = useState(false); // Mobile controls visibility
   const [isStaryVisible, setIsStaryVisible] = useState(false); // Stary chatbot visibility
   const [showNearbyLocations, setShowNearbyLocations] = useState(false); // Nearby locations visibility
+  const [showLayerSwitcher, setShowLayerSwitcher] = useState(false); // Layer switcher visibility
 
   const mapRef = useRef();
 
@@ -317,6 +319,9 @@ function MapPage() {
         🏠 Home
       </button>
 
+      {/* Help Tooltip */}
+      <HelpTooltip />
+
       {/* Mobile Controls Toggle Button */}
       <button 
         className="mobile-controls-toggle"
@@ -347,6 +352,7 @@ function MapPage() {
           <ViewToggle 
             currentView={currentView}
             onViewChange={handleViewChange}
+            onLayersToggle={() => setShowLayerSwitcher(!showLayerSwitcher)}
           />
         </div>
         
@@ -378,12 +384,14 @@ function MapPage() {
       </div>
 
       <div className="map-container">
-        <div className="layer-switcher-container">
-          <LayerSwitcher
-            currentLayer={currentLayer}
-            onLayerChange={handleLayerChange}
-          />
-        </div>
+        {showLayerSwitcher && (
+          <div className="layer-switcher-container">
+            <LayerSwitcher
+              currentLayer={currentLayer}
+              onLayerChange={handleLayerChange}
+            />
+          </div>
+        )}
 
         <MapContainer
           center={center}
@@ -392,6 +400,7 @@ function MapPage() {
           ref={mapRef}
           scrollWheelZoom={true}
           wheelPxPerZoomLevel={120}
+          zoomControl={false}
         >
           <ChangeView center={center} zoom={zoom} />
           

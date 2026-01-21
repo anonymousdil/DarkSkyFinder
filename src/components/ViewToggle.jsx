@@ -1,7 +1,7 @@
 import PropTypes from 'prop-types';
 import './ViewToggle.css';
 
-function ViewToggle({ currentView, onViewChange }) {
+function ViewToggle({ currentView, onViewChange, onLayersToggle }) {
   const views = [
     { id: 'aqi', name: 'AQI', icon: '🌫️', description: 'Air Quality Index' },
     { id: 'light', name: 'Light', icon: '🌌', description: 'Light Pollution' },
@@ -21,13 +21,22 @@ function ViewToggle({ currentView, onViewChange }) {
           <span className="view-name">{view.name}</span>
         </button>
       ))}
+      <button
+        className="view-toggle-btn layers-toggle"
+        onClick={onLayersToggle}
+        title="Toggle Map Layers"
+      >
+        <span className="view-icon">🗺️</span>
+        <span className="view-name">Layers</span>
+      </button>
     </div>
   );
 }
 
 ViewToggle.propTypes = {
   currentView: PropTypes.string.isRequired,
-  onViewChange: PropTypes.func.isRequired
+  onViewChange: PropTypes.func.isRequired,
+  onLayersToggle: PropTypes.func.isRequired
 };
 
 export default ViewToggle;
