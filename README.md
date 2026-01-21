@@ -21,10 +21,12 @@ The Ultimate Stargazing Companion!!
   - **AQI View**: Detailed air quality information with breathing quality indicators and health implications
   - **Light Pollution View**: Bortle scale analysis with sky quality measurements and stargazing recommendations
   - **Ultimate View**: Comprehensive report combining AQI, light pollution, and sky conditions into a single score
-- **Real-time AQI Data**: Live Air Quality Index from Aqicn.org (WAQI) API with:
-  - Real-time data from 12,000+ monitoring stations worldwide
+- **Real-time AQI Data**: Live Air Quality Index with intelligent fallback system:
+  - Primary source: Aqicn.org (WAQI) API with 12,000+ monitoring stations worldwide
+  - Fallback source: OpenWeather Air Pollution API for redundancy
   - Detailed pollutant breakdown (PM2.5, PM10, O₃, NO₂, SO₂, CO)
-  - Graceful fallback to mock data when API is unavailable
+  - Automatic data validation and freshness checks
+  - Graceful fallback to estimated data when APIs are unavailable
 - **Light Pollution Analysis**: Bortle scale classification with educational content and typical location examples
 - **Multiple Map Layers**: Toggle between standard map, terrain view, and satellite imagery
 - **Sky Viewability Information**: Real-time astronomical weather conditions including:
@@ -65,13 +67,18 @@ The Ultimate Stargazing Companion!!
 
 
 **API Features:**
-- Real-time air quality data from over 12,000+ monitoring stations worldwide
+- Intelligent dual-source AQI data system:
+  - Primary: AQICN with 12,000+ monitoring stations worldwide
+  - Fallback: OpenWeather Air Pollution API for reliability
+- Real-time data with automatic freshness validation
 - Detailed pollutant measurements (PM2.5, PM10, O₃, NO₂, SO₂, CO)
-- US EPA Air Quality Index (already calculated)
-- Free tier with unlimited API calls (rate-limited)
-- Data from trusted sources including EPA, DEFRA, and local environmental agencies
+- US EPA Air Quality Index calculation
+- Automatic fallback to estimated data if both APIs fail
+- Data source clearly displayed in UI
+- Free tier available for both APIs (with rate limits)
+- Comprehensive error handling and retry logic
 
-**Note**: The app will work with mock data if the API token is not configured, but real-time data is recommended for accurate air quality information.
+**Note**: The app will work with estimated data if API tokens are not configured, but real-time data is recommended for accurate air quality information.
 
 ### Sky Viewability Data
 
@@ -94,9 +101,14 @@ No setup is required for sky viewability data.
 - OpenTopoMap (Terrain Map Tiles)
 - Esri World Imagery (Satellite View)
 - 7Timer! Astronomical Weather API
+- AQICN (WAQI) API - Primary AQI data source
+- OpenWeather Air Pollution API - Fallback AQI data source
 
 ## Performance Optimizations
 
-- **API Caching**: Sky viewability data is cached for 1 hour to reduce API calls
+- **API Caching**: AQI and sky viewability data cached for 1 hour to reduce API calls and manage rate limits
+- **Intelligent Fallback**: Automatic fallback from AQICN to OpenWeather to ensure data availability
+- **Data Validation**: Freshness checks to ensure AQI data is current (warns if older than 3 hours)
+- **Retry Logic**: Exponential backoff for failed API requests
 - **Lazy Loading**: Components load only when needed
 - **Optimized Rendering**: React state management for efficient updates
