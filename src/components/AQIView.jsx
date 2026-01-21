@@ -76,7 +76,21 @@ function AQIView({ location, visible, onClose }) {
             }}>
               <strong>⚠️ Notice:</strong> Real-time AQI data is currently unavailable. 
               Displaying estimated fallback data. For accurate air quality information, 
-              please configure the Aqicn.org API token.
+              please configure API tokens for AQICN and/or OpenWeather.
+            </div>
+          )}
+          {!aqiData.isMockData && aqiData.isStale && (
+            <div className="stale-data-warning" style={{
+              backgroundColor: '#fff3cd',
+              border: '1px solid #ffc107',
+              borderRadius: '8px',
+              padding: '12px',
+              marginBottom: '16px',
+              color: '#856404',
+              fontSize: '14px'
+            }}>
+              <strong>⚠️ Notice:</strong> The displayed AQI data may be outdated (older than 3 hours). 
+              Consider refreshing for more current information.
             </div>
           )}
           <div className="location-info">
@@ -246,10 +260,15 @@ function AQIView({ location, visible, onClose }) {
 
           <div className="data-source">
             <small>
-              Data source: {aqiData.source}
+              <strong>Data source:</strong> {aqiData.source}
               {aqiData.isMockData && (
                 <span style={{ color: '#ff7e00', fontWeight: 'bold' }}>
-                  {' '}⚠️ Using fallback data - Real-time data unavailable
+                  {' '}⚠️ Mock data - Real-time data unavailable
+                </span>
+              )}
+              {!aqiData.isMockData && aqiData.isStale && (
+                <span style={{ color: '#ff7e00', fontWeight: 'bold' }}>
+                  {' '}⚠️ Data may be outdated
                 </span>
               )}
             </small>
