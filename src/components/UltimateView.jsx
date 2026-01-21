@@ -3,12 +3,16 @@ import PropTypes from 'prop-types';
 import { getAQI, getAQICategory } from '../services/aqiService';
 import { getLightPollution } from '../services/lightPollutionService';
 import { getSkyViewability, getStargazingQuality } from '../services/skyViewabilityService';
+import { getSunTimes, formatTime } from '../services/sunCalculationService';
+import { getBestStargazingTimes } from '../services/stargazingTimeService';
 import './UltimateView.css';
 
 function UltimateView({ location, visible, onClose }) {
   const [aqiData, setAqiData] = useState(null);
   const [lightData, setLightData] = useState(null);
   const [skyData, setSkyData] = useState(null);
+  const [sunData, setSunData] = useState(null);
+  const [stargazingTimes, setStargazingTimes] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
@@ -31,6 +35,14 @@ function UltimateView({ location, visible, onClose }) {
       setAqiData(aqi);
       setLightData(light);
       setSkyData(sky);
+      
+      // Calculate sun times
+      const sun = getSunTimes(lat, lon);
+      setSunData(sun);
+      
+      // Calculate best stargazing times
+      const stargazing = getBestStargazingTimes(lat, lon, sky, light);
+      setStargazingTimes(stargazing);
     } catch (err) {
       console.error('Error fetching comprehensive data:', err);
       setError('Unable to fetch complete stargazing data');
@@ -127,6 +139,14 @@ function UltimateView({ location, visible, onClose }) {
     if (score >= 4.5) return '🌙';
     if (score >= 3) return '☁️';
     return '🌧️';
+  };
+
+  const getFactorColor = (score) => {
+    if (score >= 80) return '#4CAF50';
+    if (score >= 60) return '#8BC34A';
+    if (score >= 40) return '#FFC107';
+    if (score >= 20) return '#FF9800';
+    return '#F44336';
   };
 
   if (!visible) return null;
@@ -265,6 +285,147 @@ function UltimateView({ location, visible, onClose }) {
               <div className="summary-detail">{aqiCategory.level}</div>
             </div>
           </div>
+
+          {/* Sunrise & Sunset Times */}
+          {sunData && (
+            <div className="sun-times-section">
+              <div className="section-title">
+                <span className="section-icon">☀️</span>
+                Sunrise & Sunset
+              </div>
+              <div className="sun-times-grid">
+                <div className="sun-time-card">
+                  <div className="sun-time-label">🌅 Sunrise</div>
+                  <div className="sun-time-value">{formatTime(sunData.sunrise)}</div>
+                </div>
+                <div className="sun-time-card">
+                  <div className="sun-time-label">🌇 Sunset</div>
+                  <div className="sun-time-value">{formatTime(sunData.sunset)}</div>
+                </div>
+                <div className="sun-time-card">
+                  <div className="sun-time-label">🌌 Astro Dusk</div>
+                  <div className="sun-time-value">{formatTime(sunData.astronomicalTwilight.dusk)}</div>
+                </div>
+                <div className="sun-time-card">
+                  <div className="sun-time-label">🌄 Astro Dawn</div>
+                  <div className="sun-time-value">{formatTime(sunData.astronomicalTwilight.dawn)}</div>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Best Stargazing Times */}
+          {stargazingTimes && (
+            <div className="stargazing-times-section">
+              <div className="section-title">
+                <span className="section-icon">🔭</span>
+                Best Time for Stargazing
+              </div>
+              
+              <div className="quality-indicator" style={{ 
+                borderLeft: `4px solid ${stargazingTimes.qualityCategory.color}` 
+              }}>
+                <div className="quality-emoji">{stargazingTimes.qualityCategory.emoji}</div>
+                <div className="quality-info">
+                  <div className="quality-level" style={{ color: stargazingTimes.qualityCategory.color }}>
+                    {stargazingTimes.qualityCategory.level}
+                  </div>
+                  <div className="quality-description">
+                    {stargazingTimes.qualityCategory.description}
+                  </div>
+                  <div className="quality-score">
+                    Viewing Quality: {stargazingTimes.overallQuality}/100
+                  </div>
+                </div>
+              </div>
+
+              {stargazingTimes.timeWindows.optimal && (
+                <div className="optimal-time-window">
+                  <h5>⭐ Optimal Viewing Window</h5>
+                  <div className="time-window-details">
+                    <div className="window-time">
+                      {formatTime(stargazingTimes.timeWindows.optimal.start)} - {formatTime(stargazingTimes.timeWindows.optimal.end)}
+                    </div>
+                    <div className="window-duration">
+                      Duration: {stargazingTimes.timeWindows.optimal.duration}
+                    </div>
+                    <div className="window-description">
+                      {stargazingTimes.timeWindows.optimal.description}
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* Quality Factors */}
+              <div className="quality-factors">
+                <h5>Conditions Breakdown</h5>
+                <div className="factor-item">
+                  <span className="factor-label">☁️ Cloud Cover</span>
+                  <div className="factor-bar-container">
+                    <div 
+                      className="factor-bar" 
+                      style={{ 
+                        width: `${stargazingTimes.scores.cloudCover}%`,
+                        backgroundColor: getFactorColor(stargazingTimes.scores.cloudCover)
+                      }}
+                    ></div>
+                  </div>
+                  <span className="factor-value">{stargazingTimes.scores.cloudCover}/100</span>
+                </div>
+                <div className="factor-item">
+                  <span className="factor-label">🌌 Light Pollution</span>
+                  <div className="factor-bar-container">
+                    <div 
+                      className="factor-bar" 
+                      style={{ 
+                        width: `${stargazingTimes.scores.lightPollution}%`,
+                        backgroundColor: getFactorColor(stargazingTimes.scores.lightPollution)
+                      }}
+                    ></div>
+                  </div>
+                  <span className="factor-value">{stargazingTimes.scores.lightPollution}/100</span>
+                </div>
+                <div className="factor-item">
+                  <span className="factor-label">💧 Humidity</span>
+                  <div className="factor-bar-container">
+                    <div 
+                      className="factor-bar" 
+                      style={{ 
+                        width: `${stargazingTimes.scores.humidity}%`,
+                        backgroundColor: getFactorColor(stargazingTimes.scores.humidity)
+                      }}
+                    ></div>
+                  </div>
+                  <span className="factor-value">{stargazingTimes.scores.humidity}/100</span>
+                </div>
+                <div className="factor-item">
+                  <span className="factor-label">🔍 Transparency</span>
+                  <div className="factor-bar-container">
+                    <div 
+                      className="factor-bar" 
+                      style={{ 
+                        width: `${stargazingTimes.scores.transparency}%`,
+                        backgroundColor: getFactorColor(stargazingTimes.scores.transparency)
+                      }}
+                    ></div>
+                  </div>
+                  <span className="factor-value">{stargazingTimes.scores.transparency}/100</span>
+                </div>
+              </div>
+
+              {/* Recommendations */}
+              {stargazingTimes.recommendations && stargazingTimes.recommendations.length > 0 && (
+                <div className="stargazing-recommendations">
+                  <h5>💡 Recommendations</h5>
+                  <ul>
+                    {stargazingTimes.recommendations.map((rec, index) => (
+                      <li key={index}>{rec}</li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+            </div>
+          )}
 
           {/* Detailed Metrics */}
           <div className="detailed-metrics">

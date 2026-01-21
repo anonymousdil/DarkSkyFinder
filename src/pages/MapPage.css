@@ -479,3 +479,35 @@
     width: 100%;
   }
 }
+
+/* Nearby toggle button */
+.nearby-toggle-button {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border: none;
+  padding: 0.6rem 1rem;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  font-weight: 500;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  white-space: nowrap;
+}
+
+.nearby-toggle-button:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+}
+
+.nearby-toggle-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  background: linear-gradient(135deg, #888 0%, #666 100%);
+}
+
+@media (max-width: 768px) {
+  .nearby-toggle-button {
+    font-size: 0.85rem;
+    padding: 0.5rem 0.8rem;
+  }
+}
