@@ -99,6 +99,11 @@ const determineDominantPollutant = (components) => {
     current.value > max.value ? current : max
   , pollutants[0]);
 
+  // If all values are zero (clean air or missing data), default to pm25
+  if (dominant.value === 0) {
+    return 'pm25';
+  }
+
   return dominant.code;
 };
 
@@ -115,8 +120,9 @@ export const getAQI = async (lat, lon) => {
   const cachedData = cache.get(cacheKey);
   if (cachedData && Date.now() - cachedData.timestamp < CACHE_DURATION) {
     console.log('[AQI Service] Returning cached AQI data');
-    // Check if cached data is stale
-    const isStale = Date.now() - cachedData.timestamp > STALE_THRESHOLD;
+    // Check if original data timestamp (stored in data object) is stale
+    const isStale = cachedData.data.timestamp && 
+                    (Date.now() - cachedData.data.timestamp > STALE_THRESHOLD);
     return { ...cachedData.data, isStale };
   }
 
@@ -166,8 +172,17 @@ export const getAQICategory = (aqi) => {
   // OpenWeather uses 1-5 scale, convert to standard 0-500 scale if needed
   let standardAqi = aqi;
   if (aqi <= 5) {
-    // Map OpenWeather 1-5 scale to approximate standard AQI
-    const mapping = { 1: 25, 2: 75, 3: 125, 4: 175, 5: 250 };
+    // Map OpenWeather 1-5 scale to approximate standard AQI midpoints
+    // Based on OpenWeather Air Quality Index documentation:
+    // 1 = Good, 2 = Fair, 3 = Moderate, 4 = Poor, 5 = Very Poor
+    // Mapped to EPA AQI scale midpoints for representative values
+    const mapping = { 
+      1: 25,   // Good: midpoint of 0-50
+      2: 75,   // Fair/Moderate: midpoint of 51-100
+      3: 125,  // Moderate/Unhealthy for Sensitive: midpoint of 101-150
+      4: 175,  // Unhealthy: midpoint of 151-200
+      5: 250   // Very Unhealthy: midpoint of 201-300
+    };
     standardAqi = mapping[aqi] || 75;
   }
 
