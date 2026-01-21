@@ -63,20 +63,6 @@ The Ultimate Stargazing Companion!!
 7. View detailed sky conditions, air quality, and light pollution data for your selected location
 8. Pin locations by clicking anywhere on the map to save them to your board
 
-For detailed information about the enhanced search API, see [SEARCH_API_DOCUMENTATION.md](./SEARCH_API_DOCUMENTATION.md).
-
-## API Configuration
-
-### Air Quality Index (AQI) Data
-
-The application uses the **Aqicn.org API (WAQI - World Air Quality Index)** for real-time air quality data. To enable real-time AQI data:
-
-1. Get a free API token from open weather
-2. Copy `.env.example` to `.env`
-3. Add your API token:
-   ```
-   VITE_AQICN_API_TOKEN=your_api_token_here
-   ```
 
 **API Features:**
 - Real-time air quality data from over 12,000+ monitoring stations worldwide
