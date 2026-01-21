@@ -1,8 +1,8 @@
 .help-tooltip-container {
   position: fixed;
-  top: 1rem;
-  right: 5rem;
-  z-index: 1100;
+  bottom: 2rem;
+  left: 2rem;
+  z-index: 1050;
   cursor: help;
 }
 
@@ -30,8 +30,8 @@
 
 .help-content {
   position: absolute;
-  top: 50px;
-  right: 0;
+  bottom: 50px;
+  left: 0;
   width: 450px;
   max-height: 70vh;
   background: #1a1a2e;
@@ -107,8 +107,8 @@
 /* Mobile Responsive */
 @media (max-width: 768px) {
   .help-tooltip-container {
-    top: 0.75rem;
-    right: 4rem;
+    bottom: 1.5rem;
+    left: 1.5rem;
   }
 
   .help-icon {
@@ -120,7 +120,7 @@
   .help-content {
     width: 320px;
     max-height: 60vh;
-    right: -280px;
+    left: 0;
   }
 
   .help-header h3 {
@@ -139,8 +139,8 @@
 
 @media (max-width: 480px) {
   .help-tooltip-container {
-    top: 0.625rem;
-    right: 3.5rem;
+    bottom: 1.25rem;
+    left: 1.25rem;
   }
 
   .help-icon {
@@ -152,7 +152,7 @@
   .help-content {
     width: 280px;
     max-height: 50vh;
-    right: -240px;
+    left: 0;
   }
 
   .help-header {
