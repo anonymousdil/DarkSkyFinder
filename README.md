@@ -37,7 +37,7 @@ The Ultimate Stargazing Companion!!
 
 ## Getting Started
 
-### Prerequisites
+### Builder notes
 
 To enable real-time Air Quality Index (AQI) data, you'll need an API token from Aqicn.org:
 
@@ -104,7 +104,7 @@ For detailed information about the enhanced search API, see [SEARCH_API_DOCUMENT
 
 The application uses the **Aqicn.org API (WAQI - World Air Quality Index)** for real-time air quality data. To enable real-time AQI data:
 
-1. Get a free API token from [Aqicn.org Data Platform](https://aqicn.org/data-platform/token/)
+1. Get a free API token from open weather
 2. Copy `.env.example` to `.env`
 3. Add your API token:
    ```
