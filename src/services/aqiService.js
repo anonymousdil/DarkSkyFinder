@@ -176,11 +176,12 @@ const fetchFromOpenWeather = async (lat, lon) => {
     const pm10Aqi = components.pm10 ? calculateAQI('pm10', components.pm10) : null;
     
     // Convert gases from μg/m³ to ppb/ppm for AQI calculation
-    // Conversion factor: ppb = (μg/m³ × 24.45) / molecular_weight
-    const o3Ppb = components.o3 ? (components.o3 * 24.45) / 48 : null;
-    const no2Ppb = components.no2 ? (components.no2 * 24.45) / 46 : null;
-    const so2Ppb = components.so2 ? (components.so2 * 24.45) / 64 : null;
-    const coPpm = components.co ? components.co / 1000 : null;
+    // Using conversion at 25°C and 1 atm: ppb = (μg/m³ × 24.47) / molecular_weight
+    const o3Ppb = components.o3 ? (components.o3 * 24.47) / 48 : null;
+    const no2Ppb = components.no2 ? (components.no2 * 24.47) / 46 : null;
+    const so2Ppb = components.so2 ? (components.so2 * 24.47) / 64 : null;
+    // CO conversion: ppm = (μg/m³ × 0.000873) at 25°C
+    const coPpm = components.co ? components.co * 0.000873 : null;
 
     const o3Aqi = o3Ppb ? calculateAQI('o3', o3Ppb) : null;
     const no2Aqi = no2Ppb ? calculateAQI('no2', no2Ppb) : null;
