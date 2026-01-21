@@ -166,6 +166,12 @@ function LocationCard({ location, onClick }) {
   const summary = formatLocationSummary(location);
   const improvementColor = getImprovementColor(location.improvements);
 
+  const handleNavigate = (e) => {
+    e.stopPropagation();
+    const url = `https://www.google.com/maps/dir/?api=1&destination=${location.lat},${location.lon}`;
+    window.open(url, '_blank', 'noopener,noreferrer');
+  };
+
   return (
     <div 
       className="location-card" 
@@ -174,7 +180,11 @@ function LocationCard({ location, onClick }) {
     >
       <div className="location-header">
         <span className="location-distance">{summary.distance}</span>
-        <button className="navigate-button" title="Navigate to location">
+        <button 
+          className="navigate-button" 
+          onClick={handleNavigate}
+          title="Navigate to location"
+        >
           🧭
         </button>
       </div>

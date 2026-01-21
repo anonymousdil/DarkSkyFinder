@@ -113,6 +113,16 @@ function SearchResults({ results, onSelectResult, visible, onClose }) {
 
                     <div className="result-actions">
                       <button
+                        className="navigate-button"
+                        onClick={() => {
+                          const url = `https://www.google.com/maps/dir/?api=1&destination=${result.lat},${result.lon}`;
+                          window.open(url, '_blank', 'noopener,noreferrer');
+                        }}
+                        title="Navigate to location"
+                      >
+                        🧭
+                      </button>
+                      <button
                         className="select-button"
                         onClick={() => onSelectResult(result)}
                       >

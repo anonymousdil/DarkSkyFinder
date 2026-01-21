@@ -87,6 +87,17 @@ function AQIView({ location, visible, onClose }) {
             {aqiData.station && (
               <p className="station-name">Station: {aqiData.station}</p>
             )}
+            <button
+              className="navigate-button"
+              onClick={() => {
+                const url = `https://www.google.com/maps/dir/?api=1&destination=${location.position[0]},${location.position[1]}`;
+                window.open(url, '_blank', 'noopener,noreferrer');
+              }}
+              title="Navigate with Google Maps"
+              style={{ marginTop: '8px' }}
+            >
+              🧭 Navigate
+            </button>
           </div>
 
           {/* Main AQI Display */}

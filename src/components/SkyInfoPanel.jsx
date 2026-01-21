@@ -71,6 +71,17 @@ function SkyInfoPanel({ location, visible, onClose }) {
             <p className="coordinates">
               {location.position[0].toFixed(4)}°, {location.position[1].toFixed(4)}°
             </p>
+            <button
+              className="navigate-button"
+              onClick={() => {
+                const url = `https://www.google.com/maps/dir/?api=1&destination=${location.position[0]},${location.position[1]}`;
+                window.open(url, '_blank', 'noopener,noreferrer');
+              }}
+              title="Navigate with Google Maps"
+              style={{ marginTop: '8px' }}
+            >
+              🧭 Navigate
+            </button>
           </div>
 
           <div className="overall-rating">
