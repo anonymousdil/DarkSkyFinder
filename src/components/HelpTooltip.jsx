@@ -1,10 +1,7 @@
 import { useState } from 'react';
 import './HelpTooltip.css';
 
-function HelpTooltip() {
-  const [isHovered, setIsHovered] = useState(false);
-
-  const tutorialContent = `
+const TUTORIAL_CONTENT = `
 Welcome to DarkSkyFinder! 🌟
 
 🔍 SEARCH & EXPLORE:
@@ -34,7 +31,10 @@ Welcome to DarkSkyFinder! 🌟
 🗺️ MAP LAYERS:
 • Click the Layers button to switch between map types
 • Choose Standard, Terrain, or Satellite views
-  `;
+`;
+
+function HelpTooltip() {
+  const [isHovered, setIsHovered] = useState(false);
 
   return (
     <div 
@@ -49,7 +49,7 @@ Welcome to DarkSkyFinder! 🌟
             <h3>DarkSkyFinder Tutorial</h3>
           </div>
           <div className="help-body">
-            <pre>{tutorialContent}</pre>
+            <pre>{TUTORIAL_CONTENT}</pre>
           </div>
         </div>
       )}

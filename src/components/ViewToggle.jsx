@@ -36,7 +36,7 @@ function ViewToggle({ currentView, onViewChange, onLayersToggle }) {
 ViewToggle.propTypes = {
   currentView: PropTypes.string.isRequired,
   onViewChange: PropTypes.func.isRequired,
-  onLayersToggle: PropTypes.func
+  onLayersToggle: PropTypes.func.isRequired
 };
 
 export default ViewToggle;
