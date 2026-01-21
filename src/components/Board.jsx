@@ -66,8 +66,18 @@ function Board({ pinnedLocations, onSelectLocation, onRemovePin, visible, onClos
                 <div className="pinned-actions">
                   <button
                     className="navigate-button"
+                    onClick={() => {
+                      const googleMapsUrl = `https://www.google.com/maps/dir/?api=1&destination=${location.position[0]},${location.position[1]}`;
+                      window.open(googleMapsUrl, '_blank');
+                    }}
+                    title="Navigate with Google Maps"
+                  >
+                    🧭
+                  </button>
+                  <button
+                    className="navigate-button"
                     onClick={() => onSelectLocation(location)}
-                    title="Navigate to location"
+                    title="View on map"
                   >
                     🗺️
                   </button>
