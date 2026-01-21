@@ -100,14 +100,25 @@ function Stary({ onNavigate, isVisible, onClose }) {
                 </div>
               )}
 
-              {/* Action Button */}
+              {/* Action Buttons */}
               {data.location && (
-                <button 
-                  className="explore-button"
-                  onClick={() => handleExploreLocation(data.location.lat, data.location.lon)}
-                >
-                  🗺️ Explore on Map
-                </button>
+                <div style={{ display: 'flex', gap: '0.5rem', flexDirection: 'column' }}>
+                  <button 
+                    className="explore-button"
+                    onClick={() => handleExploreLocation(data.location.lat, data.location.lon)}
+                  >
+                    🗺️ Explore on Map
+                  </button>
+                  <button 
+                    className="explore-button"
+                    onClick={() => {
+                      const googleMapsUrl = `https://www.google.com/maps/dir/?api=1&destination=${data.location.lat},${data.location.lon}`;
+                      window.open(googleMapsUrl, '_blank');
+                    }}
+                  >
+                    🧭 Navigate with Google Maps
+                  </button>
+                </div>
               )}
 
               {/* Alternatives */}
