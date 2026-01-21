@@ -21,12 +21,11 @@ The Ultimate Stargazing Companion!!
   - **AQI View**: Detailed air quality information with breathing quality indicators and health implications
   - **Light Pollution View**: Bortle scale analysis with sky quality measurements and stargazing recommendations
   - **Ultimate View**: Comprehensive report combining AQI, light pollution, and sky conditions into a single score
-- **Real-time AQI Data**: Live Air Quality Index with intelligent fallback system:
-  - Primary source: Aqicn.org (WAQI) API with 12,000+ monitoring stations worldwide
-  - Fallback source: OpenWeather Air Pollution API for redundancy
+- **Real-time AQI Data**: Live Air Quality Index from OpenWeather API:
+  - Comprehensive air pollution data using OpenWeather Air Pollution API
   - Detailed pollutant breakdown (PM2.5, PM10, O₃, NO₂, SO₂, CO)
   - Automatic data validation and freshness checks
-  - Graceful fallback to estimated data when APIs are unavailable
+  - Graceful fallback to estimated data when API is unavailable
 - **Light Pollution Analysis**: Bortle scale classification with educational content and typical location examples
 - **Multiple Map Layers**: Toggle between standard map, terrain view, and satellite imagery
 - **Sky Viewability Information**: Real-time astronomical weather conditions including:
@@ -57,17 +56,15 @@ cd DarkSkyFinder
 npm install
 ```
 
-3. Configure API tokens (optional but recommended):
+3. Configure API token (optional but recommended):
    - Copy `.env.example` to `.env`:
      ```bash
      cp .env.example .env
      ```
-   - Get your free API tokens:
-     - **AQICN API**: Visit [https://aqicn.org/data-platform/token/](https://aqicn.org/data-platform/token/) to get your token
+   - Get your free OpenWeather API key:
      - **OpenWeather API**: Visit [https://openweathermap.org/api](https://openweathermap.org/api) and sign up for a free API key
-   - Add your tokens to `.env`:
+   - Add your token to `.env`:
      ```
-     VITE_AQICN_API_TOKEN=your_actual_aqicn_token_here
      VITE_OPENWEATHER_API_KEY=your_actual_openweather_key_here
      ```
    - **⚠️ SECURITY NOTE**: Never commit your `.env` file with real API tokens to version control. The `.env` file is already in `.gitignore`.
@@ -107,18 +104,16 @@ npm run dev
 
 
 **API Features:**
-- Intelligent dual-source AQI data system:
-  - Primary: AQICN with 12,000+ monitoring stations worldwide
-  - Fallback: OpenWeather Air Pollution API for reliability
+- OpenWeather Air Pollution API for real-time AQI data
 - Real-time data with automatic freshness validation
 - Detailed pollutant measurements (PM2.5, PM10, O₃, NO₂, SO₂, CO)
-- US EPA Air Quality Index calculation
-- Automatic fallback to estimated data if both APIs fail
+- Air Quality Index on a 1-5 scale (mapped to standard EPA AQI)
+- Automatic fallback to estimated data if API fails
 - Data source clearly displayed in UI
-- Free tier available for both APIs (with rate limits)
-- Comprehensive error handling and retry logic
+- Free tier available (1,000 calls/day with rate limits)
+- Comprehensive error handling and logging
 
-**Note**: The app will work with estimated data if API tokens are not configured, but real-time data is recommended for accurate air quality information.
+**Note**: The app will work with estimated data if the API token is not configured, but real-time data is recommended for accurate air quality information.
 
 ### Sky Viewability Data
 
@@ -141,14 +136,12 @@ No setup is required for sky viewability data.
 - OpenTopoMap (Terrain Map Tiles)
 - Esri World Imagery (Satellite View)
 - 7Timer! Astronomical Weather API
-- AQICN (WAQI) API - Primary AQI data source
-- OpenWeather Air Pollution API - Fallback AQI data source
+- OpenWeather Air Pollution API - Exclusive AQI data source
 
 ## Performance Optimizations
 
 - **API Caching**: AQI and sky viewability data cached for 1 hour to reduce API calls and manage rate limits
-- **Intelligent Fallback**: Automatic fallback from AQICN to OpenWeather to ensure data availability
+- **Enhanced Error Handling**: Comprehensive error handling with detailed logging for AQI service
 - **Data Validation**: Freshness checks to ensure AQI data is current (warns if older than 3 hours)
-- **Retry Logic**: Exponential backoff for failed API requests
 - **Lazy Loading**: Components load only when needed
 - **Optimized Rendering**: React state management for efficient updates

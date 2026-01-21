@@ -76,7 +76,7 @@ function AQIView({ location, visible, onClose }) {
             }}>
               <strong>⚠️ Notice:</strong> Real-time AQI data is currently unavailable. 
               Displaying estimated fallback data. For accurate air quality information, 
-              please configure API tokens for AQICN and/or OpenWeather.
+              please configure the OpenWeather API key in your .env file.
             </div>
           )}
           {!aqiData.isMockData && aqiData.isStale && (
