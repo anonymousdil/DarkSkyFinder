@@ -158,6 +158,7 @@
 }
 
 .navigate-button,
+.view-button,
 .remove-button {
   width: 36px;
   height: 36px;
@@ -178,6 +179,16 @@
 
 .navigate-button:hover {
   background: #45a049;
+  transform: scale(1.05);
+}
+
+.view-button {
+  background: #2196F3;
+  color: white;
+}
+
+.view-button:hover {
+  background: #0b7dda;
   transform: scale(1.05);
 }
 
@@ -246,6 +257,7 @@
   }
 
   .navigate-button,
+  .view-button,
   .remove-button {
     width: 40px;
     height: 40px;
@@ -284,6 +296,7 @@
   }
 
   .navigate-button,
+  .view-button,
   .remove-button {
     width: 44px;
     height: 44px;

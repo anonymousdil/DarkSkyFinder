@@ -170,6 +170,7 @@
   flex-shrink: 0;
 }
 
+.navigate-button,
 .select-button,
 .details-button {
   padding: 8px 16px;
@@ -179,6 +180,16 @@
   transition: all 0.2s;
   border: none;
   font-weight: 500;
+}
+
+.navigate-button {
+  background: #28a745;
+  color: white;
+  padding: 8px 12px;
+}
+
+.navigate-button:hover {
+  background: #218838;
 }
 
 .select-button {
@@ -368,6 +379,7 @@
     flex-direction: column;
   }
 
+  .navigate-button,
   .select-button,
   .details-button {
     padding: 6px 12px;
