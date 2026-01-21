@@ -475,3 +475,208 @@
     font-size: 1.25rem;
   }
 }
+
+/* Sunrise & Sunset Times Section */
+.sun-times-section {
+  background: linear-gradient(135deg, rgba(45, 45, 68, 0.5) 0%, rgba(30, 30, 46, 0.5) 100%);
+  border-radius: 12px;
+  padding: 1.25rem;
+  margin-bottom: 1.5rem;
+  border: 1px solid rgba(102, 126, 234, 0.2);
+}
+
+.sun-times-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.75rem;
+  margin-top: 1rem;
+}
+
+.sun-time-card {
+  background: rgba(30, 30, 46, 0.6);
+  border-radius: 8px;
+  padding: 0.75rem;
+  text-align: center;
+  border: 1px solid rgba(102, 126, 234, 0.15);
+}
+
+.sun-time-label {
+  font-size: 0.85rem;
+  color: #a0a0c0;
+  margin-bottom: 0.5rem;
+}
+
+.sun-time-value {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #ffffff;
+}
+
+/* Stargazing Times Section */
+.stargazing-times-section {
+  background: linear-gradient(135deg, rgba(45, 45, 68, 0.6) 0%, rgba(30, 30, 46, 0.6) 100%);
+  border-radius: 12px;
+  padding: 1.25rem;
+  margin-bottom: 1.5rem;
+  border: 1px solid rgba(102, 126, 234, 0.2);
+}
+
+.quality-indicator {
+  background: rgba(30, 30, 46, 0.8);
+  border-radius: 10px;
+  padding: 1rem;
+  margin: 1rem 0;
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+}
+
+.quality-emoji {
+  font-size: 2.5rem;
+  line-height: 1;
+}
+
+.quality-info {
+  flex: 1;
+}
+
+.quality-level {
+  font-size: 1.2rem;
+  font-weight: 600;
+  margin-bottom: 0.25rem;
+}
+
+.quality-description {
+  font-size: 0.9rem;
+  color: #a0a0c0;
+  margin-bottom: 0.5rem;
+}
+
+.quality-score {
+  font-size: 0.85rem;
+  color: #ffffff;
+  opacity: 0.8;
+}
+
+.optimal-time-window {
+  background: rgba(76, 175, 80, 0.15);
+  border: 1px solid rgba(76, 175, 80, 0.3);
+  border-radius: 10px;
+  padding: 1rem;
+  margin: 1rem 0;
+}
+
+.optimal-time-window h5 {
+  margin: 0 0 0.75rem 0;
+  color: #8BC34A;
+  font-size: 1rem;
+}
+
+.time-window-details {
+  color: #ffffff;
+}
+
+.window-time {
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+}
+
+.window-duration {
+  font-size: 0.9rem;
+  color: #a0a0c0;
+  margin-bottom: 0.5rem;
+}
+
+.window-description {
+  font-size: 0.85rem;
+  color: #c0c0d0;
+  font-style: italic;
+}
+
+.quality-factors {
+  margin-top: 1.5rem;
+}
+
+.quality-factors h5 {
+  margin: 0 0 1rem 0;
+  color: #ffffff;
+  font-size: 0.95rem;
+}
+
+.factor-item {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 0.75rem;
+}
+
+.factor-label {
+  min-width: 140px;
+  font-size: 0.85rem;
+  color: #a0a0c0;
+}
+
+.factor-bar-container {
+  flex: 1;
+  height: 8px;
+  background: rgba(30, 30, 46, 0.8);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.factor-bar {
+  height: 100%;
+  border-radius: 4px;
+  transition: width 0.3s ease;
+}
+
+.factor-value {
+  min-width: 50px;
+  text-align: right;
+  font-size: 0.85rem;
+  color: #ffffff;
+  font-weight: 600;
+}
+
+.stargazing-recommendations {
+  margin-top: 1.5rem;
+  background: rgba(30, 30, 46, 0.6);
+  border-radius: 8px;
+  padding: 1rem;
+}
+
+.stargazing-recommendations h5 {
+  margin: 0 0 0.75rem 0;
+  color: #ffffff;
+  font-size: 0.95rem;
+}
+
+.stargazing-recommendations ul {
+  margin: 0;
+  padding-left: 1.5rem;
+  color: #c0c0d0;
+}
+
+.stargazing-recommendations li {
+  margin-bottom: 0.5rem;
+  font-size: 0.85rem;
+  line-height: 1.4;
+}
+
+/* Mobile Responsiveness */
+@media (max-width: 768px) {
+  .sun-times-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .factor-label {
+    min-width: 100px;
+    font-size: 0.8rem;
+  }
+  
+  .factor-value {
+    min-width: 45px;
+    font-size: 0.8rem;
+  }
+}

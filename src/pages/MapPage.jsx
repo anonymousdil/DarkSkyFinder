@@ -14,6 +14,7 @@ import AutocompleteInput from '../components/AutocompleteInput';
 import Board from '../components/Board';
 import LightPollutionOverlay from '../components/LightPollutionOverlay';
 import Stary from '../components/Stary';
+import NearbyLocations from '../components/NearbyLocations';
 import { searchLocations, parseCoordinates } from '../services/searchService';
 import { getAQI, getAQICategory } from '../services/aqiService';
 import { getLightPollution } from '../services/lightPollutionService';
@@ -97,6 +98,7 @@ function MapPage() {
   const [overlayCenter, setOverlayCenter] = useState(null); // Center for light pollution overlay
   const [showMobileControls, setShowMobileControls] = useState(false); // Mobile controls visibility
   const [isStaryVisible, setIsStaryVisible] = useState(false); // Stary chatbot visibility
+  const [showNearbyLocations, setShowNearbyLocations] = useState(false); // Nearby locations visibility
 
   const mapRef = useRef();
 
@@ -297,6 +299,12 @@ function MapPage() {
     addMarker(lat, lon, `Location: ${lat}, ${lon}`);
   };
 
+  // Handle nearby location selection
+  const handleNearbyLocationSelect = async (lat, lon) => {
+    await addMarker(lat, lon, `Nearby Location: ${lat.toFixed(4)}, ${lon.toFixed(4)}`);
+    setShowNearbyLocations(false);
+  };
+
   return (
     <div className="map-page-container">
       {/* Home Button */}
@@ -350,6 +358,15 @@ function MapPage() {
             title="Toggle Pinned Locations Board"
           >
             📌 Board ({pinnedLocations.length})
+          </button>
+          
+          <button 
+            className="nearby-toggle-button"
+            onClick={() => setShowNearbyLocations(!showNearbyLocations)}
+            title="Find Nearby Better Locations"
+            disabled={!selectedLocation}
+          >
+            🔍 Nearby
           </button>
         </div>
         
@@ -585,6 +602,14 @@ function MapPage() {
         onNavigate={handleStaryNavigate} 
         isVisible={isStaryVisible}
         onClose={() => setIsStaryVisible(false)}
+      />
+
+      {/* Nearby Locations Panel */}
+      <NearbyLocations
+        location={selectedLocation}
+        visible={showNearbyLocations}
+        onClose={() => setShowNearbyLocations(false)}
+        onLocationSelect={handleNearbyLocationSelect}
       />
     </div>
   );
