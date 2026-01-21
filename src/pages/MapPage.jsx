@@ -344,14 +344,13 @@ function MapPage() {
           >
             {loading ? 'Searching...' : 'Search'}
           </button>
-        </div>
-        
-        <div className="controls-row">
           <ViewToggle 
             currentView={currentView}
             onViewChange={handleViewChange}
           />
-          
+        </div>
+        
+        <div className="controls-row">
           <button 
             className="board-toggle-button"
             onClick={() => setShowBoard(!showBoard)}

@@ -10,20 +10,17 @@ function ViewToggle({ currentView, onViewChange }) {
 
   return (
     <div className="view-toggle-container">
-      <div className="view-toggle-label">Select View:</div>
-      <div className="view-toggle-buttons">
-        {views.map((view) => (
-          <button
-            key={view.id}
-            className={`view-toggle-btn ${currentView === view.id ? 'active' : ''}`}
-            onClick={() => onViewChange(view.id)}
-            title={view.description}
-          >
-            <span className="view-icon">{view.icon}</span>
-            <span className="view-name">{view.name}</span>
-          </button>
-        ))}
-      </div>
+      {views.map((view) => (
+        <button
+          key={view.id}
+          className={`view-toggle-btn ${currentView === view.id ? 'active' : ''}`}
+          onClick={() => onViewChange(view.id)}
+          title={view.description}
+        >
+          <span className="view-icon">{view.icon}</span>
+          <span className="view-name">{view.name}</span>
+        </button>
+      ))}
     </div>
   );
 }
