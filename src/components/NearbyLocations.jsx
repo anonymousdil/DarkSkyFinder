@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import PropTypes from 'prop-types';
 import { findNearbyLocations, formatLocationSummary, getImprovementColor } from '../services/nearbyLocationsService';
 import './NearbyLocations.css';
@@ -9,13 +9,7 @@ function NearbyLocations({ location, visible, onClose, onLocationSelect }) {
   const [error, setError] = useState(null);
   const [searchRadius, setSearchRadius] = useState(10);
 
-  useEffect(() => {
-    if (location && visible) {
-      fetchNearbyLocations();
-    }
-  }, [location, visible, searchRadius]);
-
-  const fetchNearbyLocations = async () => {
+  const fetchNearbyLocations = useCallback(async () => {
     if (!location || !location.position) return;
 
     setLoading(true);
@@ -34,7 +28,13 @@ function NearbyLocations({ location, visible, onClose, onLocationSelect }) {
     } finally {
       setLoading(false);
     }
-  };
+  }, [location, searchRadius]);
+
+  useEffect(() => {
+    if (location && visible) {
+      fetchNearbyLocations();
+    }
+  }, [location, visible, fetchNearbyLocations]);
 
   const handleLocationClick = (nearbyLocation) => {
     if (onLocationSelect) {
