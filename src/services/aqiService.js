@@ -247,7 +247,7 @@ const fetchFromAQICN = async (lat, lon) => {
     `https://api.waqi.info/feed/geo:${lat};${lon}/`,
     {
       params: {
-        token: AQICN_API_KEY
+        token: a87d60b45493985ee0c842179fd66174a556f4fe
       },
       timeout: API_CONFIG.timeout
     }
