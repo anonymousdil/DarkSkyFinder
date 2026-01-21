@@ -5,7 +5,7 @@ const fetchFromOpenWeather = async (lat, lon) => {
   }
 
   const response = await fetch(
-    `http://api.openweathermap.org/data/2.5/air_pollution?lat={lat}&lon={lon}&appid={bca4460ade4fda9cce3c64440a1d9be8}`
+    `https://api.openweathermap.org/data/2.5/air_pollution?lat=${lat}&lon=${lon}&appid=${openWeatherApiKey}`
   );
 
   if (!response.ok) {
