@@ -39,6 +39,46 @@ The Ultimate Stargazing Companion!!
 
 ## Getting Started
 
+### Prerequisites
+
+- Node.js (v16 or higher)
+- npm or yarn
+
+### Installation
+
+1. Clone the repository:
+```bash
+git clone https://github.com/anonymousdil/DarkSkyFinder.git
+cd DarkSkyFinder
+```
+
+2. Install dependencies:
+```bash
+npm install
+```
+
+3. Configure API tokens (optional but recommended):
+   - Copy `.env.example` to `.env`:
+     ```bash
+     cp .env.example .env
+     ```
+   - Get your free API tokens:
+     - **AQICN API**: Visit [https://aqicn.org/data-platform/token/](https://aqicn.org/data-platform/token/) to get your token
+     - **OpenWeather API**: Visit [https://openweathermap.org/api](https://openweathermap.org/api) and sign up for a free API key
+   - Add your tokens to `.env`:
+     ```
+     VITE_AQICN_API_TOKEN=your_actual_aqicn_token_here
+     VITE_OPENWEATHER_API_KEY=your_actual_openweather_key_here
+     ```
+   - **⚠️ SECURITY NOTE**: Never commit your `.env` file with real API tokens to version control. The `.env` file is already in `.gitignore`.
+
+4. Start the development server:
+```bash
+npm run dev
+```
+
+5. Open your browser and navigate to `http://localhost:5173`
+
 ## Usage
 
 1. Open the application and click "Dive In" on the welcome page

@@ -10,7 +10,7 @@ const cache = new Map();
 const CACHE_DURATION = 3600000; // 1 hour in milliseconds
 
 // Get API keys from environment variables
-// const AQICN_API_KEY = import.meta.env.VITE_AQICN_API_TOKEN;
+const AQICN_API_KEY = import.meta.env.VITE_AQICN_API_TOKEN;
 const OPENWEATHER_API_KEY = import.meta.env.VITE_OPENWEATHER_API_KEY;
 
 // API configuration

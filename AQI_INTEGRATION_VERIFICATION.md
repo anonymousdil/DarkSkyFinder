@@ -3,8 +3,19 @@
 ## Integration Status: ✅ COMPLETE
 
 ### API Configuration
-- **AQICN API Token**: Configured and ready (Primary source)
-- **OpenWeather API Key**: Configured and ready (Fallback source)
+
+**⚠️ SECURITY NOTICE**: API tokens must be configured securely through environment variables.
+
+- **AQICN API Token**: Configure `VITE_AQICN_API_TOKEN` in your `.env` file (Primary source)
+  - Get your free token at: [https://aqicn.org/data-platform/token/](https://aqicn.org/data-platform/token/)
+- **OpenWeather API Key**: Configure `VITE_OPENWEATHER_API_KEY` in your `.env` file (Fallback source)
+  - Get your free API key at: [https://openweathermap.org/api](https://openweathermap.org/api)
+
+**Setup Instructions**:
+1. Copy `.env.example` to `.env`
+2. Add your API tokens to `.env`
+3. **NEVER commit `.env` file to version control** - it's already in `.gitignore`
+4. For production deployments, use secure environment variable management (e.g., GitHub Secrets, environment variables in hosting platform)
 
 ### Fallback Chain Verification
 The system implements a three-tier fallback mechanism:
