@@ -232,7 +232,8 @@ export const getDirection = (lat, lon, targetLat, targetLon) => {
   const dLat = targetLat - lat;
   const dLon = targetLon - lon;
   
-  const angle = Math.atan2(dLon, dLat) * 180 / Math.PI;
+  // Corrected: Math.atan2 uses (y, x) which is (dLat, dLon) for bearing
+  const angle = Math.atan2(dLat, dLon) * 180 / Math.PI;
   
   // Convert to compass direction
   const directions = ['N', 'NE', 'E', 'SE', 'S', 'SW', 'W', 'NW'];
@@ -247,15 +248,11 @@ export const getDirection = (lat, lon, targetLat, targetLon) => {
  * @returns {Object} Formatted summary
  */
 export const formatLocationSummary = (location) => {
-  const dir = location.direction || getDirection(
-    location.centerLat,
-    location.centerLon,
-    location.lat,
-    location.lon
-  );
+  // Use existing direction or default to empty string
+  const dir = location.direction || '';
   
   return {
-    distance: `${location.distance.toFixed(1)} km ${dir}`,
+    distance: `${location.distance.toFixed(1)} km ${dir}`.trim(),
     conditions: `AQI: ${location.aqi}, Bortle: ${location.bortleClass}`,
     improvement: getImprovementText(location.improvements)
   };

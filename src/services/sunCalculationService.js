@@ -256,7 +256,7 @@ export const getCurrentSunPhase = (sunTimes, currentTime = new Date()) => {
   }
   
   if (civilDawn && civilDusk) {
-    if ((now >= civilDusk && now < sunset) || (now >= sunrise && now < civilDawn)) {
+    if ((now >= sunset && now < civilDusk) || (now >= civilDawn && now < sunrise)) {
       return { 
         phase: 'twilight', 
         description: 'Twilight',

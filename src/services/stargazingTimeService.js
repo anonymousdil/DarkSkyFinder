@@ -207,7 +207,19 @@ const calculateTimeWindows = (sunTimes, quality) => {
     };
   } else if (quality >= 25) {
     // For fair conditions, recommend middle of the night (darkest time)
-    const midNight = new Date((dusk.getTime() + dawn.getTime()) / 2);
+    // Handle midnight crossing properly
+    const duskTime = dusk.getTime();
+    const dawnTime = dawn.getTime();
+    
+    let midNight;
+    if (dawnTime > duskTime) {
+      // Same night, no midnight crossing
+      midNight = new Date((duskTime + dawnTime) / 2);
+    } else {
+      // Crosses midnight
+      midNight = new Date(((duskTime + dawnTime + 24 * 60 * 60 * 1000) / 2));
+    }
+    
     const twoHoursBefore = new Date(midNight.getTime() - 2 * 60 * 60 * 1000);
     const twoHoursAfter = new Date(midNight.getTime() + 2 * 60 * 60 * 1000);
     

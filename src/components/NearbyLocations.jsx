@@ -17,7 +17,8 @@ function NearbyLocations({ location, visible, onClose, onLocationSelect }) {
 
     try {
       const [lat, lon] = location.position;
-      const currentAQI = location.aqi === 'N/A' ? 999 : location.aqi;
+      // Ensure AQI is a number, handle 'N/A' and string numbers
+      const currentAQI = location.aqi === 'N/A' || !location.aqi ? 999 : Number(location.aqi);
       const currentBortle = location.pollutionIndex || 5;
 
       const data = await findNearbyLocations(lat, lon, currentAQI, currentBortle, searchRadius);
