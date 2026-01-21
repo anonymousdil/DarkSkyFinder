@@ -37,39 +37,6 @@ The Ultimate Stargazing Companion!!
 
 ## Getting Started
 
-### Builder notes
-
-To enable real-time Air Quality Index (AQI) data, you'll need an API token from Aqicn.org:
-
-1. Get a free API token from [Aqicn.org Data Platform](https://aqicn.org/data-platform/token/)
-2. Copy `.env.example` to `.env`
-3. Add your API token to the `.env` file:
-   ```
-   VITE_AQICN_API_TOKEN=your_api_token_here
-   ```
-
-**Note**: The app will work with fallback mock data if the API token is not configured, but real-time data is recommended for accurate air quality information.
-
-### Installation
-
-```bash
-npm install
-```
-
-### Development
-
-```bash
-npm run dev
-```
-
-Visit `http://localhost:5173` to view the application.
-
-### Build
-
-```bash
-npm run build
-```
-
 ## Usage
 
 1. Open the application and click "Dive In" on the welcome page
