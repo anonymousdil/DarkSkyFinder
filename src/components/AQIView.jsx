@@ -8,7 +8,7 @@ function AQIView({ location, visible, onClose }) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
-  const fetchAQIData = useCallback(async () => {
+  const fetchAQIData = useCallback(async (forceFresh = false) => {
     if (!location || !location.position) return;
 
     setLoading(true);
@@ -16,7 +16,7 @@ function AQIView({ location, visible, onClose }) {
 
     try {
       const [lat, lon] = location.position;
-      const data = await getAQI(lat, lon);
+      const data = await getAQI(lat, lon, { forceFresh });
       setAqiData(data);
     } catch (err) {
       console.error('Error fetching AQI data:', err);
@@ -172,7 +172,7 @@ function AQIView({ location, visible, onClose }) {
               {aqiData.pm25 !== null && (
                 <div className="pollutant-card">
                   <div className="pollutant-name">PM2.5</div>
-                  <div className="pollutant-value">{aqiData.pm25}</div>
+                  <div className="pollutant-value">{aqiData.pm25.toFixed(1)}</div>
                   <div className="pollutant-unit">µg/m³</div>
                 </div>
               )}
@@ -180,7 +180,7 @@ function AQIView({ location, visible, onClose }) {
               {aqiData.pm10 !== null && (
                 <div className="pollutant-card">
                   <div className="pollutant-name">PM10</div>
-                  <div className="pollutant-value">{aqiData.pm10}</div>
+                  <div className="pollutant-value">{aqiData.pm10.toFixed(1)}</div>
                   <div className="pollutant-unit">µg/m³</div>
                 </div>
               )}
@@ -188,32 +188,32 @@ function AQIView({ location, visible, onClose }) {
               {aqiData.o3 !== null && (
                 <div className="pollutant-card">
                   <div className="pollutant-name">O₃</div>
-                  <div className="pollutant-value">{aqiData.o3}</div>
-                  <div className="pollutant-unit">ppb</div>
+                  <div className="pollutant-value">{aqiData.o3.toFixed(1)}</div>
+                  <div className="pollutant-unit">µg/m³</div>
                 </div>
               )}
 
               {aqiData.no2 !== null && (
                 <div className="pollutant-card">
                   <div className="pollutant-name">NO₂</div>
-                  <div className="pollutant-value">{aqiData.no2}</div>
-                  <div className="pollutant-unit">ppb</div>
+                  <div className="pollutant-value">{aqiData.no2.toFixed(1)}</div>
+                  <div className="pollutant-unit">µg/m³</div>
                 </div>
               )}
 
               {aqiData.so2 !== null && (
                 <div className="pollutant-card">
                   <div className="pollutant-name">SO₂</div>
-                  <div className="pollutant-value">{aqiData.so2}</div>
-                  <div className="pollutant-unit">ppb</div>
+                  <div className="pollutant-value">{aqiData.so2.toFixed(1)}</div>
+                  <div className="pollutant-unit">µg/m³</div>
                 </div>
               )}
 
               {aqiData.co !== null && (
                 <div className="pollutant-card">
                   <div className="pollutant-name">CO</div>
-                  <div className="pollutant-value">{aqiData.co}</div>
-                  <div className="pollutant-unit">ppm</div>
+                  <div className="pollutant-value">{aqiData.co.toFixed(1)}</div>
+                  <div className="pollutant-unit">µg/m³</div>
                 </div>
               )}
             </div>
@@ -274,7 +274,7 @@ function AQIView({ location, visible, onClose }) {
             </small>
           </div>
 
-          <button onClick={fetchAQIData} className="refresh-button">
+          <button onClick={() => fetchAQIData(true)} className="refresh-button">
             🔄 Refresh Data
           </button>
         </div>

@@ -17,6 +17,19 @@ const STALE_THRESHOLD = 10800000; // 3 hours in milliseconds
 const fetchFromOpenWeather = async (lat, lon) => {
   const openWeatherApiKey = import.meta.env.VITE_OPENWEATHER_API_KEY;
 
+  // Validate coordinates
+  if (typeof lat !== 'number' || typeof lon !== 'number') {
+    throw new Error('Invalid coordinates: latitude and longitude must be numbers');
+  }
+  
+  if (lat < -90 || lat > 90) {
+    throw new Error(`Invalid latitude: ${lat}. Must be between -90 and 90`);
+  }
+  
+  if (lon < -180 || lon > 180) {
+    throw new Error(`Invalid longitude: ${lon}. Must be between -180 and 180`);
+  }
+
   // Validate API key
   if (!openWeatherApiKey) {
     console.error('[AQI Service] OpenWeather API key is missing in the environment variables.');
@@ -28,6 +41,9 @@ const fetchFromOpenWeather = async (lat, lon) => {
   try {
     // OpenWeather API endpoint for Air Pollution data
     const apiUrl = `https://api.openweathermap.org/data/2.5/air_pollution?lat=${lat}&lon=${lon}&appid=${openWeatherApiKey}`;
+    // Log API URL with masked key for debugging (using split/join to avoid regex issues)
+    console.log(`[AQI Service] API URL: ${apiUrl.split(openWeatherApiKey).join('API_KEY_HIDDEN')}`);
+    
     const response = await fetch(apiUrl);
 
     // Check HTTP response status
@@ -35,7 +51,17 @@ const fetchFromOpenWeather = async (lat, lon) => {
       const errorText = await response.text();
       console.error(`[AQI Service] Failed API call. Status code: ${response.status}`);
       console.error(`[AQI Service] Response: ${errorText}`);
-      throw new Error(`Failed to fetch AQI data from OpenWeather API. Status: ${response.status}`);
+      
+      // Provide more specific error messages based on status code
+      if (response.status === 401) {
+        throw new Error('Invalid API key. Please check your VITE_OPENWEATHER_API_KEY in .env file.');
+      } else if (response.status === 429) {
+        throw new Error('API rate limit exceeded. Please try again later.');
+      } else if (response.status === 404) {
+        throw new Error('Location not found by OpenWeather API.');
+      } else {
+        throw new Error(`Failed to fetch AQI data from OpenWeather API. Status: ${response.status}`);
+      }
     }
 
     const data = await response.json();
@@ -53,6 +79,8 @@ const fetchFromOpenWeather = async (lat, lon) => {
     const dominantPollutant = determineDominantPollutant(components);
 
     // Extract AQI and pollutants with enriched metadata
+    // Note: OpenWeather API returns all pollutant concentrations in μg/m³
+    // including CO, which is sometimes measured in ppm elsewhere but is μg/m³ here
     const enrichedData = {
       aqi: aqiValue,                                      // Air Quality Index value (1-5 scale from OpenWeather)
       pm25: components.pm2_5 || 0,                        // PM2.5 in μg/m³
@@ -111,22 +139,27 @@ const determineDominantPollutant = (components) => {
  * Get AQI data for a location (main export function)
  * @param {number} lat - Latitude
  * @param {number} lon - Longitude
+ * @param {Object} options - Optional configuration
+ * @param {boolean} options.forceFresh - Force fetching fresh data, bypassing cache
  * @returns {Promise<Object>} AQI data with metadata
  */
-export const getAQI = async (lat, lon) => {
+export const getAQI = async (lat, lon, options = {}) => {
+  const { forceFresh = false } = options;
   const cacheKey = `${lat.toFixed(2)},${lon.toFixed(2)}`;
 
-  // Check cache first
-  const cachedData = cache.get(cacheKey);
-  if (cachedData && Date.now() - cachedData.timestamp < CACHE_DURATION) {
-    console.log('[AQI Service] Returning cached AQI data');
-    // Check if original data timestamp (stored in data object) is stale
-    const isStale = cachedData.data.timestamp && 
-                    (Date.now() - cachedData.data.timestamp > STALE_THRESHOLD);
-    return { ...cachedData.data, isStale };
+  // Check cache first (unless forceFresh is true)
+  if (!forceFresh) {
+    const cachedData = cache.get(cacheKey);
+    if (cachedData && Date.now() - cachedData.timestamp < CACHE_DURATION) {
+      console.log('[AQI Service] Returning cached AQI data');
+      // Check if original data timestamp (stored in data object) is stale
+      const isStale = cachedData.data.timestamp && 
+                      (Date.now() - cachedData.data.timestamp > STALE_THRESHOLD);
+      return { ...cachedData.data, isStale };
+    }
   }
 
-  console.log('[AQI Service] Cache miss or expired, fetching fresh data');
+  console.log(forceFresh ? '[AQI Service] Force refresh requested, fetching fresh data' : '[AQI Service] Cache miss or expired, fetching fresh data');
 
   try {
     // Fetch from OpenWeather API

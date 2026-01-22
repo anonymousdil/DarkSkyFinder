@@ -145,3 +145,38 @@ No setup is required for sky viewability data.
 - **Data Validation**: Freshness checks to ensure AQI data is current (warns if older than 3 hours)
 - **Lazy Loading**: Components load only when needed
 - **Optimized Rendering**: React state management for efficient updates
+
+## Testing
+
+### AQI Integration Testing
+
+A comprehensive test harness is included to verify the AQI integration:
+
+1. **Browser-based Tests** (Manual Testing Only):
+   - **Important**: This test makes live API calls and is designed for manual browser testing only
+   - Start the development server: `npm run dev`
+   - Navigate to `http://localhost:5173/test-aqi-service.html`
+   - Click "Run All Tests" to verify:
+     - API endpoint accessibility
+     - AQI category mapping (1-5 scale)
+     - Error handling for invalid coordinates
+     - Real-time data from multiple locations
+   - **Note**: This test will be blocked in CI/CD environments due to firewall rules (this is normal and expected)
+
+2. **Manual Verification**:
+   - Start the development server: `npm run dev`
+   - Search for a location (e.g., "New York")
+   - Click the location marker
+   - Verify:
+     - AQI data displays without "mock data" warnings
+     - All pollutant values show in µg/m³
+     - Source shows "OpenWeather" (not "Estimated")
+     - Console shows successful API logs
+
+3. **Expected Console Logs**:
+   ```
+   [AQI Service] Fetching AQI data from OpenWeather for coordinates: X, Y
+   [AQI Service] Successfully fetched and enriched AQI data
+   ```
+
+For detailed testing instructions, see `AQI_INTEGRATION_VERIFICATION.md`.
