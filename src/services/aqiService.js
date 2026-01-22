@@ -175,6 +175,12 @@ const AQI_BREAKPOINTS = {
 ====================================================== */
 
 function calculateAQI(concentration, breakpoints) {
+  // Handle invalid or zero concentrations
+  if (concentration == null || concentration < 0) {
+    return null;
+  }
+
+  // Find the appropriate breakpoint range
   for (const bp of breakpoints) {
     if (concentration >= bp.cLow && concentration <= bp.cHigh) {
       return Math.round(
@@ -184,6 +190,13 @@ function calculateAQI(concentration, breakpoints) {
       );
     }
   }
+
+  // If concentration exceeds highest breakpoint, cap at maximum AQI
+  if (concentration > breakpoints[breakpoints.length - 1].cHigh) {
+    return 500; // Maximum AQI value
+  }
+
+  // If we somehow didn't match any range, return null
   return null;
 }
 
@@ -247,11 +260,14 @@ async function fetchAQIFromAPI(lat, lon) {
   const pm10AQI = calculateAQI(pm10, AQI_BREAKPOINTS.pm10);
 
   // The overall AQI is the maximum of PM2.5 and PM10 AQI (exact numeric value)
-  const overallAQI = Math.max(pm25AQI || 0, pm10AQI || 0);
+  // Use nullish coalescing to handle null values from calculateAQI
+  const overallAQI = Math.max(pm25AQI ?? 0, pm10AQI ?? 0);
 
-  // Determine dominant pollutant
+  // Determine dominant pollutant (with null checks)
   let dominant = 'pm2_5';
-  if (pm10AQI > pm25AQI) {
+  if (pm10AQI != null && pm25AQI != null && pm10AQI > pm25AQI) {
+    dominant = 'pm10';
+  } else if (pm10AQI != null && pm25AQI == null) {
     dominant = 'pm10';
   }
 
