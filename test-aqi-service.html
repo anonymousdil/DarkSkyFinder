@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AQI Service Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 20px auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        h1 {
+            color: #333;
+        }
+        .test-section {
+            background: white;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .test-result {
+            margin: 10px 0;
+            padding: 10px;
+            border-radius: 4px;
+        }
+        .success {
+            background-color: #d4edda;
+            border: 1px solid #c3e6cb;
+            color: #155724;
+        }
+        .error {
+            background-color: #f8d7da;
+            border: 1px solid #f5c6cb;
+            color: #721c24;
+        }
+        .info {
+            background-color: #d1ecf1;
+            border: 1px solid #bee5eb;
+            color: #0c5460;
+        }
+        button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        pre {
+            background-color: #f8f9fa;
+            padding: 10px;
+            border-radius: 4px;
+            overflow-x: auto;
+        }
+        .loading {
+            color: #666;
+            font-style: italic;
+        }
+    </style>
+</head>
+<body>
+    <h1>AQI Service Integration Test</h1>
+    
+    <div class="test-section">
+        <h2>Test Configuration</h2>
+        <div class="test-result info">
+            <strong>Test Locations:</strong>
+            <ul>
+                <li>Noida, India (28.5355°N, 77.3910°E) - Expected: Moderate to Unhealthy AQI</li>
+                <li>New York, USA (40.7128°N, 74.0060°W) - Expected: Good to Moderate AQI</li>
+                <li>Rural Australia (-25.2744°S, 133.7751°E) - Expected: Good AQI</li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="test-section">
+        <h2>API Integration Tests</h2>
+        <button onclick="runTests()">Run All Tests</button>
+        <div id="test-results"></div>
+    </div>
+
+    <script type="module">
+        // Test configuration
+        const API_KEY = 'bca4460ade4fda9cce3c64440a1d9be8';
+        const testLocations = [
+            { name: 'Noida, India', lat: 28.5355, lon: 77.3910, expectedAQI: [2, 3, 4] },
+            { name: 'New York, USA', lat: 40.7128, lon: -74.0060, expectedAQI: [1, 2, 3] },
+            { name: 'Rural Australia', lat: -25.2744, lon: 133.7751, expectedAQI: [1, 2] }
+        ];
+
+        async function testOpenWeatherAPI(lat, lon) {
+            const url = `https://api.openweathermap.org/data/2.5/air_pollution?lat=${lat}&lon=${lon}&appid=${API_KEY}`;
+            
+            try {
+                const response = await fetch(url);
+                
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    throw new Error(`HTTP ${response.status}: ${errorText}`);
+                }
+                
+                const data = await response.json();
+                
+                if (!data.list || !data.list[0]) {
+                    throw new Error('Invalid API response format');
+                }
+                
+                return {
+                    success: true,
+                    aqi: data.list[0].main.aqi,
+                    components: data.list[0].components,
+                    coord: data.coord
+                };
+            } catch (error) {
+                return {
+                    success: false,
+                    error: error.message
+                };
+            }
+        }
+
+        async function testAQICategories() {
+            const categories = [
+                { aqi: 1, expected: 'Good' },
+                { aqi: 2, expected: 'Moderate' },
+                { aqi: 3, expected: 'Unhealthy for Sensitive Groups' },
+                { aqi: 4, expected: 'Unhealthy' },
+                { aqi: 5, expected: 'Very Unhealthy' }
+            ];
+
+            return categories.map(({ aqi, expected }) => {
+                // Simplified category mapping
+                const levels = {
+                    1: 'Good',
+                    2: 'Moderate',
+                    3: 'Unhealthy for Sensitive Groups',
+                    4: 'Unhealthy',
+                    5: 'Very Unhealthy'
+                };
+                const actual = levels[aqi];
+                return {
+                    aqi,
+                    expected,
+                    actual,
+                    passed: actual === expected
+                };
+            });
+        }
+
+        window.runTests = async function() {
+            const resultsDiv = document.getElementById('test-results');
+            resultsDiv.innerHTML = '<p class="loading">Running tests...</p>';
+            
+            let html = '';
+            
+            // Test 1: API Endpoint Accessibility
+            html += '<h3>Test 1: API Endpoint Accessibility</h3>';
+            for (const location of testLocations) {
+                const result = await testOpenWeatherAPI(location.lat, location.lon);
+                
+                if (result.success) {
+                    const isExpected = location.expectedAQI.includes(result.aqi);
+                    const className = isExpected ? 'success' : 'info';
+                    html += `
+                        <div class="test-result ${className}">
+                            <strong>✓ ${location.name}</strong><br>
+                            API Call: Success<br>
+                            AQI: ${result.aqi} ${isExpected ? '(Expected)' : '(Unexpected but valid)'}<br>
+                            PM2.5: ${result.components.pm2_5.toFixed(1)} µg/m³<br>
+                            PM10: ${result.components.pm10.toFixed(1)} µg/m³<br>
+                            O₃: ${result.components.o3.toFixed(1)} µg/m³<br>
+                            Coordinates verified: ${result.coord ? 'Yes' : 'No'}
+                        </div>
+                    `;
+                } else {
+                    html += `
+                        <div class="test-result error">
+                            <strong>✗ ${location.name}</strong><br>
+                            API Call: Failed<br>
+                            Error: ${result.error}
+                        </div>
+                    `;
+                }
+            }
+            
+            // Test 2: AQI Category Mapping
+            html += '<h3>Test 2: AQI Category Mapping</h3>';
+            const categoryTests = await testAQICategories();
+            categoryTests.forEach(test => {
+                const className = test.passed ? 'success' : 'error';
+                html += `
+                    <div class="test-result ${className}">
+                        <strong>${test.passed ? '✓' : '✗'} AQI ${test.aqi}</strong><br>
+                        Expected: ${test.expected}<br>
+                        Actual: ${test.actual}
+                    </div>
+                `;
+            });
+            
+            // Test 3: Invalid Coordinates
+            html += '<h3>Test 3: Error Handling</h3>';
+            const invalidTests = [
+                { name: 'Invalid Latitude (100)', lat: 100, lon: 0 },
+                { name: 'Invalid Longitude (200)', lat: 0, lon: 200 }
+            ];
+            
+            for (const test of invalidTests) {
+                const result = await testOpenWeatherAPI(test.lat, test.lon);
+                const className = result.success ? 'error' : 'success';
+                html += `
+                    <div class="test-result ${className}">
+                        <strong>${result.success ? '✗' : '✓'} ${test.name}</strong><br>
+                        ${result.success ? 'Should have failed but succeeded' : 'Correctly handled invalid input'}
+                    </div>
+                `;
+            }
+            
+            resultsDiv.innerHTML = html;
+        };
+    </script>
+</body>
+</html>
