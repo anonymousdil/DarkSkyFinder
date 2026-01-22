@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AQI Service Test</title>
+    <title>AQI Service Test - Manual Browser Testing Only</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -68,6 +68,22 @@
 </head>
 <body>
     <h1>AQI Service Integration Test</h1>
+    
+    <div class="test-section">
+        <h2>⚠️ Important: Manual Browser Testing Only</h2>
+        <div class="test-result info">
+            <p><strong>This test file is designed for manual testing in a web browser only.</strong></p>
+            <p>It makes direct API calls to OpenWeather, which will be blocked in GitHub Actions CI environment.</p>
+            <p><strong>How to use:</strong></p>
+            <ol>
+                <li>Make sure you have configured <code>VITE_OPENWEATHER_API_KEY</code> in your <code>.env</code> file</li>
+                <li>Start the development server: <code>npm run dev</code></li>
+                <li>Open this file directly in your browser: <code>http://localhost:5173/test-aqi-service.html</code></li>
+                <li>Click "Run All Tests" to verify the AQI integration</li>
+            </ol>
+            <p><em>Note: This file should NOT be run as part of automated CI/CD pipelines.</em></p>
+        </div>
+    </div>
     
     <div class="test-section">
         <h2>Test Configuration</h2>

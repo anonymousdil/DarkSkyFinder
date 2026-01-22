@@ -152,13 +152,16 @@ No setup is required for sky viewability data.
 
 A comprehensive test harness is included to verify the AQI integration:
 
-1. **Browser-based Tests**:
-   - Open `test-aqi-service.html` in your web browser
+1. **Browser-based Tests** (Manual Testing Only):
+   - **Important**: This test makes live API calls and is designed for manual browser testing only
+   - Start the development server: `npm run dev`
+   - Navigate to `http://localhost:5173/test-aqi-service.html`
    - Click "Run All Tests" to verify:
      - API endpoint accessibility
      - AQI category mapping (1-5 scale)
      - Error handling for invalid coordinates
      - Real-time data from multiple locations
+   - **Note**: This test will be blocked in CI/CD environments due to firewall rules (this is normal and expected)
 
 2. **Manual Verification**:
    - Start the development server: `npm run dev`
