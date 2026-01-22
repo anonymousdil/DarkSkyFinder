@@ -1,11 +1,46 @@
-// exactAQI.js
-// Calculates US EPA AQI using PM2.5 and PM10 (most dominant)
-
-const OPENWEATHER_API_KEY = import.meta.env.OPENWEATHER_API_KEY;;
-
 /**
- * AQI breakpoints (US EPA)
+ * exactAQI.js
+ * --------------------------------------------
+ * Calculates REAL (US EPA) AQI (0–500) using
+ * PM2.5 and PM10 data from OpenWeatherMap.
+ *
+ * This file is meant to run on:
+ * ✅ Node.js
+ * ✅ Vercel serverless functions
+ *
+ * ❌ Do NOT use this directly in frontend code
  */
+
+/* ======================================================
+   🔑 API TOKEN SETUP (IMPORTANT)
+   ------------------------------------------------------
+   DO NOT hardcode your API key here.
+
+   Instead, set it as an environment variable:
+
+   Vercel Dashboard →
+   Project Settings →
+   Environment Variables →
+
+   Key:    OPENWEATHER_API_KEY
+   Value: your_api_token_here
+
+   Then access it below using process.env
+====================================================== */
+
+const OPENWEATHER_API_KEY = process.env.OPENWEATHER_API_KEY;
+
+/* Safety check (optional but recommended) */
+if (!OPENWEATHER_API_KEY) {
+  throw new Error(
+    "Missing OPENWEATHER_API_KEY. Add it to your environment variables."
+  );
+}
+
+/* ======================================================
+   AQI BREAKPOINT TABLES (US EPA STANDARD)
+====================================================== */
+
 const AQI_BREAKPOINTS = {
   pm25: [
     { cLow: 0.0, cHigh: 12.0, aqiLow: 0, aqiHigh: 50 },
@@ -27,30 +62,43 @@ const AQI_BREAKPOINTS = {
   ]
 };
 
-/**
- * Linear AQI calculation
- */
+/* ======================================================
+   AQI CALCULATION (LINEAR INTERPOLATION)
+====================================================== */
+
 function calculateAQI(concentration, breakpoints) {
   for (const bp of breakpoints) {
     if (concentration >= bp.cLow && concentration <= bp.cHigh) {
       return Math.round(
         ((bp.aqiHigh - bp.aqiLow) / (bp.cHigh - bp.cLow)) *
-        (concentration - bp.cLow) +
-        bp.aqiLow
+          (concentration - bp.cLow) +
+          bp.aqiLow
       );
     }
   }
   return null;
 }
 
+/* ======================================================
+   FETCH + COMPUTE EXACT AQI
+====================================================== */
+
 /**
- * Fetch and compute exact AQI
+ * Fetch AQI from OpenWeatherMap and compute exact AQI
+ * @param {number} lat Latitude
+ * @param {number} lon Longitude
+ * @returns {Object} AQI details
  */
 async function getExactAQI(lat, lon) {
-  const url = `https://api.openweathermap.org/data/2.5/air_pollution?lat=${lat}&lon=${lon}&appid=OPENWEATHER_API_KEY`;
+  const url = `https://api.openweathermap.org/data/2.5/air_pollution?lat=${lat}&lon=${lon}&appid=${OPENWEATHER_API_KEY}`;
 
-  const res = await fetch(url);
-  const data = await res.json();
+  const response = await fetch(url);
+
+  if (!response.ok) {
+    throw new Error("Failed to fetch AQI data from OpenWeatherMap");
+  }
+
+  const data = await response.json();
 
   const pm25 = data.list[0].components.pm2_5;
   const pm10 = data.list[0].components.pm10;
@@ -59,17 +107,19 @@ async function getExactAQI(lat, lon) {
   const pm10AQI = calculateAQI(pm10, AQI_BREAKPOINTS.pm10);
 
   return {
-    exactAQI: Math.max(pm25AQI, pm10AQI),
+    exactAQI: Math.max(pm25AQI, pm10AQI), // final AQI
     pm25AQI,
-    pm10AQI
+    pm10AQI,
+    pm25,
+    pm10
   };
 }
 
-// Example usage
-(async () => {
-  const lat = 17.385;
-  const lon = 78.4867;
+/* ======================================================
+   EXPORT (IMPORTANT)
+   ------------------------------------------------------
+   Call this function at RUNTIME ONLY
+   (API route, serverless function, etc.)
+====================================================== */
 
-  const result = await getExactAQI(lat, lon);
-  console.log(result);
-})();
+export { getExactAQI };
