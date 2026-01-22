@@ -132,6 +132,7 @@
                     throw new Error('Invalid API response format');
                 }
                 
+                // Note: 'dominentpol' is intentionally misspelled to match AQICN API field name
                 return {
                     success: true,
                     aqi: data.data.aqi,
