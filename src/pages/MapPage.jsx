@@ -8,6 +8,7 @@ import ZoomControl from '../components/ZoomControl';
 import SkyInfoPanel from '../components/SkyInfoPanel';
 import AQIView from '../components/AQIView';
 import LightPollutionView from '../components/LightPollutionView';
+import ConstellationView from '../components/ConstellationView';
 import UltimateView from '../components/UltimateView';
 import ViewToggle from '../components/ViewToggle';
 import AutocompleteInput from '../components/AutocompleteInput';
@@ -578,6 +579,14 @@ function MapPage() {
 
       {currentView === 'light' && (
         <LightPollutionView
+          location={selectedLocation}
+          visible={showSkyInfo}
+          onClose={() => setShowSkyInfo(false)}
+        />
+      )}
+
+      {currentView === 'constellation' && (
+        <ConstellationView
           location={selectedLocation}
           visible={showSkyInfo}
           onClose={() => setShowSkyInfo(false)}
