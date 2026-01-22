@@ -21,8 +21,8 @@ The Ultimate Stargazing Companion!!
   - **AQI View**: Detailed air quality information with breathing quality indicators and health implications
   - **Light Pollution View**: Bortle scale analysis with sky quality measurements and stargazing recommendations
   - **Ultimate View**: Comprehensive report combining AQI, light pollution, and sky conditions into a single score
-- **Real-time AQI Data**: Live Air Quality Index from OpenWeather API:
-  - Comprehensive air pollution data using OpenWeather Air Pollution API
+- **Real-time AQI Data**: Live Air Quality Index from AQICN (World Air Quality Index) API:
+  - Comprehensive air pollution data using AQICN's global monitoring network
   - Detailed pollutant breakdown (PM2.5, PM10, O₃, NO₂, SO₂, CO)
   - Automatic data validation and freshness checks
   - Graceful fallback to estimated data when API is unavailable
@@ -61,11 +61,11 @@ npm install
      ```bash
      cp .env.example .env
      ```
-   - Get your free OpenWeather API key:
-     - **OpenWeather API**: Visit [https://openweathermap.org/api](https://openweathermap.org/api) and sign up for a free API key
+   - Get your free AQICN API token:
+     - **AQICN API**: Visit [https://aqicn.org/data-platform/token/](https://aqicn.org/data-platform/token/) and request a free API token
    - Add your token to `.env`:
      ```
-     VITE_OPENWEATHER_API_KEY=your_actual_openweather_key_here
+     VITE_AQICN_TOKEN=your_actual_aqicn_token_here
      ```
    - **⚠️ SECURITY NOTE**: Never commit your `.env` file with real API tokens to version control. The `.env` file is already in `.gitignore`.
 
@@ -104,13 +104,13 @@ npm run dev
 
 
 **API Features:**
-- OpenWeather Air Pollution API for real-time AQI data
+- AQICN (World Air Quality Index) API for real-time AQI data
 - Real-time data with automatic freshness validation
 - Detailed pollutant measurements (PM2.5, PM10, O₃, NO₂, SO₂, CO)
-- Air Quality Index on a 1-5 scale (mapped to standard EPA AQI)
+- Air Quality Index on US EPA standard (0-500 scale)
 - Automatic fallback to estimated data if API fails
 - Data source clearly displayed in UI
-- Free tier available (1,000 calls/day with rate limits)
+- Free tier available (1,000 calls/minute with rate limits)
 - Comprehensive error handling and logging
 
 **Note**: The app will work with estimated data if the API token is not configured, but real-time data is recommended for accurate air quality information.
@@ -136,7 +136,7 @@ No setup is required for sky viewability data.
 - OpenTopoMap (Terrain Map Tiles)
 - Esri World Imagery (Satellite View)
 - 7Timer! Astronomical Weather API
-- OpenWeather Air Pollution API - Exclusive AQI data source
+- AQICN (World Air Quality Index) API - Exclusive AQI data source
 
 ## Performance Optimizations
 
