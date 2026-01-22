@@ -129,7 +129,7 @@ function MapPage() {
         id: Date.now(),
         position: [lat, lon],
         name: name,
-        aqi: aqiData ? aqiData.aqi : 'N/A',
+        aqi: aqiData ? aqiData.aqi : 50, // Default to "Good" AQI (exact numeric value)
         aqiCategory: aqiData ? getAQICategory(aqiData.aqi) : null,
         lightPollution: lightData,
         pollutionIndex: lightData ? lightData.bortleClass : DEFAULT_BORTLE_CLASS
@@ -253,7 +253,7 @@ function MapPage() {
         id: Date.now(),
         position: [lat, lon],
         name: name,
-        aqi: aqiData ? aqiData.aqi : 'N/A',
+        aqi: aqiData ? aqiData.aqi : 50, // Default to "Good" AQI (exact numeric value)
         aqiCategory: aqiData ? getAQICategory(aqiData.aqi) : null,
         lightPollution: lightData,
         pollutionIndex: lightData ? lightData.bortleClass : DEFAULT_BORTLE_CLASS,
