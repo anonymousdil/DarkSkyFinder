@@ -65,7 +65,7 @@ const AQI_BREAKPOINTS = {
 };
 
 function calculateAQI(concentration, breakpoints) {
-  if (concentration == null || concentration < 0) {
+  if (concentration === null || concentration === undefined || concentration < 0) {
     return null;
   }
 
