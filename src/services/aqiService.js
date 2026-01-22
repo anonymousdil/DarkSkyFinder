@@ -256,6 +256,7 @@ async function fetchAQIFromAPI(lat, lon) {
 
   // Extract pollutant concentrations from iaqi (Individual Air Quality Index)
   // AQICN provides pollutant data in iaqi object where each pollutant has a 'v' value
+  // Note: These are already AQI values (not raw concentrations in µg/m³)
   const iaqi = aqicnData.iaqi || {};
   
   const pm25 = iaqi.pm25?.v ?? null;
@@ -265,13 +266,14 @@ async function fetchAQIFromAPI(lat, lon) {
   const so2 = iaqi.so2?.v ?? null;
   const co = iaqi.co?.v ?? null;
 
-  // Calculate exact numeric AQI values from PM2.5 and PM10 concentrations
-  // Note: AQICN provides concentrations in different units, we need to use them to calculate EPA AQI
-  const pm25AQI = pm25 !== null ? calculateAQI(pm25, AQI_BREAKPOINTS.pm25) : null;
-  const pm10AQI = pm10 !== null ? calculateAQI(pm10, AQI_BREAKPOINTS.pm10) : null;
+  // AQICN already provides AQI values in iaqi, not raw concentrations
+  // So we use them directly as AQI values
+  const pm25AQI = pm25 !== null ? pm25 : null;
+  const pm10AQI = pm10 !== null ? pm10 : null;
 
   // Get dominant pollutant from AQICN (they provide it directly)
-  let dominant = aqicnData.dominentpol || 'pm2_5'; // Note: AQICN spells it as "dominentpol"
+  // Note: AQICN API uses the spelling "dominentpol" (their typo, not ours)
+  let dominant = aqicnData.dominentpol || 'pm2_5';
   
   // Normalize dominant pollutant name to match our convention
   if (dominant === 'pm25') {
