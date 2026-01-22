@@ -1,330 +1,75 @@
-/**
- * AQI Service - Provides Air Quality Index data exclusively from OpenWeather API
- * This service fetches, processes, and caches AQI data with enhanced error handling
- */
+// exactAQI.js
+// Calculates US EPA AQI using PM2.5 and PM10 (most dominant)
 
-// Cache for AQI data to minimize API calls
-const cache = new Map();
-const CACHE_DURATION = 3600000; // 1 hour in milliseconds
-const STALE_THRESHOLD = 10800000; // 3 hours in milliseconds
+const OPENWEATHER_API_KEY = import.meta.env.VITE_OPENWEATHER_API_KEY;;
 
 /**
- * Function to fetch AQI data from OpenWeather API
- * @param {number} lat - Latitude
- * @param {number} lon - Longitude
- * @returns {Promise<Object>} Enriched AQI data
+ * AQI breakpoints (US EPA)
  */
-const fetchFromOpenWeather = async (lat, lon) => {
-  const openWeatherApiKey = import.meta.env.VITE_OPENWEATHER_API_KEY;
-
-  // Validate coordinates
-  if (typeof lat !== 'number' || typeof lon !== 'number') {
-    throw new Error('Invalid coordinates: latitude and longitude must be numbers');
-  }
-  
-  if (lat < -90 || lat > 90) {
-    throw new Error(`Invalid latitude: ${lat}. Must be between -90 and 90`);
-  }
-  
-  if (lon < -180 || lon > 180) {
-    throw new Error(`Invalid longitude: ${lon}. Must be between -180 and 180`);
-  }
-
-  // Validate API key
-  if (!openWeatherApiKey) {
-    console.error('[AQI Service] OpenWeather API key is missing in the environment variables.');
-    throw new Error('OpenWeather API key not configured. Please add VITE_OPENWEATHER_API_KEY to .env.');
-  }
-
-  console.log(`[AQI Service] Fetching AQI data from OpenWeather for coordinates: ${lat}, ${lon}`);
-
-  try {
-    // OpenWeather API endpoint for Air Pollution data
-    const apiUrl = `https://api.openweathermap.org/data/2.5/air_pollution?lat=${lat}&lon=${lon}&appid=${openWeatherApiKey}`;
-    // Log API URL with masked key for debugging (using split/join to avoid regex issues)
-    console.log(`[AQI Service] API URL: ${apiUrl.split(openWeatherApiKey).join('API_KEY_HIDDEN')}`);
-    
-    const response = await fetch(apiUrl);
-
-    // Check HTTP response status
-    if (!response.ok) {
-      const errorText = await response.text();
-      console.error(`[AQI Service] Failed API call. Status code: ${response.status}`);
-      console.error(`[AQI Service] Response: ${errorText}`);
-      
-      // Provide more specific error messages based on status code
-      if (response.status === 401) {
-        throw new Error('Invalid API key. Please check your VITE_OPENWEATHER_API_KEY in .env file.');
-      } else if (response.status === 429) {
-        throw new Error('API rate limit exceeded. Please try again later.');
-      } else if (response.status === 404) {
-        throw new Error('Location not found by OpenWeather API.');
-      } else {
-        throw new Error(`Failed to fetch AQI data from OpenWeather API. Status: ${response.status}`);
-      }
-    }
-
-    const data = await response.json();
-
-    // Validate response data
-    if (!data.list || !data.list[0] || !data.list[0].main || !data.list[0].components) {
-      console.error('[AQI Service] Invalid response format from OpenWeather API:', data);
-      throw new Error('Invalid response format from OpenWeather API.');
-    }
-
-    const components = data.list[0].components;
-    const aqiValue = data.list[0].main.aqi;
-
-    // Determine dominant pollutant based on component values
-    const dominantPollutant = determineDominantPollutant(components);
-
-    // Extract AQI and pollutants with enriched metadata
-    // Note: OpenWeather API returns all pollutant concentrations in μg/m³
-    // including CO, which is sometimes measured in ppm elsewhere but is μg/m³ here
-    const enrichedData = {
-      aqi: aqiValue,                                      // Air Quality Index value (1-5 scale from OpenWeather)
-      pm25: components.pm2_5 || 0,                        // PM2.5 in μg/m³
-      pm10: components.pm10 || 0,                         // PM10 in μg/m³
-      o3: components.o3 || 0,                             // Ozone in μg/m³
-      no2: components.no2 || 0,                           // Nitrogen dioxide in μg/m³
-      so2: components.so2 || 0,                           // Sulfur dioxide in μg/m³
-      co: components.co || 0,                             // Carbon monoxide in μg/m³
-      dominant: dominantPollutant,                        // Dominant pollutant code
-      components: components,                             // Full components object
-      timestamp: Date.now(),                              // Timestamp in milliseconds
-      station: `${lat.toFixed(2)}°, ${lon.toFixed(2)}°`, // Location as coordinates
-      source: 'OpenWeather',                              // API source attribution
-      isMockData: false,                                  // Real data flag
-      isStale: false                                      // Data freshness flag
-    };
-
-    console.log('[AQI Service] Successfully fetched and enriched AQI data:', enrichedData);
-
-    return enrichedData;
-  } catch (error) {
-    console.error('[AQI Service] Error fetching AQI data from OpenWeather:', error.message);
-    throw error;
-  }
+const AQI_BREAKPOINTS = {
+  pm25: [
+    { cLow: 0.0, cHigh: 12.0, aqiLow: 0, aqiHigh: 50 },
+    { cLow: 12.1, cHigh: 35.4, aqiLow: 51, aqiHigh: 100 },
+    { cLow: 35.5, cHigh: 55.4, aqiLow: 101, aqiHigh: 150 },
+    { cLow: 55.5, cHigh: 150.4, aqiLow: 151, aqiHigh: 200 },
+    { cLow: 150.5, cHigh: 250.4, aqiLow: 201, aqiHigh: 300 },
+    { cLow: 250.5, cHigh: 350.4, aqiLow: 301, aqiHigh: 400 },
+    { cLow: 350.5, cHigh: 500.4, aqiLow: 401, aqiHigh: 500 }
+  ],
+  pm10: [
+    { cLow: 0, cHigh: 54, aqiLow: 0, aqiHigh: 50 },
+    { cLow: 55, cHigh: 154, aqiLow: 51, aqiHigh: 100 },
+    { cLow: 155, cHigh: 254, aqiLow: 101, aqiHigh: 150 },
+    { cLow: 255, cHigh: 354, aqiLow: 151, aqiHigh: 200 },
+    { cLow: 355, cHigh: 424, aqiLow: 201, aqiHigh: 300 },
+    { cLow: 425, cHigh: 504, aqiLow: 301, aqiHigh: 400 },
+    { cLow: 505, cHigh: 604, aqiLow: 401, aqiHigh: 500 }
+  ]
 };
 
 /**
- * Determine the dominant pollutant from components
- * @param {Object} components - Pollutant components
- * @returns {string} Dominant pollutant code
+ * Linear AQI calculation
  */
-const determineDominantPollutant = (components) => {
-  const pollutants = [
-    { code: 'pm25', value: components.pm2_5 || 0 },
-    { code: 'pm10', value: components.pm10 || 0 },
-    { code: 'o3', value: components.o3 || 0 },
-    { code: 'no2', value: components.no2 || 0 },
-    { code: 'so2', value: components.so2 || 0 },
-    { code: 'co', value: components.co || 0 }
-  ];
-
-  // Find pollutant with highest value
-  const dominant = pollutants.reduce((max, current) => 
-    current.value > max.value ? current : max
-  , pollutants[0]);
-
-  // If all values are zero (clean air or missing data), default to pm25
-  if (dominant.value === 0) {
-    return 'pm25';
-  }
-
-  return dominant.code;
-};
-
-/**
- * Get AQI data for a location (main export function)
- * @param {number} lat - Latitude
- * @param {number} lon - Longitude
- * @param {Object} options - Optional configuration
- * @param {boolean} options.forceFresh - Force fetching fresh data, bypassing cache
- * @returns {Promise<Object>} AQI data with metadata
- */
-export const getAQI = async (lat, lon, options = {}) => {
-  const { forceFresh = false } = options;
-  const cacheKey = `${lat.toFixed(2)},${lon.toFixed(2)}`;
-
-  // Check cache first (unless forceFresh is true)
-  if (!forceFresh) {
-    const cachedData = cache.get(cacheKey);
-    if (cachedData && Date.now() - cachedData.timestamp < CACHE_DURATION) {
-      console.log('[AQI Service] Returning cached AQI data');
-      // Check if original data timestamp (stored in data object) is stale
-      const isStale = cachedData.data.timestamp && 
-                      (Date.now() - cachedData.data.timestamp > STALE_THRESHOLD);
-      return { ...cachedData.data, isStale };
+function calculateAQI(concentration, breakpoints) {
+  for (const bp of breakpoints) {
+    if (concentration >= bp.cLow && concentration <= bp.cHigh) {
+      return Math.round(
+        ((bp.aqiHigh - bp.aqiLow) / (bp.cHigh - bp.cLow)) *
+        (concentration - bp.cLow) +
+        bp.aqiLow
+      );
     }
   }
-
-  console.log(forceFresh ? '[AQI Service] Force refresh requested, fetching fresh data' : '[AQI Service] Cache miss or expired, fetching fresh data');
-
-  try {
-    // Fetch from OpenWeather API
-    const aqiData = await fetchFromOpenWeather(lat, lon);
-
-    // Cache the result
-    cache.set(cacheKey, {
-      data: aqiData,
-      timestamp: Date.now()
-    });
-
-    return aqiData;
-  } catch (error) {
-    console.error('[AQI Service] Failed to fetch AQI data:', error.message);
-    
-    // Return mock data as fallback
-    console.warn('[AQI Service] Returning mock/estimated AQI data');
-    return {
-      aqi: 2,                                      // Moderate air quality
-      pm25: 25,
-      pm10: 40,
-      o3: 50,
-      no2: 30,
-      so2: 20,
-      co: 400,
-      dominant: 'pm25',
-      timestamp: Date.now(),
-      station: `${lat.toFixed(2)}°, ${lon.toFixed(2)}°`,
-      source: 'Estimated',
-      isMockData: true,
-      isStale: false
-    };
-  }
-};
+  return null;
+}
 
 /**
- * Get AQI category information based on AQI value
- * OpenWeather uses a 1-5 scale, this function maps it to standard AQI categories
- * @param {number} aqi - AQI value (1-5 from OpenWeather, or 0-500 from other sources)
- * @returns {Object} Category information
+ * Fetch and compute exact AQI
  */
-export const getAQICategory = (aqi) => {
-  // OpenWeather uses 1-5 scale, convert to standard 0-500 scale if needed
-  let standardAqi = aqi;
-  if (aqi <= 5) {
-    // Map OpenWeather 1-5 scale to approximate standard AQI midpoints
-    // Based on OpenWeather Air Quality Index documentation:
-    // 1 = Good, 2 = Fair, 3 = Moderate, 4 = Poor, 5 = Very Poor
-    // Mapped to EPA AQI scale midpoints for representative values
-    const mapping = { 
-      1: 25,   // Good: midpoint of 0-50
-      2: 75,   // Fair/Moderate: midpoint of 51-100
-      3: 125,  // Moderate/Unhealthy for Sensitive: midpoint of 101-150
-      4: 175,  // Unhealthy: midpoint of 151-200
-      5: 250   // Very Unhealthy: midpoint of 201-300
-    };
-    standardAqi = mapping[aqi] || 75;
-  }
+async function getExactAQI(lat, lon) {
+  const url = `https://api.openweathermap.org/data/2.5/air_pollution?lat=${lat}&lon=${lon}&appid=OPENWEATHER_API_KEY`;
 
-  if (standardAqi <= 50) {
-    return {
-      level: 'Good',
-      color: '#00e400',
-      description: 'Air quality is satisfactory',
-      breathingQuality: 'Excellent',
-      healthImplications: 'Air quality is considered satisfactory, and air pollution poses little or no risk.',
-      stargazingImpact: 'Minimal impact on sky visibility'
-    };
-  } else if (standardAqi <= 100) {
-    return {
-      level: 'Moderate',
-      color: '#ffff00',
-      description: 'Air quality is acceptable',
-      breathingQuality: 'Good',
-      healthImplications: 'Air quality is acceptable for most people. However, sensitive groups may experience minor respiratory effects.',
-      stargazingImpact: 'Slight haze may affect horizon visibility'
-    };
-  } else if (standardAqi <= 150) {
-    return {
-      level: 'Unhealthy for Sensitive Groups',
-      color: '#ff7e00',
-      description: 'Sensitive groups may be affected',
-      breathingQuality: 'Acceptable',
-      healthImplications: 'Members of sensitive groups may experience health effects. The general public is less likely to be affected.',
-      stargazingImpact: 'Moderate haze affecting sky clarity'
-    };
-  } else if (standardAqi <= 200) {
-    return {
-      level: 'Unhealthy',
-      color: '#ff0000',
-      description: 'Everyone may begin to experience health effects',
-      breathingQuality: 'Poor',
-      healthImplications: 'Everyone may begin to experience health effects; members of sensitive groups may experience more serious health effects.',
-      stargazingImpact: 'Significant haze reducing visibility'
-    };
-  } else if (standardAqi <= 300) {
-    return {
-      level: 'Very Unhealthy',
-      color: '#8f3f97',
-      description: 'Health alert: everyone may experience serious effects',
-      breathingQuality: 'Very Poor',
-      healthImplications: 'Health warnings of emergency conditions. The entire population is more likely to be affected.',
-      stargazingImpact: 'Heavy haze severely limiting visibility'
-    };
-  } else {
-    return {
-      level: 'Hazardous',
-      color: '#7e0023',
-      description: 'Health warnings of emergency conditions',
-      breathingQuality: 'Hazardous',
-      healthImplications: 'Health alert: everyone may experience more serious health effects.',
-      stargazingImpact: 'Extreme haze making stargazing difficult'
-    };
-  }
-};
+  const res = await fetch(url);
+  const data = await res.json();
 
-/**
- * Get pollutant information
- * @param {string} pollutantCode - Pollutant code (pm25, pm10, o3, no2, so2, co)
- * @returns {Object} Pollutant information
- */
-export const getPollutantInfo = (pollutantCode) => {
-  const pollutants = {
-    pm25: {
-      name: 'PM2.5',
-      fullName: 'Fine Particulate Matter (PM2.5)',
-      unit: 'μg/m³',
-      description: 'Tiny particles that can penetrate deep into lungs'
-    },
-    pm10: {
-      name: 'PM10',
-      fullName: 'Particulate Matter (PM10)',
-      unit: 'μg/m³',
-      description: 'Inhalable particles that can affect respiratory system'
-    },
-    o3: {
-      name: 'O₃',
-      fullName: 'Ozone',
-      unit: 'μg/m³',
-      description: 'Ground-level ozone, a harmful air pollutant'
-    },
-    no2: {
-      name: 'NO₂',
-      fullName: 'Nitrogen Dioxide',
-      unit: 'μg/m³',
-      description: 'Harmful gas from vehicle and industrial emissions'
-    },
-    so2: {
-      name: 'SO₂',
-      fullName: 'Sulfur Dioxide',
-      unit: 'μg/m³',
-      description: 'Harmful gas from burning fossil fuels'
-    },
-    co: {
-      name: 'CO',
-      fullName: 'Carbon Monoxide',
-      unit: 'μg/m³',
-      description: 'Colorless, odorless gas from combustion'
-    }
+  const pm25 = data.list[0].components.pm2_5;
+  const pm10 = data.list[0].components.pm10;
+
+  const pm25AQI = calculateAQI(pm25, AQI_BREAKPOINTS.pm25);
+  const pm10AQI = calculateAQI(pm10, AQI_BREAKPOINTS.pm10);
+
+  return {
+    exactAQI: Math.max(pm25AQI, pm10AQI),
+    pm25AQI,
+    pm10AQI
   };
+}
 
-  return pollutants[pollutantCode] || {
-    name: pollutantCode || 'Unknown',
-    fullName: 'Unknown Pollutant',
-    unit: 'μg/m³',
-    description: 'Pollutant information not available'
-  };
-};
+// Example usage
+(async () => {
+  const lat = 17.385;
+  const lon = 78.4867;
+
+  const result = await getExactAQI(lat, lon);
+  console.log(result);
+})();
