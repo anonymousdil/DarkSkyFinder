@@ -1,7 +1,7 @@
 // exactAQI.js
 // Calculates US EPA AQI using PM2.5 and PM10 (most dominant)
 
-const OPENWEATHER_API_KEY = import.meta.env.VITE_OPENWEATHER_API_KEY;;
+const OPENWEATHER_API_KEY = import.meta.env.OPENWEATHER_API_KEY;;
 
 /**
  * AQI breakpoints (US EPA)
