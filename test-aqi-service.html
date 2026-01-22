@@ -89,7 +89,9 @@
 
     <script type="module">
         // Test configuration
-        const API_KEY = 'bca4460ade4fda9cce3c64440a1d9be8';
+        // Note: In production, API keys should be stored in environment variables
+        // This is a test API key for demonstration purposes only
+        const API_KEY = import.meta.env?.VITE_OPENWEATHER_API_KEY || 'YOUR_API_KEY_HERE';
         const testLocations = [
             { name: 'Noida, India', lat: 28.5355, lon: 77.3910, expectedAQI: [2, 3, 4] },
             { name: 'New York, USA', lat: 40.7128, lon: -74.0060, expectedAQI: [1, 2, 3] },

@@ -41,7 +41,8 @@ const fetchFromOpenWeather = async (lat, lon) => {
   try {
     // OpenWeather API endpoint for Air Pollution data
     const apiUrl = `https://api.openweathermap.org/data/2.5/air_pollution?lat=${lat}&lon=${lon}&appid=${openWeatherApiKey}`;
-    console.log(`[AQI Service] API URL: ${apiUrl.replace(openWeatherApiKey, 'API_KEY_HIDDEN')}`);
+    // Log API URL with masked key for debugging (using split/join to avoid regex issues)
+    console.log(`[AQI Service] API URL: ${apiUrl.split(openWeatherApiKey).join('API_KEY_HIDDEN')}`);
     
     const response = await fetch(apiUrl);
 
@@ -78,6 +79,8 @@ const fetchFromOpenWeather = async (lat, lon) => {
     const dominantPollutant = determineDominantPollutant(components);
 
     // Extract AQI and pollutants with enriched metadata
+    // Note: OpenWeather API returns all pollutant concentrations in μg/m³
+    // including CO, which is sometimes measured in ppm elsewhere but is μg/m³ here
     const enrichedData = {
       aqi: aqiValue,                                      // Air Quality Index value (1-5 scale from OpenWeather)
       pm25: components.pm2_5 || 0,                        // PM2.5 in μg/m³
