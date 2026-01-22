@@ -248,20 +248,28 @@ async function fetchAQIFromAPI(lat, lon) {
   const components = data.list[0].components;
 
   // Extract pollutant concentrations (in μg/m³)
-  const pm25 = components.pm2_5 || 0;
-  const pm10 = components.pm10 || 0;
-  const o3 = components.o3 || null;
-  const no2 = components.no2 || null;
-  const so2 = components.so2 || null;
-  const co = components.co || null;
+  // Don't default missing PM values to 0 - treat as null to avoid misleading "clean air" readings
+  const pm25 = components.pm2_5 ?? null;
+  const pm10 = components.pm10 ?? null;
+  const o3 = components.o3 ?? null;
+  const no2 = components.no2 ?? null;
+  const so2 = components.so2 ?? null;
+  const co = components.co ?? null;
 
   // Calculate exact numeric AQI values from PM2.5 and PM10
   const pm25AQI = calculateAQI(pm25, AQI_BREAKPOINTS.pm25);
   const pm10AQI = calculateAQI(pm10, AQI_BREAKPOINTS.pm10);
 
   // The overall AQI is the maximum of PM2.5 and PM10 AQI (exact numeric value)
-  // Use nullish coalescing to handle null values from calculateAQI
-  const overallAQI = Math.max(pm25AQI ?? 0, pm10AQI ?? 0);
+  // If both are null, the overall AQI should also be null to avoid misleading data
+  let overallAQI;
+  if (pm25AQI === null && pm10AQI === null) {
+    console.warn('[AQI Service] Both PM2.5 and PM10 data are missing - cannot calculate accurate AQI');
+    overallAQI = null;
+  } else {
+    // Use 0 as fallback only when one value exists and the other is null
+    overallAQI = Math.max(pm25AQI ?? 0, pm10AQI ?? 0);
+  }
 
   // Determine dominant pollutant (with null checks)
   let dominant = 'pm2_5';
@@ -271,7 +279,12 @@ async function fetchAQIFromAPI(lat, lon) {
     dominant = 'pm10';
   }
 
-  console.log(`[AQI Service] Successfully fetched and calculated exact numeric AQI: ${overallAQI}`);
+  console.log(`[AQI Service] Successfully fetched and calculated exact numeric AQI: ${overallAQI ?? 'N/A (missing PM data)'}`);
+
+  // If we couldn't calculate AQI due to missing data, throw an error to trigger fallback
+  if (overallAQI === null) {
+    throw new Error('Cannot calculate AQI - both PM2.5 and PM10 data are missing from API response');
+  }
 
   return {
     aqi: overallAQI, // Exact numeric value (0-500 scale)
