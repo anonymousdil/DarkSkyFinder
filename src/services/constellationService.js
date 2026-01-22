@@ -258,12 +258,52 @@ export const getBestViewingTime = async (lat, lon, date = new Date()) => {
     const sunsetDate = sunset.date;
     const sunriseDate = sunrise.date;
     
-    // Find astronomical twilight (sun 18° below horizon)
-    const nightStart = new Date(sunsetDate.getTime());
-    nightStart.setHours(nightStart.getHours() + 1.5); // Approximate astronomical twilight
+    // Calculate astronomical twilight more accurately
+    // Astronomical twilight ends when sun is 18° below horizon
+    let nightStart = new Date(sunsetDate.getTime());
+    let nightEnd = new Date(sunriseDate.getTime());
     
-    const nightEnd = new Date(sunriseDate.getTime());
-    nightEnd.setHours(nightEnd.getHours() - 1.5);
+    try {
+      // Try to find precise astronomical twilight times
+      // Search for when sun reaches -18° altitude after sunset
+      const astroTwilightEvening = Astronomy.SearchAltitude(
+        Astronomy.Body.Sun, 
+        observer, 
+        1,  // direction: descending (sun going down)
+        sunsetDate, 
+        1,  // limitDays: search within 1 day
+        -18 // target altitude
+      );
+      
+      if (astroTwilightEvening) {
+        nightStart = astroTwilightEvening.date;
+      } else {
+        // Fallback to approximation
+        nightStart.setHours(nightStart.getHours() + 1.5);
+      }
+      
+      // Search for when sun reaches -18° altitude before sunrise
+      const astroTwilightMorning = Astronomy.SearchAltitude(
+        Astronomy.Body.Sun, 
+        observer, 
+        -1, // direction: ascending (sun coming up)
+        sunriseDate, 
+        1,  // limitDays: search within 1 day
+        -18 // target altitude
+      );
+      
+      if (astroTwilightMorning) {
+        nightEnd = astroTwilightMorning.date;
+      } else {
+        // Fallback to approximation
+        nightEnd.setHours(nightEnd.getHours() - 1.5);
+      }
+    } catch (twilightError) {
+      // If astronomical twilight calculation fails, use approximation
+      console.warn('Using approximate astronomical twilight:', twilightError);
+      nightStart.setHours(nightStart.getHours() + 1.5);
+      nightEnd.setHours(nightEnd.getHours() - 1.5);
+    }
     
     // Calculate midnight (best viewing time)
     const midnight = new Date((nightStart.getTime() + nightEnd.getTime()) / 2);
@@ -297,20 +337,20 @@ export const getBestViewingTime = async (lat, lon, date = new Date()) => {
 export const getVisiblePlanets = (lat, lon, date = new Date()) => {
   try {
     const observer = new Astronomy.Observer(lat, lon, 0);
-    const planets = [
-      Astronomy.Body.Mercury,
-      Astronomy.Body.Venus,
-      Astronomy.Body.Mars,
-      Astronomy.Body.Jupiter,
-      Astronomy.Body.Saturn
+    const planetBodies = [
+      { body: Astronomy.Body.Mercury, name: 'Mercury' },
+      { body: Astronomy.Body.Venus, name: 'Venus' },
+      { body: Astronomy.Body.Mars, name: 'Mars' },
+      { body: Astronomy.Body.Jupiter, name: 'Jupiter' },
+      { body: Astronomy.Body.Saturn, name: 'Saturn' }
     ];
     
-    const visiblePlanets = planets.map(planet => {
-      const equatorial = Astronomy.Equator(planet, date, observer, true, true);
+    const visiblePlanets = planetBodies.map(({ body, name }) => {
+      const equatorial = Astronomy.Equator(body, date, observer, true, true);
       const horizontal = Astronomy.Horizon(date, observer, equatorial.ra, equatorial.dec, 'normal');
       
       return {
-        name: planet,
+        name,
         ra: equatorial.ra,
         dec: equatorial.dec,
         altitude: horizontal.altitude,

@@ -66,7 +66,7 @@ function ConstellationView({ location, visible, onClose }) {
   const handleTimeChange = (e) => {
     const [hours, minutes] = e.target.value.split(':');
     const newDate = new Date(selectedDate);
-    newDate.setHours(parseInt(hours), parseInt(minutes));
+    newDate.setHours(parseInt(hours, 10), parseInt(minutes, 10));
     setSelectedDate(newDate);
   };
 
