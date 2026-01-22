@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AQI Service Test - Manual Browser Testing Only</title>
+    <title>AQI Service Test - Manual Browser Testing Only (AQICN API)</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -73,10 +73,10 @@
         <h2>⚠️ Important: Manual Browser Testing Only</h2>
         <div class="test-result info">
             <p><strong>This test file is designed for manual testing in a web browser only.</strong></p>
-            <p>It makes direct API calls to OpenWeather, which will be blocked in GitHub Actions CI environment.</p>
+            <p>It makes direct API calls to AQICN, which will be blocked in GitHub Actions CI environment.</p>
             <p><strong>How to use:</strong></p>
             <ol>
-                <li>Make sure you have configured <code>VITE_OPENWEATHER_API_KEY</code> in your <code>.env</code> file</li>
+                <li>Make sure you have configured <code>VITE_AQICN_TOKEN</code> in your <code>.env</code> file</li>
                 <li>Start the development server: <code>npm run dev</code></li>
                 <li>Open this file directly in your browser: <code>http://localhost:5173/test-aqi-service.html</code></li>
                 <li>Click "Run All Tests" to verify the AQI integration</li>
@@ -90,10 +90,11 @@
         <div class="test-result info">
             <strong>Test Locations:</strong>
             <ul>
-                <li>Noida, India (28.5355°N, 77.3910°E) - Expected: Moderate to Unhealthy AQI</li>
-                <li>New York, USA (40.7128°N, 74.0060°W) - Expected: Good to Moderate AQI</li>
-                <li>Rural Australia (-25.2744°S, 133.7751°E) - Expected: Good AQI</li>
+                <li>Noida, India (28.5355°N, 77.3910°E) - Expected: Moderate to Unhealthy AQI (50-300)</li>
+                <li>New York, USA (40.7128°N, 74.0060°W) - Expected: Good to Moderate AQI (0-150)</li>
+                <li>Rural Australia (-25.2744°S, 133.7751°E) - Expected: Good AQI (0-100)</li>
             </ul>
+            <strong>Note:</strong> AQICN returns AQI values on the US EPA 0-500 scale directly.
         </div>
     </div>
 
@@ -105,17 +106,17 @@
 
     <script type="module">
         // Test configuration
-        // Note: In production, API keys should be stored in environment variables
-        // This is a test API key for demonstration purposes only
-        const API_KEY = import.meta.env?.VITE_OPENWEATHER_API_KEY || 'YOUR_API_KEY_HERE';
+        // Note: In production, API tokens should be stored in environment variables
+        // This is a test API token for demonstration purposes only
+        const API_TOKEN = import.meta.env?.VITE_AQICN_TOKEN || 'YOUR_API_TOKEN_HERE';
         const testLocations = [
-            { name: 'Noida, India', lat: 28.5355, lon: 77.3910, expectedAQI: [2, 3, 4] },
-            { name: 'New York, USA', lat: 40.7128, lon: -74.0060, expectedAQI: [1, 2, 3] },
-            { name: 'Rural Australia', lat: -25.2744, lon: 133.7751, expectedAQI: [1, 2] }
+            { name: 'Noida, India', lat: 28.5355, lon: 77.3910, expectedAQI: [50, 300] },
+            { name: 'New York, USA', lat: 40.7128, lon: -74.0060, expectedAQI: [0, 150] },
+            { name: 'Rural Australia', lat: -25.2744, lon: 133.7751, expectedAQI: [0, 100] }
         ];
 
-        async function testOpenWeatherAPI(lat, lon) {
-            const url = `https://api.openweathermap.org/data/2.5/air_pollution?lat=${lat}&lon=${lon}&appid=${API_KEY}`;
+        async function testAQICNAPI(lat, lon) {
+            const url = `https://api.waqi.info/feed/geo:${lat};${lon}/?token=${API_TOKEN}`;
             
             try {
                 const response = await fetch(url);
@@ -127,15 +128,16 @@
                 
                 const data = await response.json();
                 
-                if (!data.list || !data.list[0]) {
+                if (data.status !== 'ok' || !data.data) {
                     throw new Error('Invalid API response format');
                 }
                 
                 return {
                     success: true,
-                    aqi: data.list[0].main.aqi,
-                    components: data.list[0].components,
-                    coord: data.coord
+                    aqi: data.data.aqi,
+                    dominentpol: data.data.dominentpol,
+                    iaqi: data.data.iaqi,
+                    city: data.data.city
                 };
             } catch (error) {
                 return {
@@ -147,23 +149,24 @@
 
         async function testAQICategories() {
             const categories = [
-                { aqi: 1, expected: 'Good' },
-                { aqi: 2, expected: 'Moderate' },
-                { aqi: 3, expected: 'Unhealthy for Sensitive Groups' },
-                { aqi: 4, expected: 'Unhealthy' },
-                { aqi: 5, expected: 'Very Unhealthy' }
+                { aqi: 25, expected: 'Good' },
+                { aqi: 75, expected: 'Moderate' },
+                { aqi: 125, expected: 'Unhealthy for Sensitive Groups' },
+                { aqi: 175, expected: 'Unhealthy' },
+                { aqi: 250, expected: 'Very Unhealthy' },
+                { aqi: 350, expected: 'Hazardous' }
             ];
 
             return categories.map(({ aqi, expected }) => {
-                // Simplified category mapping
-                const levels = {
-                    1: 'Good',
-                    2: 'Moderate',
-                    3: 'Unhealthy for Sensitive Groups',
-                    4: 'Unhealthy',
-                    5: 'Very Unhealthy'
-                };
-                const actual = levels[aqi];
+                // Category mapping for US EPA standard (0-500 scale)
+                let actual;
+                if (aqi <= 50) actual = 'Good';
+                else if (aqi <= 100) actual = 'Moderate';
+                else if (aqi <= 150) actual = 'Unhealthy for Sensitive Groups';
+                else if (aqi <= 200) actual = 'Unhealthy';
+                else if (aqi <= 300) actual = 'Very Unhealthy';
+                else actual = 'Hazardous';
+                
                 return {
                     aqi,
                     expected,
@@ -182,20 +185,22 @@
             // Test 1: API Endpoint Accessibility
             html += '<h3>Test 1: API Endpoint Accessibility</h3>';
             for (const location of testLocations) {
-                const result = await testOpenWeatherAPI(location.lat, location.lon);
+                const result = await testAQICNAPI(location.lat, location.lon);
                 
                 if (result.success) {
-                    const isExpected = location.expectedAQI.includes(result.aqi);
+                    const isExpected = result.aqi >= location.expectedAQI[0] && result.aqi <= location.expectedAQI[1];
                     const className = isExpected ? 'success' : 'info';
+                    const iaqi = result.iaqi || {};
                     html += `
                         <div class="test-result ${className}">
                             <strong>✓ ${location.name}</strong><br>
                             API Call: Success<br>
                             AQI: ${result.aqi} ${isExpected ? '(Expected)' : '(Unexpected but valid)'}<br>
-                            PM2.5: ${result.components.pm2_5.toFixed(1)} µg/m³<br>
-                            PM10: ${result.components.pm10.toFixed(1)} µg/m³<br>
-                            O₃: ${result.components.o3.toFixed(1)} µg/m³<br>
-                            Coordinates verified: ${result.coord ? 'Yes' : 'No'}
+                            Dominant Pollutant: ${result.dominentpol || 'N/A'}<br>
+                            PM2.5: ${iaqi.pm25?.v || 'N/A'} AQI<br>
+                            PM10: ${iaqi.pm10?.v || 'N/A'} AQI<br>
+                            O₃: ${iaqi.o3?.v || 'N/A'} AQI<br>
+                            City: ${result.city?.name || 'N/A'}
                         </div>
                     `;
                 } else {
@@ -231,7 +236,7 @@
             ];
             
             for (const test of invalidTests) {
-                const result = await testOpenWeatherAPI(test.lat, test.lon);
+                const result = await testAQICNAPI(test.lat, test.lon);
                 const className = result.success ? 'error' : 'success';
                 html += `
                     <div class="test-result ${className}">

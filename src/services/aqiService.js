@@ -2,7 +2,7 @@
  * aqiService.js
  * --------------------------------------------
  * Calculates REAL (US EPA) AQI (0–500) using
- * PM2.5 and PM10 data from OpenWeatherMap.
+ * PM2.5 and PM10 data from AQICN (World Air Quality Index).
  * 
  * Provides exact numeric AQI values (not labels) and detailed
  * air quality information for stargazing locations.
@@ -11,17 +11,17 @@
 /* ======================================================
    🔑 API TOKEN SETUP (IMPORTANT)
    ------------------------------------------------------
-   DO NOT hardcode your API key here.
+   DO NOT hardcode your API token here.
 
    Instead, set it as an environment variable in .env file:
 
-   VITE_OPENWEATHER_API_KEY=your_api_token_here
+   VITE_AQICN_TOKEN=your_api_token_here
 
-   Get your free API key at: https://openweathermap.org/api
-   Free tier includes: 1,000 calls/day
+   Get your free API token at: https://aqicn.org/data-platform/token/
+   Free tier includes: 1,000 calls/minute with rate limits
 ====================================================== */
 
-const OPENWEATHER_API_KEY = import.meta.env.VITE_OPENWEATHER_API_KEY; // #add token here
+const AQICN_TOKEN = import.meta.env.VITE_AQICN_TOKEN; // #add token here
 
 /* Cache for AQI data to reduce API calls */
 const aqiCache = new Map();
@@ -205,7 +205,7 @@ function calculateAQI(concentration, breakpoints) {
 ====================================================== */
 
 /**
- * Fetch AQI from OpenWeatherMap and compute exact numeric AQI value
+ * Fetch AQI from AQICN and compute exact numeric AQI value
  * @param {number} lat Latitude
  * @param {number} lon Longitude
  * @returns {Object} AQI details with exact numeric values
@@ -216,75 +216,73 @@ async function fetchAQIFromAPI(lat, lon) {
     throw new Error('Invalid coordinates. Latitude must be between -90 and 90, longitude between -180 and 180.');
   }
 
-  if (!OPENWEATHER_API_KEY) {
-    console.warn('[AQI Service] OpenWeather API key not configured. Using mock data.');
+  if (!AQICN_TOKEN) {
+    console.warn('[AQI Service] AQICN API token not configured. Using mock data.');
     return null;
   }
 
-  const url = `https://api.openweathermap.org/data/2.5/air_pollution?lat=${lat}&lon=${lon}&appid=${OPENWEATHER_API_KEY}`; // #add token here
+  const url = `https://api.waqi.info/feed/geo:${lat};${lon}/?token=${AQICN_TOKEN}`;
 
-  console.log(`[AQI Service] Fetching AQI data from OpenWeather for coordinates: ${lat}, ${lon}`);
+  console.log(`[AQI Service] Fetching AQI data from AQICN for coordinates: ${lat}, ${lon}`);
 
   const response = await fetch(url);
 
   if (!response.ok) {
     if (response.status === 401) {
-      console.error('[AQI Service] API authentication failed. Check your API key.');
-      throw new Error('OpenWeather API authentication failed. Verify your API key is correct and active.');
+      console.error('[AQI Service] API authentication failed. Check your API token.');
+      throw new Error('AQICN API authentication failed. Verify your API token is correct and active.');
     }
     if (response.status === 429) {
       console.error('[AQI Service] API rate limit exceeded.');
-      throw new Error('OpenWeather API rate limit exceeded. Please try again later.');
+      throw new Error('AQICN API rate limit exceeded. Please try again later.');
     }
-    throw new Error(`Failed to fetch AQI data from OpenWeatherMap (Status: ${response.status})`);
+    throw new Error(`Failed to fetch AQI data from AQICN (Status: ${response.status})`);
   }
 
   const data = await response.json();
 
-  if (!data.list || !data.list[0] || !data.list[0].components) {
-    throw new Error('Invalid AQI data received from OpenWeatherMap');
+  if (data.status !== 'ok' || !data.data) {
+    throw new Error('Invalid AQI data received from AQICN');
   }
 
-  const components = data.list[0].components;
+  const aqicnData = data.data;
 
-  // Extract pollutant concentrations (in μg/m³)
-  // Don't default missing PM values to 0 - treat as null to avoid misleading "clean air" readings
-  const pm25 = components.pm2_5 ?? null;
-  const pm10 = components.pm10 ?? null;
-  const o3 = components.o3 ?? null;
-  const no2 = components.no2 ?? null;
-  const so2 = components.so2 ?? null;
-  const co = components.co ?? null;
-
-  // Calculate exact numeric AQI values from PM2.5 and PM10
-  const pm25AQI = calculateAQI(pm25, AQI_BREAKPOINTS.pm25);
-  const pm10AQI = calculateAQI(pm10, AQI_BREAKPOINTS.pm10);
-
-  // The overall AQI is the maximum of PM2.5 and PM10 AQI (exact numeric value)
-  // If both are null, the overall AQI should also be null to avoid misleading data
-  let overallAQI;
-  if (pm25AQI === null && pm10AQI === null) {
-    console.warn('[AQI Service] Both PM2.5 and PM10 data are missing - cannot calculate accurate AQI');
-    overallAQI = null;
-  } else {
-    // Use 0 as fallback only when one value exists and the other is null
-    overallAQI = Math.max(pm25AQI ?? 0, pm10AQI ?? 0);
+  // AQICN returns the overall AQI directly
+  const overallAQI = aqicnData.aqi;
+  
+  if (overallAQI === null || overallAQI === undefined || overallAQI === '-') {
+    throw new Error('Cannot calculate AQI - AQI data is missing from API response');
   }
 
-  // Determine dominant pollutant (with null checks)
-  let dominant = 'pm2_5';
-  if (pm10AQI != null && pm25AQI != null && pm10AQI > pm25AQI) {
-    dominant = 'pm10';
-  } else if (pm10AQI != null && pm25AQI == null) {
-    dominant = 'pm10';
+  // Extract pollutant concentrations from iaqi (Individual Air Quality Index)
+  // AQICN provides pollutant data in iaqi object where each pollutant has a 'v' value
+  const iaqi = aqicnData.iaqi || {};
+  
+  const pm25 = iaqi.pm25?.v ?? null;
+  const pm10 = iaqi.pm10?.v ?? null;
+  const o3 = iaqi.o3?.v ?? null;
+  const no2 = iaqi.no2?.v ?? null;
+  const so2 = iaqi.so2?.v ?? null;
+  const co = iaqi.co?.v ?? null;
+
+  // Calculate exact numeric AQI values from PM2.5 and PM10 concentrations
+  // Note: AQICN provides concentrations in different units, we need to use them to calculate EPA AQI
+  const pm25AQI = pm25 !== null ? calculateAQI(pm25, AQI_BREAKPOINTS.pm25) : null;
+  const pm10AQI = pm10 !== null ? calculateAQI(pm10, AQI_BREAKPOINTS.pm10) : null;
+
+  // Get dominant pollutant from AQICN (they provide it directly)
+  let dominant = aqicnData.dominentpol || 'pm2_5'; // Note: AQICN spells it as "dominentpol"
+  
+  // Normalize dominant pollutant name to match our convention
+  if (dominant === 'pm25') {
+    dominant = 'pm2_5';
   }
 
-  console.log(`[AQI Service] Successfully fetched and calculated exact numeric AQI: ${overallAQI ?? 'N/A (missing PM data)'}`);
+  console.log(`[AQI Service] Successfully fetched and calculated exact numeric AQI: ${overallAQI}`);
 
-  // If we couldn't calculate AQI due to missing data, throw an error to trigger fallback
-  if (overallAQI === null) {
-    throw new Error('Cannot calculate AQI - both PM2.5 and PM10 data are missing from API response');
-  }
+  // Extract city information and metadata
+  const cityInfo = aqicnData.city || {};
+  const attribution = aqicnData.attributions || [];
 
   return {
     aqi: overallAQI, // Exact numeric value (0-500 scale)
@@ -298,8 +296,12 @@ async function fetchAQIFromAPI(lat, lon) {
     co,
     dominant,
     timestamp: Date.now(),
-    source: 'OpenWeather',
-    isMockData: false
+    source: 'AQICN',
+    isMockData: false,
+    cityName: cityInfo.name || null,
+    cityUrl: cityInfo.url || null,
+    attribution: attribution.length > 0 ? attribution : null,
+    forecast: aqicnData.forecast || null
   };
 }
 
