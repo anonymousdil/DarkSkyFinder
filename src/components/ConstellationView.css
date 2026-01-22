@@ -1,0 +1,514 @@
+.constellation-panel {
+  position: fixed;
+  right: 20px;
+  top: 80px;
+  width: 450px;
+  max-width: calc(100vw - 40px);
+  max-height: calc(100vh - 100px);
+  background: rgba(255, 255, 255, 0.98);
+  border-radius: 12px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  backdrop-filter: blur(10px);
+}
+
+.constellation-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 20px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border-radius: 12px 12px 0 0;
+}
+
+.constellation-header h3 {
+  margin: 0;
+  font-size: 1.4rem;
+  font-weight: 600;
+}
+
+.datetime-selector {
+  padding: 16px 20px;
+  background: #f8f9fa;
+  border-bottom: 1px solid #e0e0e0;
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.datetime-input-group {
+  flex: 1;
+  min-width: 180px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.datetime-input-group label {
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: #555;
+}
+
+.date-input,
+.time-input {
+  padding: 8px 12px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-size: 0.95rem;
+  background: white;
+  transition: border-color 0.2s;
+}
+
+.date-input:focus,
+.time-input:focus {
+  outline: none;
+  border-color: #667eea;
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+.constellation-content {
+  flex: 1;
+  overflow-y: auto;
+  padding: 20px;
+}
+
+.location-info {
+  margin-bottom: 20px;
+}
+
+.location-info h4 {
+  margin: 0 0 8px 0;
+  font-size: 1.2rem;
+  color: #333;
+}
+
+.coordinates {
+  color: #666;
+  font-size: 0.9rem;
+  font-family: 'Courier New', monospace;
+}
+
+.observation-info {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.info-card {
+  background: #f8f9fa;
+  padding: 12px;
+  border-radius: 8px;
+  text-align: center;
+  border: 1px solid #e0e0e0;
+}
+
+.info-label {
+  font-size: 0.8rem;
+  color: #666;
+  margin-bottom: 6px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.info-value {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #333;
+}
+
+.time-astronomical-night {
+  color: #4CAF50;
+}
+
+.time-nautical-twilight,
+.time-civil-twilight {
+  color: #FF9800;
+}
+
+.time-day,
+.time-golden-hour {
+  color: #F44336;
+}
+
+.viewing-warning,
+.weather-warning,
+.moon-warning {
+  padding: 12px;
+  margin-bottom: 16px;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  background: #fff3cd;
+  border: 1px solid #ffc107;
+  color: #856404;
+}
+
+.weather-warning {
+  background: #d1ecf1;
+  border-color: #17a2b8;
+  color: #0c5460;
+}
+
+.moon-warning {
+  background: #e7e7ff;
+  border-color: #9999ff;
+  color: #4d4d99;
+}
+
+.best-times {
+  margin-bottom: 20px;
+  padding: 16px;
+  background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+  border-radius: 8px;
+  color: white;
+}
+
+.best-times h4 {
+  margin: 0 0 12px 0;
+  font-size: 1.1rem;
+}
+
+.times-grid {
+  display: grid;
+  gap: 8px;
+}
+
+.time-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 6px;
+}
+
+.time-label {
+  font-size: 0.9rem;
+  opacity: 0.9;
+}
+
+.time-value {
+  font-weight: 600;
+  font-size: 0.95rem;
+}
+
+.time-value.highlight {
+  background: rgba(255, 215, 0, 0.3);
+  padding: 4px 8px;
+  border-radius: 4px;
+  color: #ffd700;
+}
+
+.planets-section {
+  margin-bottom: 20px;
+  padding: 16px;
+  background: linear-gradient(135deg, #2d1b69 0%, #5a3d8a 100%);
+  border-radius: 8px;
+  color: white;
+}
+
+.planets-section h4 {
+  margin: 0 0 12px 0;
+  font-size: 1.1rem;
+}
+
+.planet-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.planet-item {
+  display: grid;
+  grid-template-columns: 1fr auto auto;
+  gap: 12px;
+  align-items: center;
+  padding: 10px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 6px;
+}
+
+.planet-name {
+  font-weight: 600;
+}
+
+.planet-direction {
+  font-size: 0.9rem;
+  opacity: 0.9;
+}
+
+.planet-altitude {
+  font-family: 'Courier New', monospace;
+  font-size: 0.9rem;
+}
+
+.constellation-controls {
+  margin-bottom: 16px;
+  padding: 12px;
+  background: #f8f9fa;
+  border-radius: 8px;
+}
+
+.filter-toggle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  user-select: none;
+}
+
+.filter-toggle input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  cursor: pointer;
+}
+
+.constellation-list h4 {
+  margin: 0 0 16px 0;
+  font-size: 1.1rem;
+  color: #333;
+}
+
+.no-constellations {
+  text-align: center;
+  padding: 40px 20px;
+  color: #666;
+  font-style: italic;
+}
+
+.constellation-grid {
+  display: grid;
+  gap: 12px;
+}
+
+.constellation-card {
+  background: white;
+  border: 2px solid #e0e0e0;
+  border-radius: 8px;
+  padding: 14px;
+  transition: all 0.2s;
+}
+
+.constellation-card.visible {
+  border-color: #667eea;
+  background: linear-gradient(135deg, #f5f7ff 0%, #ffffff 100%);
+}
+
+.constellation-card.hidden {
+  opacity: 0.6;
+}
+
+.constellation-card:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  transform: translateY(-2px);
+}
+
+.constellation-header-card {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.constellation-header-card h5 {
+  margin: 0;
+  font-size: 1.05rem;
+  color: #333;
+}
+
+.constellation-abbr {
+  font-size: 0.85rem;
+  color: #666;
+  font-weight: 500;
+  background: #f0f0f0;
+  padding: 2px 8px;
+  border-radius: 4px;
+}
+
+.constellation-details {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.detail-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.9rem;
+}
+
+.detail-label {
+  color: #666;
+  font-weight: 500;
+}
+
+.detail-value {
+  color: #333;
+  font-family: 'Courier New', monospace;
+  font-size: 0.85rem;
+}
+
+.visibility-badge {
+  padding: 4px 10px;
+  border-radius: 12px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+}
+
+.visibility-badge.score-5 {
+  background: #4CAF50;
+  color: white;
+}
+
+.visibility-badge.score-4 {
+  background: #8BC34A;
+  color: white;
+}
+
+.visibility-badge.score-3 {
+  background: #FFEB3B;
+  color: #333;
+}
+
+.visibility-badge.score-2 {
+  background: #FF9800;
+  color: white;
+}
+
+.visibility-badge.score-1 {
+  background: #FF5722;
+  color: white;
+}
+
+.below-horizon {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  text-align: center;
+  padding: 8px;
+  color: #999;
+  font-style: italic;
+  font-size: 0.9rem;
+}
+
+.season-hint {
+  font-size: 0.8rem;
+  color: #666;
+}
+
+.loading-state,
+.error-state {
+  padding: 40px 20px;
+  text-align: center;
+}
+
+.spinner {
+  width: 40px;
+  height: 40px;
+  margin: 0 auto 16px;
+  border: 4px solid #f3f3f3;
+  border-top: 4px solid #667eea;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.error-state p {
+  color: #d32f2f;
+  margin-bottom: 16px;
+}
+
+.retry-button {
+  padding: 8px 20px;
+  background: #667eea;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: background 0.2s;
+}
+
+.retry-button:hover {
+  background: #5568d3;
+}
+
+.close-button {
+  background: rgba(255, 255, 255, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  color: white;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  font-size: 1.2rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+}
+
+.close-button:hover {
+  background: rgba(255, 255, 255, 0.3);
+  transform: scale(1.1);
+}
+
+/* Mobile responsiveness */
+@media (max-width: 768px) {
+  .constellation-panel {
+    position: fixed;
+    top: 60px;
+    right: 10px;
+    left: 10px;
+    width: auto;
+    max-height: calc(100vh - 70px);
+  }
+
+  .datetime-selector {
+    flex-direction: column;
+  }
+
+  .datetime-input-group {
+    min-width: 100%;
+  }
+
+  .observation-info {
+    grid-template-columns: 1fr;
+  }
+
+  .constellation-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Scrollbar styling */
+.constellation-content::-webkit-scrollbar {
+  width: 8px;
+}
+
+.constellation-content::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 4px;
+}
+
+.constellation-content::-webkit-scrollbar-thumb {
+  background: #888;
+  border-radius: 4px;
+}
+
+.constellation-content::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}

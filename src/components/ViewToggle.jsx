@@ -5,6 +5,7 @@ function ViewToggle({ currentView, onViewChange, onLayersToggle }) {
   const views = [
     { id: 'aqi', name: 'AQI', icon: '🌫️', description: 'Air Quality Index' },
     { id: 'light', name: 'Light', icon: '🌌', description: 'Light Pollution' },
+    { id: 'constellation', name: 'Stars', icon: '⭐', description: 'Constellation Viewer' },
     { id: 'ultimate', name: 'Ultimate', icon: '🌟', description: 'Complete Report' }
   ];
 
