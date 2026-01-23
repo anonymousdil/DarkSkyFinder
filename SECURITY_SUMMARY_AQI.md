@@ -124,10 +124,31 @@ This architecture:
 2 vulnerabilities (1 moderate, 1 high)
 ```
 
-**Note**: These vulnerabilities are in development dependencies and do not affect the AQI implementation:
-- Not related to AQI service code
-- Can be addressed with `npm audit fix`
-- Do not pose immediate security risk to AQI functionality
+**Specific Vulnerabilities Identified:**
+
+1. **react-router (7.0.0 - 7.12.0-pre.0)** - HIGH SEVERITY
+   - CSRF issue in Action/Server Action Request Processing
+   - Advisory: GHSA-h5cw-625j-3rxh
+   - XSS vulnerability via Open Redirects
+   - Advisory: GHSA-2w69-qvjg-hvjx
+   
+2. **react-router-dom (7.0.0-pre.0 - 7.11.0)** - MODERATE SEVERITY
+   - SSR XSS in ScrollRestoration
+   - Advisory: GHSA-8v8x-cx79-35w7
+   - Depends on vulnerable react-router version
+
+**Impact on AQI Functionality:**
+- ❌ These vulnerabilities are **NOT** in the AQI service code
+- ❌ These are routing library vulnerabilities
+- ✅ AQI functionality does not use server-side rendering or actions
+- ✅ AQI code does not depend on react-router
+
+**Remediation:**
+```bash
+npm audit fix
+```
+
+**Priority**: Medium - Should be addressed but does not affect AQI security
 
 ## Code Review Findings
 

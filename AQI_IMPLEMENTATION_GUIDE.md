@@ -54,7 +54,7 @@ The AQI service is integrated into:
 1. Visit [https://aqicn.org/data-platform/token/](https://aqicn.org/data-platform/token/)
 2. Sign up for a free account
 3. Request an API token
-4. Copy your token (it will look like: `a87d60b45493985ee0c842179fd66174a556f4fe`)
+4. Copy your token (it will be a 40-character alphanumeric string)
 
 ### Step 2: Configure Environment Variables
 

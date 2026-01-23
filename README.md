@@ -1,7 +1,7 @@
 # DarkSkyFinder
 The Ultimate Stargazing Companion!!
 
-> **✨ NEW**: Complete Air Quality Index (AQI) integration using AQICN API - [Setup Guide](./AQI_IMPLEMENTATION_GUIDE.md)
+> **✨ FULLY DOCUMENTED**: Complete AQI integration using AQICN API - [Setup Guide](./AQI_IMPLEMENTATION_GUIDE.md)
 
 ## Features
 
