@@ -40,7 +40,7 @@ function ConstellationTooltip({ name, abbr }) {
         onMouseLeave={handleMouseLeave}
         onFocus={handleMouseEnter}
         onBlur={handleMouseLeave}
-        tabIndex="0"
+        tabIndex={0}
         role="button"
         aria-label={`View ${name} constellation image`}
       >
