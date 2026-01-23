@@ -122,11 +122,19 @@ return response.data.status === 'ok' && response.data.geminiConfigured;
 
 When deploying to production, ensure:
 
-1. ✓ `GEMINI_API_KEY` is set in production environment
-2. ✓ `VITE_BACKEND_URL` points to production backend URL
-3. ✓ Backend server is running and accessible from frontend
-4. ✓ Network allows outbound HTTPS connections to Google's Gemini API
-5. Monitor backend logs for API errors or rate limiting
+1. ✓ Create a `.env` file based on `.env.example` (the .env file is not in the repository for security)
+2. ✓ `GEMINI_API_KEY` is set in production environment
+3. ✓ `VITE_BACKEND_URL` points to production backend URL
+4. ✓ Backend server is running and accessible from frontend
+5. ✓ Network allows outbound HTTPS connections to Google's Gemini API
+6. Monitor backend logs for API errors or rate limiting
+
+## Security Considerations
+
+- The `.env` file is excluded from version control to prevent exposing API keys
+- Users must create their own `.env` file using `.env.example` as a template
+- API keys should never be committed to the repository
+- In production, use environment variables or secrets management systems
 
 ## Additional Improvements Made
 
