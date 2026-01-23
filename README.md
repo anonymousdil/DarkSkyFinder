@@ -1,6 +1,8 @@
 # DarkSkyFinder
 The Ultimate Stargazing Companion!!
 
+> **✨ FULLY DOCUMENTED**: Complete AQI integration using AQICN API - [Setup Guide](./AQI_IMPLEMENTATION_GUIDE.md)
+
 ## Features
 
 - **Welcome Page**: Beautiful hero section with starry sky imagery and information about stargazing
@@ -220,14 +222,14 @@ A comprehensive test harness is included to verify the AQI integration:
    - Click the location marker
    - Verify:
      - AQI data displays without "mock data" warnings
-     - All pollutant values show in µg/m³
-     - Source shows "OpenWeather" (not "Estimated")
+     - All pollutant values show as AQI values (0-500 scale)
+     - Source shows "AQICN" (not "Estimated")
      - Console shows successful API logs
 
 3. **Expected Console Logs**:
    ```
-   [AQI Service] Fetching AQI data from OpenWeather for coordinates: X, Y
-   [AQI Service] Successfully fetched and enriched AQI data
+   [AQI Service] Fetching AQI data from AQICN for coordinates: X, Y
+   [AQI Service] Successfully fetched and calculated exact numeric AQI
    ```
 
 For detailed testing instructions, see `AQI_INTEGRATION_VERIFICATION.md`.
