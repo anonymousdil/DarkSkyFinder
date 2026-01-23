@@ -17,7 +17,7 @@ export const checkLLMAvailability = async () => {
     const response = await axios.get(`${BACKEND_URL}/api/health`, {
       timeout: 5000
     });
-    return response.data.status === 'ok' && response.data.openaiConfigured;
+    return response.data.status === 'ok' && response.data.geminiConfigured;
   } catch (error) {
     console.warn('LLM backend not available:', error.message);
     return false;
