@@ -17,7 +17,7 @@ export const checkLLMAvailability = async () => {
     const response = await axios.get(`${BACKEND_URL}/api/health`, {
       timeout: 5000
     });
-    return response.data.status === 'ok' && response.data.openaiConfigured;
+    return response.data.status === 'ok' && response.data.geminiConfigured;
   } catch (error) {
     console.warn('LLM backend not available:', error.message);
     return false;
@@ -32,6 +32,7 @@ export const checkLLMAvailability = async () => {
  */
 export const processLLMQuery = async (query, conversationHistory = []) => {
   try {
+    console.log('[LLM Service] Sending request to backend:', { url: BACKEND_URL, query });
     const response = await axios.post(
       `${BACKEND_URL}/api/chat`,
       {
@@ -46,6 +47,7 @@ export const processLLMQuery = async (query, conversationHistory = []) => {
       }
     );
 
+    console.log('[LLM Service] Received response:', { success: response.data.success });
     if (!response.data.success) {
       throw new Error(response.data.message || 'LLM request failed');
     }
@@ -57,7 +59,11 @@ export const processLLMQuery = async (query, conversationHistory = []) => {
       usage: response.data.usage
     };
   } catch (error) {
-    console.error('LLM service error:', error);
+    console.error('[LLM Service] Error:', {
+      message: error.message,
+      hasResponse: !!error.response,
+      hasRequest: !!error.request
+    });
 
     // Return error information
     if (error.response) {

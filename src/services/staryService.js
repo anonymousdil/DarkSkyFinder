@@ -31,15 +31,18 @@ export const processQuery = async (query, conversationHistory = []) => {
 
   // Determine if query is conversational
   const isConversational = isConversationalQuery(query);
+  console.log(`[Stary] Query type: ${isConversational ? 'conversational' : 'location'}, Query: "${query}"`);
   
   // If conversational, try LLM first
   if (isConversational) {
     try {
+      console.log('[Stary] Processing conversational query with LLM...');
       const llmResponse = await processLLMQuery(
         query, 
         formatConversationHistory(conversationHistory)
       );
 
+      console.log('[Stary] LLM response received:', { success: llmResponse.success, hasLocation: !!llmResponse.locationInfo });
       if (llmResponse.success) {
         // Check if LLM extracted location information
         if (llmResponse.locationInfo && llmResponse.locationInfo.location) {
@@ -65,7 +68,11 @@ export const processQuery = async (query, conversationHistory = []) => {
         };
       }
     } catch (error) {
-      console.warn('LLM processing failed, falling back to structured query:', error);
+      console.error('[Stary] LLM processing failed, falling back to structured query:', {
+        error: error.message,
+        stack: error.stack,
+        response: error.response?.data
+      });
       // Fall through to structured processing
     }
   }

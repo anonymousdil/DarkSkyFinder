@@ -73,8 +73,10 @@ function extractLocationInfo(response) {
 app.post('/api/chat', async (req, res) => {
   try {
     const { query, conversationHistory = [] } = req.body;
+    console.log('[Chat API] Received request:', { query, historyLength: conversationHistory.length });
 
     if (!query || typeof query !== 'string') {
+      console.error('[Chat API] Invalid query parameter');
       return res.status(400).json({
         success: false,
         error: 'Invalid query parameter'
@@ -83,6 +85,7 @@ app.post('/api/chat', async (req, res) => {
 
     // Check if Gemini API key is configured
     if (!process.env.GEMINI_API_KEY || !geminiClient) {
+      console.error('[Chat API] Gemini API key not configured');
       return res.status(503).json({
         success: false,
         error: 'Gemini API key not configured',
@@ -108,11 +111,13 @@ app.post('/api/chat', async (req, res) => {
     // Add current user query
     fullPrompt += `User: ${query}\nAssistant:`;
 
+    console.log('[Chat API] Calling Gemini API...');
     // Call Gemini API
     const model = geminiClient.getGenerativeModel({ model: 'gemini-2.0-flash-exp' });
     const result = await model.generateContent(fullPrompt);
     const response = await result.response;
     const responseText = response.text();
+    console.log('[Chat API] Gemini API response received, length:', responseText.length);
 
     // Extract location info if present
     const locationInfo = extractLocationInfo(responseText);
@@ -132,6 +137,7 @@ app.post('/api/chat', async (req, res) => {
         totalTokens: 0
       }
     });
+    console.log('[Chat API] Response sent successfully');
 
   } catch (error) {
     console.error('Chat API error:', error);
