@@ -174,7 +174,7 @@ const AQI_BREAKPOINTS = {
    AQI CALCULATION (LINEAR INTERPOLATION)
 ====================================================== */
 
-function calculateAQI(concentration, breakpoints) {
+function _calculateAQI(concentration, breakpoints) {
   // Handle invalid or zero concentrations
   if (concentration == null || concentration < 0) {
     return null;

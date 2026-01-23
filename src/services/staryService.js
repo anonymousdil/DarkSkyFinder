@@ -10,8 +10,7 @@ import { getSkyViewability } from './skyViewabilityService.js';
 import { 
   processLLMQuery, 
   formatConversationHistory, 
-  isConversationalQuery,
-  hasLocationIndicator 
+  isConversationalQuery
 } from './llmService.js';
 
 /**

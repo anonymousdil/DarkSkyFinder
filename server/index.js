@@ -13,10 +13,13 @@ const PORT = process.env.VITE_BACKEND_PORT || 3001;
 app.use(cors());
 app.use(express.json());
 
-// Initialize OpenAI client
-const openai = new OpenAI({
-  apiKey: process.env.VITE_OPENAI_API_KEY,
-});
+// Initialize OpenAI client (only if API key is available)
+let openai = null;
+if (process.env.VITE_OPENAI_API_KEY) {
+  openai = new OpenAI({
+    apiKey: process.env.VITE_OPENAI_API_KEY,
+  });
+}
 
 // System prompt for the Starry chatbot
 const SYSTEM_PROMPT = `You are Stary, a friendly and knowledgeable stargazing companion chatbot for the DarkSkyFinder application. Your role is to help users find the best stargazing locations and answer questions about astronomy and stargazing.
@@ -81,7 +84,7 @@ app.post('/api/chat', async (req, res) => {
     }
 
     // Check if OpenAI API key is configured
-    if (!process.env.VITE_OPENAI_API_KEY) {
+    if (!process.env.VITE_OPENAI_API_KEY || !openai) {
       return res.status(503).json({
         success: false,
         error: 'OpenAI API key not configured',
