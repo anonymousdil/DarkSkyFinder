@@ -1,31 +1,92 @@
 /**
  * Stary Chatbot Service
  * Provides intelligent stargazing recommendations and location analysis
+ * Now enhanced with LLM capabilities for conversational queries
  */
 
 import { searchLocations, parseCoordinates } from './searchService.js';
 import { getLightPollution, getStargazingRecommendations } from './lightPollutionService.js';
 import { getSkyViewability } from './skyViewabilityService.js';
+import { 
+  processLLMQuery, 
+  formatConversationHistory, 
+  isConversationalQuery,
+  hasLocationIndicator 
+} from './llmService.js';
 
 /**
  * Process user query and generate chatbot response
- * @param {string} query - User's location query
+ * Enhanced with LLM support for conversational queries
+ * @param {string} query - User's query (location or conversational)
+ * @param {Array} conversationHistory - Previous messages for context
  * @returns {Promise<Object>} Chatbot response with recommendations
  */
-export const processQuery = async (query) => {
+export const processQuery = async (query, conversationHistory = []) => {
   if (!query || !query.trim()) {
     return {
       type: 'error',
-      message: "🌟 Hi there! I'm Stary, your stargazing companion. Please tell me a location or coordinates to check!",
-      suggestions: ['Try: "Yellowstone National Park"', 'Or coordinates: "44.4280, -110.5885"']
+      message: "🌟 Hi there! I'm Stary, your stargazing companion. Please tell me a location or ask me anything about stargazing!",
+      suggestions: ['Try: "Yellowstone National Park"', 'Or ask: "What\'s the best time to see the Milky Way?"']
     };
   }
 
+  // Determine if query is conversational
+  const isConversational = isConversationalQuery(query);
+  
+  // If conversational, try LLM first
+  if (isConversational) {
+    try {
+      const llmResponse = await processLLMQuery(
+        query, 
+        formatConversationHistory(conversationHistory)
+      );
+
+      if (llmResponse.success) {
+        // Check if LLM extracted location information
+        if (llmResponse.locationInfo && llmResponse.locationInfo.location) {
+          // Process the location extracted by LLM
+          const locationQuery = llmResponse.locationInfo.location;
+          const locationData = await processLocationQuery(locationQuery);
+          
+          if (locationData.success) {
+            return {
+              type: 'llm_with_location',
+              message: llmResponse.message,
+              location: locationData.location,
+              data: locationData.data,
+              alternatives: locationData.alternatives
+            };
+          }
+        }
+
+        // Pure conversational response
+        return {
+          type: 'llm_conversation',
+          message: llmResponse.message
+        };
+      }
+    } catch (error) {
+      console.warn('LLM processing failed, falling back to structured query:', error);
+      // Fall through to structured processing
+    }
+  }
+
+  // Process as structured location query
+  return await processLocationQuery(query);
+};
+
+/**
+ * Process structured location query
+ * @param {string} query - Location query string
+ * @returns {Promise<Object>} Location analysis result
+ */
+const processLocationQuery = async (query) => {
   // Check if input is coordinates
   const coords = parseCoordinates(query);
   
   if (coords) {
-    return await analyzeLocation(coords.lat, coords.lon, 'Coordinates');
+    const result = await analyzeLocation(coords.lat, coords.lon, 'Coordinates');
+    return { success: true, ...result };
   }
 
   // Search for location
@@ -34,6 +95,7 @@ export const processQuery = async (query) => {
     
     if (!searchResult.success || searchResult.results.length === 0) {
       return {
+        success: false,
         type: 'not_found',
         message: `🔍 Hmm, I couldn't find "${query}". Could you try a different spelling or be more specific?`,
         suggestions: ['Try adding country/state', 'Check spelling', 'Use coordinates instead']
@@ -44,10 +106,12 @@ export const processQuery = async (query) => {
     const bestMatch = searchResult.results[0];
     
     // Analyze the location
-    return await analyzeLocation(bestMatch.lat, bestMatch.lon, bestMatch.name);
+    const result = await analyzeLocation(bestMatch.lat, bestMatch.lon, bestMatch.name);
+    return { success: true, ...result };
   } catch (error) {
     console.error('Stary query error:', error);
     return {
+      success: false,
       type: 'error',
       message: '⚠️ Oops! Something went wrong on my end. Please try again in a moment.',
       error: error.message
@@ -292,11 +356,11 @@ export const getGreeting = () => {
 
   return {
     type: 'greeting',
-    message: `🌟 ${greeting}! I'm **Stary**, your stargazing companion!\n\nI can help you find the perfect spots for viewing the night sky. Just tell me a location name or coordinates, and I'll analyze:\n\n✨ Light pollution levels\n☁️ Current sky conditions\n🔭 Stargazing recommendations\n\nWhere would you like to check?`,
+    message: `🌟 ${greeting}! I'm **Stary**, your AI-powered stargazing companion!\n\nI can help you in two ways:\n\n🗺️ **Location Analysis**: Tell me a place or coordinates for detailed stargazing analysis\n💬 **Conversation**: Ask me anything about astronomy, celestial events, or stargazing tips!\n\nWhat would you like to know?`,
     examples: [
       'Yellowstone National Park',
-      'Death Valley',
-      '44.4280, -110.5885'
+      'What\'s the best time to see the Milky Way?',
+      'How\'s the weather for stargazing tonight?'
     ]
   };
 };
