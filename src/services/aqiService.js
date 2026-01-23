@@ -21,7 +21,9 @@
    Free tier includes: 1,000 calls/minute with rate limits
 ====================================================== */
 
-const AQICN_TOKEN = import.meta.env.VITE_AQICN_TOKEN; // #add token here
+// Load AQICN API token from environment variables (configured in .env file)
+// SECURITY: Never hardcode the token here - always use environment variables
+const AQICN_TOKEN = import.meta.env.VITE_AQICN_TOKEN;
 
 /* Cache for AQI data to reduce API calls */
 const aqiCache = new Map();
