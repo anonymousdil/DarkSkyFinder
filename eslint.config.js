@@ -31,7 +31,7 @@ export default defineConfig([
     files: ['setup-env.js'],
     extends: [js.configs.recommended],
     languageOptions: {
-      ecmaVersion: 2020,
+      ecmaVersion: 'latest',
       globals: globals.node,
       parserOptions: {
         ecmaVersion: 'latest',

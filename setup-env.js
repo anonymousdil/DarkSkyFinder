@@ -52,6 +52,11 @@ try {
 } catch (error) {
   console.log('❌ Error creating .env file:', error.message);
   console.log('   Please manually copy .env.example to .env');
-  console.log('   Command: cp .env.example .env\n');
+  console.log('');
+  console.log('   Commands:');
+  console.log('   - Unix/Mac/Linux: cp .env.example .env');
+  console.log('   - Windows (CMD): copy .env.example .env');
+  console.log('   - Windows (PowerShell): Copy-Item .env.example .env');
+  console.log('');
   process.exit(1);
 }
