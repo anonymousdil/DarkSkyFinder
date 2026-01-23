@@ -141,7 +141,7 @@ app.post('/api/chat', async (req, res) => {
       return res.status(401).json({
         success: false,
         error: 'Invalid OpenAI API key',
-        message: 'Please check your VITE_OPENAI_API_KEY configuration.'
+        message: 'Please check your OPENAI_API_KEY configuration.'
       });
     }
 
