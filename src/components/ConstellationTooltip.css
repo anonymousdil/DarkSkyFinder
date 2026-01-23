@@ -1,0 +1,186 @@
+/* ConstellationTooltip Styles */
+
+.constellation-name-wrapper {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  position: relative;
+}
+
+.constellation-name-text {
+  /* Inherit font styles from parent */
+}
+
+.constellation-help-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  font-size: 11px;
+  font-weight: bold;
+  cursor: help;
+  position: relative;
+  transition: all 0.2s ease;
+  user-select: none;
+  flex-shrink: 0;
+}
+
+.constellation-help-icon:hover,
+.constellation-help-icon:focus {
+  transform: scale(1.15);
+  box-shadow: 0 2px 8px rgba(102, 126, 234, 0.4);
+  outline: none;
+}
+
+/* Tooltip container */
+.constellation-tooltip {
+  position: absolute;
+  bottom: calc(100% + 12px);
+  left: 50%;
+  transform: translateX(-50%);
+  background: white;
+  border-radius: 8px;
+  padding: 12px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
+  z-index: 10000;
+  min-width: 220px;
+  max-width: 280px;
+  pointer-events: none;
+  animation: tooltipFadeIn 0.2s ease-out;
+  border: 2px solid #667eea;
+}
+
+/* Tooltip arrow */
+.constellation-tooltip::after {
+  content: '';
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  border: 8px solid transparent;
+  border-top-color: #667eea;
+}
+
+@keyframes tooltipFadeIn {
+  from {
+    opacity: 0;
+    transform: translateX(-50%) translateY(-5px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+}
+
+/* Constellation image */
+.constellation-image {
+  width: 100%;
+  height: auto;
+  display: block;
+  border-radius: 6px;
+  background: #0a0e27;
+  margin-bottom: 8px;
+}
+
+/* Tooltip label */
+.constellation-tooltip-label {
+  display: block;
+  text-align: center;
+  font-size: 13px;
+  font-weight: 600;
+  color: #333;
+  padding: 4px 0;
+}
+
+/* Fallback styling when image is not available */
+.constellation-tooltip-fallback {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 8px;
+}
+
+.fallback-icon {
+  font-size: 48px;
+  opacity: 0.7;
+}
+
+.fallback-text {
+  font-size: 14px;
+  font-weight: 600;
+  color: #333;
+}
+
+.fallback-message {
+  font-size: 11px;
+  color: #999;
+  font-style: italic;
+}
+
+/* Responsive adjustments for mobile */
+@media (max-width: 768px) {
+  .constellation-tooltip {
+    /* On mobile, position tooltip above but allow it to be visible */
+    min-width: 200px;
+    max-width: 250px;
+    padding: 10px;
+  }
+
+  .constellation-help-icon {
+    /* Make icon slightly larger on mobile for easier touch */
+    width: 18px;
+    height: 18px;
+    font-size: 12px;
+  }
+}
+
+/* Handle tooltip positioning edge cases */
+@media (max-width: 480px) {
+  .constellation-tooltip {
+    /* Prevent tooltip from going off-screen on small devices */
+    max-width: calc(100vw - 40px);
+    left: auto;
+    right: auto;
+    transform: translateX(-50%);
+  }
+}
+
+/* Ensure tooltip is visible when positioned near edges */
+.constellation-card:first-child .constellation-tooltip,
+.constellation-card:last-child .constellation-tooltip {
+  /* Adjust positioning for cards at edges if needed */
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  .constellation-help-icon {
+    border: 2px solid currentColor;
+  }
+  
+  .constellation-tooltip {
+    border: 3px solid #000;
+  }
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  .constellation-help-icon,
+  .constellation-tooltip {
+    transition: none;
+    animation: none;
+  }
+}
+
+/* Print styles - hide tooltips when printing */
+@media print {
+  .constellation-help-icon {
+    display: none;
+  }
+}
