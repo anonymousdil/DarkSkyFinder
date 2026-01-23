@@ -108,7 +108,7 @@ export const isConversationalQuery = (query) => {
   const conversationalPatterns = [
     /^(what|when|where|why|how|can|could|would|should|is|are|tell me|explain)/i,
     /\?$/,
-    /weather|tonight|tonight|best time|recommendation|advice|tip|help/i,
+    /weather|tonight|best time|recommendation|advice|tip|help/i,
     /^(hi|hello|hey|greetings)/i
   ];
 

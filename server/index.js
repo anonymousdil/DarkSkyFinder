@@ -7,7 +7,7 @@ import OpenAI from 'openai';
 dotenv.config();
 
 const app = express();
-const PORT = process.env.VITE_BACKEND_PORT || 3001;
+const PORT = process.env.BACKEND_PORT || process.env.PORT || 3001;
 
 // Middleware
 app.use(cors());
@@ -15,9 +15,9 @@ app.use(express.json());
 
 // Initialize OpenAI client (only if API key is available)
 let openai = null;
-if (process.env.VITE_OPENAI_API_KEY) {
+if (process.env.OPENAI_API_KEY) {
   openai = new OpenAI({
-    apiKey: process.env.VITE_OPENAI_API_KEY,
+    apiKey: process.env.OPENAI_API_KEY,
   });
 }
 
@@ -84,11 +84,11 @@ app.post('/api/chat', async (req, res) => {
     }
 
     // Check if OpenAI API key is configured
-    if (!process.env.VITE_OPENAI_API_KEY || !openai) {
+    if (!process.env.OPENAI_API_KEY || !openai) {
       return res.status(503).json({
         success: false,
         error: 'OpenAI API key not configured',
-        message: 'Please configure VITE_OPENAI_API_KEY in your .env file to enable LLM features.'
+        message: 'Please configure OPENAI_API_KEY in your .env file to enable LLM features.'
       });
     }
 
@@ -168,16 +168,16 @@ app.get('/api/health', (req, res) => {
   res.json({
     status: 'ok',
     service: 'DarkSkyFinder LLM Backend',
-    openaiConfigured: !!process.env.VITE_OPENAI_API_KEY
+    openaiConfigured: !!process.env.OPENAI_API_KEY
   });
 });
 
 // Start server
 app.listen(PORT, () => {
   console.log(`🌟 DarkSkyFinder LLM Backend running on port ${PORT}`);
-  console.log(`OpenAI API configured: ${process.env.VITE_OPENAI_API_KEY ? 'Yes ✓' : 'No ✗'}`);
-  if (!process.env.VITE_OPENAI_API_KEY) {
-    console.warn('⚠️  Warning: VITE_OPENAI_API_KEY not set. LLM features will not work.');
+  console.log(`OpenAI API configured: ${process.env.OPENAI_API_KEY ? 'Yes ✓' : 'No ✗'}`);
+  if (!process.env.OPENAI_API_KEY) {
+    console.warn('⚠️  Warning: OPENAI_API_KEY not set. LLM features will not work.');
   }
 });
 

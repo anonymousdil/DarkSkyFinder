@@ -121,7 +121,7 @@ Process chat query with LLM
 {
   "success": false,
   "error": "OpenAI API key not configured",
-  "message": "Please configure VITE_OPENAI_API_KEY in your .env file..."
+  "message": "Please configure OPENAI_API_KEY in your .env file..."
 }
 ```
 
@@ -133,10 +133,10 @@ Add to `.env` file:
 
 ```bash
 # OpenAI API Configuration
-VITE_OPENAI_API_KEY=sk-proj-your-key-here
+OPENAI_API_KEY=sk-proj-your-key-here
 
 # Backend Configuration (optional)
-VITE_BACKEND_PORT=3001
+BACKEND_PORT=3001
 VITE_BACKEND_URL=http://localhost:3001
 ```
 

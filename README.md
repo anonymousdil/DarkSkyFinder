@@ -68,7 +68,8 @@ npm install
    - **OpenAI API** (for LLM-powered conversational chatbot):
      - Visit [https://platform.openai.com/api-keys](https://platform.openai.com/api-keys)
      - Create an API key (requires OpenAI account with credits)
-     - Add to `.env`: `VITE_OPENAI_API_KEY=your_openai_api_key_here`
+     - Add to `.env`: `OPENAI_API_KEY=your_openai_api_key_here`
+     - **Note**: This is a backend-only variable and will NOT be exposed to the frontend for security
    
    - **⚠️ SECURITY NOTE**: Never commit your `.env` file with real API tokens to version control. The `.env` file is already in `.gitignore`.
 
@@ -277,8 +278,8 @@ For production deployment, you'll need to:
 | Variable | Required | Purpose | Example |
 |----------|----------|---------|---------|
 | `VITE_AQICN_TOKEN` | Optional | Real-time AQI data | `abc123...` |
-| `VITE_OPENAI_API_KEY` | Required for LLM | Conversational AI features | `sk-proj-...` |
-| `VITE_BACKEND_PORT` | Optional | Backend server port | `3001` |
+| `OPENAI_API_KEY` | Required for LLM | Conversational AI features (backend only) | `sk-proj-...` |
+| `BACKEND_PORT` | Optional | Backend server port | `3001` |
 | `VITE_BACKEND_URL` | Optional | Backend URL for frontend | `http://localhost:3001` |
 
 ## Troubleshooting
@@ -296,7 +297,7 @@ For production deployment, you'll need to:
 
 2. Verify OpenAI API key is set in `.env`:
    ```bash
-   grep VITE_OPENAI_API_KEY .env
+   grep OPENAI_API_KEY .env
    ```
 
 3. Check browser console for errors
@@ -321,7 +322,7 @@ For production deployment, you'll need to:
 
 3. Change port in `.env`:
    ```
-   VITE_BACKEND_PORT=3002
+   BACKEND_PORT=3002
    VITE_BACKEND_URL=http://localhost:3002
    ```
 
