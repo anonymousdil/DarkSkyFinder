@@ -17,6 +17,7 @@ dist-ssr
 
 # Test files
 test-llm-integration.html
+test-llm-integration.js
 
 # Editor directories and files
 .vscode/*
