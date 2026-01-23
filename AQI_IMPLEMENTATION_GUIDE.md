@@ -95,14 +95,33 @@ The AQI service is integrated into:
 2. **No Hardcoded Secrets**: The code explicitly warns against hardcoding tokens
 3. **Gitignore**: `.env` file is in `.gitignore` to prevent accidental commits
 4. **Example File**: `.env.example` provides a template without real tokens
-5. **Frontend Exposure**: Uses `VITE_` prefix which is acceptable for AQICN (free tier, public API)
 
-### ⚠️ Important Notes
+### ⚠️ Important Security Considerations
 
-- AQICN tokens are designed for frontend use (similar to Google Maps API keys)
-- Rate limits are enforced on the API side (1,000 calls/minute)
-- The caching system (1 hour cache) helps minimize API calls
-- Always regenerate tokens if exposed or compromised
+**Frontend API Key Exposure:**
+- The `VITE_` prefix exposes the token in the frontend JavaScript bundle
+- This is a **trade-off** for simplicity in development and demo applications
+- **Risk**: Exposed API keys can be discovered and potentially abused by others, which could:
+  - Exhaust your rate limits (1,000 calls/minute)
+  - Result in unexpected API usage
+  - Require token regeneration if heavily abused
+
+**Production Recommendations:**
+- For production applications, consider using a **backend proxy** to hide the API key
+- The proxy would make AQICN API calls server-side and expose a custom endpoint to your frontend
+- This prevents direct exposure of your API token in client-side code
+- The current implementation is suitable for:
+  - Personal projects
+  - Educational use
+  - Demo applications
+  - Free tier usage with acceptable risk
+
+**Mitigation Strategies:**
+- Use the caching system (1 hour cache) to minimize API calls
+- Monitor your AQICN dashboard for unusual usage patterns
+- Regenerate tokens if you notice abuse
+- Consider implementing rate limiting on your frontend
+- For production, migrate to a backend proxy architecture
 
 ## Testing
 
@@ -149,14 +168,14 @@ For integration testing with real API calls:
 
 ## AQI Categories (US EPA Standard)
 
-| AQI Range | Level | Color | Health Implications |
-|-----------|-------|-------|-------------------|
-| 0-50 | Good | Green | Air quality is satisfactory |
-| 51-100 | Moderate | Yellow | Acceptable for most people |
-| 101-150 | Unhealthy for Sensitive Groups | Orange | Sensitive groups may be affected |
-| 151-200 | Unhealthy | Red | Everyone may begin to experience health effects |
-| 201-300 | Very Unhealthy | Purple | Health alert: everyone may be affected |
-| 301-500 | Hazardous | Maroon | Health warnings of emergency conditions |
+| AQI Range | Level                              | Color  | Health Implications                        |
+|-----------|-----------------------------------|--------|--------------------------------------------|
+| 0-50      | Good                              | Green  | Air quality is satisfactory               |
+| 51-100    | Moderate                          | Yellow | Acceptable for most people                |
+| 101-150   | Unhealthy for Sensitive Groups    | Orange | Sensitive groups may be affected          |
+| 151-200   | Unhealthy                         | Red    | Everyone may experience health effects    |
+| 201-300   | Very Unhealthy                    | Purple | Health alert: everyone may be affected    |
+| 301-500   | Hazardous                         | Maroon | Health warnings of emergency conditions   |
 
 ## API Reference
 
