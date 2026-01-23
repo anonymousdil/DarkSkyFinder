@@ -4,6 +4,7 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
+    "postinstall": "node setup-env.js",
     "dev": "vite",
     "dev:backend": "cd server && npm install && npm run dev",
     "dev:full": "concurrently \"npm run dev\" \"npm run dev:backend\"",
