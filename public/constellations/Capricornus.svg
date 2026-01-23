@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200">
+  <rect width="200" height="200" fill="#0a0e27"/>
+  <g id="lines">
+    <line x1="138.6138182138346" y1="155.10517864339425" x2="144.8083769494116" y2="31.92195220254561" stroke="#6495ED" stroke-width="1.5" opacity="0.6"/>
+    <line x1="144.8083769494116" y1="31.92195220254561" x2="53.02532046585274" y2="131.93813890056734" stroke="#6495ED" stroke-width="1.5" opacity="0.6"/>
+    <line x1="53.02532046585274" y1="131.93813890056734" x2="81.90417605956395" y2="135.64795735335935" stroke="#6495ED" stroke-width="1.5" opacity="0.6"/>
+    <line x1="81.90417605956395" y1="135.64795735335935" x2="27.538109518628815" y2="100.530399129653" stroke="#6495ED" stroke-width="1.5" opacity="0.6"/>
+  </g>
+  <g id="stars">
+    <circle cx="138.6138182138346" cy="155.10517864339425" r="3.3290431786434675" fill="#FFD700" opacity="0.9"/>
+    <circle cx="144.8083769494116" cy="31.92195220254561" r="4.393046175018126" fill="#FFD700" opacity="0.9"/>
+    <circle cx="53.02532046585274" cy="131.93813890056734" r="3.434224006270656" fill="#FFD700" opacity="0.9"/>
+    <circle cx="81.90417605956395" cy="135.64795735335935" r="4.206514024573762" fill="#FFD700" opacity="0.9"/>
+    <circle cx="27.538109518628815" cy="100.530399129653" r="2.8732188134455545" fill="#FFD700" opacity="0.9"/>
+  </g>
+  <text x="100" y="190" font-family="Arial, sans-serif" font-size="12" fill="#fff" text-anchor="middle" opacity="0.7">Capricornus</text>
+</svg>

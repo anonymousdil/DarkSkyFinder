@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback } from 'react';
 import PropTypes from 'prop-types';
 import { getVisibleConstellations, getBestViewingTime, getVisiblePlanets } from '../services/constellationService';
 import { getSkyViewability, interpretCloudCover } from '../services/skyViewabilityService';
+import ConstellationTooltip from './ConstellationTooltip';
 import './ConstellationView.css';
 
 function ConstellationView({ location, visible, onClose }) {
@@ -254,7 +255,12 @@ function ConstellationView({ location, visible, onClose }) {
                     className={`constellation-card ${constellation.isVisible ? 'visible' : 'hidden'}`}
                   >
                     <div className="constellation-header-card">
-                      <h5>{constellation.name}</h5>
+                      <h5>
+                        <ConstellationTooltip 
+                          name={constellation.name} 
+                          abbr={constellation.abbr}
+                        />
+                      </h5>
                       <span className="constellation-abbr">{constellation.abbr}</span>
                     </div>
                     <div className="constellation-details">
