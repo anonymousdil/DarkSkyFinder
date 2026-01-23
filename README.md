@@ -56,27 +56,47 @@ cd DarkSkyFinder
 npm install
 ```
 
-3. Configure API token (optional but recommended):
+3. Configure API tokens (optional but recommended):
    - Copy `.env.example` to `.env`:
      ```bash
      cp .env.example .env
      ```
-   - Get your free AQICN API token:
-     - **AQICN API**: Visit [https://aqicn.org/data-platform/token/](https://aqicn.org/data-platform/token/) and request a free API token
-   - Add your token to `.env`:
-     ```
-     VITE_AQICN_TOKEN=your_actual_aqicn_token_here
-     ```
+   - **AQICN API** (for real-time AQI data):
+     - Visit [https://aqicn.org/data-platform/token/](https://aqicn.org/data-platform/token/) and request a free API token
+     - Add to `.env`: `VITE_AQICN_TOKEN=your_actual_aqicn_token_here`
+   
+   - **Gemini API** (for LLM-powered conversational chatbot):
+     - Visit [https://aistudio.google.com/app/apikey](https://aistudio.google.com/app/apikey)
+     - Create an API key (requires Google Cloud account (free tier available))
+     - Add to `.env`: `GEMINI_API_KEY=your_openai_api_key_here`
+     - **Note**: This is a backend-only variable and will NOT be exposed to the frontend for security
+   
    - **⚠️ SECURITY NOTE**: Never commit your `.env` file with real API tokens to version control. The `.env` file is already in `.gitignore`.
 
-4. Start the development server:
-```bash
-npm run dev
-```
+4. Start the development servers:
+
+   **Option A - Full Experience (Frontend + LLM Backend):**
+   ```bash
+   npm run dev:full
+   ```
+   This starts both the Vite frontend (port 5173) and Express backend (port 3001) concurrently.
+
+   **Option B - Frontend Only (without LLM features):**
+   ```bash
+   npm run dev
+   ```
+   The chatbot will still work with structured location queries, but won't have conversational AI capabilities.
+
+   **Option C - Backend Only:**
+   ```bash
+   npm run dev:backend
+   ```
 
 5. Open your browser and navigate to `http://localhost:5173`
 
 ## Usage
+
+### Basic Features
 
 1. Open the application and click "Dive In" on the welcome page
 2. Search for a location using the enhanced search features:
@@ -102,6 +122,35 @@ npm run dev
 7. View detailed sky conditions, air quality, and light pollution data for your selected location
 8. Pin locations by clicking anywhere on the map to save them to your board
 
+### Stary Chatbot - AI-Powered Companion
+
+The **Stary** chatbot (🌟 icon) provides two modes of interaction:
+
+#### Structured Location Queries (Always Available)
+- "Yellowstone National Park"
+- "Death Valley"
+- "44.4280, -110.5885" (coordinates)
+
+#### Conversational AI Mode (Requires Gemini API Key)
+When configured with Gemini API key, Stary can handle free-form conversations:
+
+**Example Questions:**
+- "What's the best time to see the Milky Way?"
+- "How does light pollution affect stargazing?"
+- "Tell me about meteor showers this month"
+- "What equipment do I need for astrophotography?"
+- "Show me dark sky locations in California"
+- "How's the weather for stargazing tonight?"
+
+**Features:**
+- Natural language understanding
+- Context-aware responses
+- Automatic location extraction from conversational queries
+- Astronomy knowledge and recommendations
+- Friendly, engaging personality
+
+**Fallback Behavior:**
+If the backend is unavailable or Gemini API is not configured, Stary gracefully falls back to structured location query mode.
 
 **API Features:**
 - AQICN (World Air Quality Index) API for real-time AQI data
@@ -132,6 +181,8 @@ No setup is required for sky viewability data.
 - React Router DOM
 - Leaflet & React Leaflet
 - Axios
+- Express.js (Backend Server)
+- OpenAI Gemini 2.0 Flash (LLM Integration)
 - OpenStreetMap (Standard Map Tiles)
 - OpenTopoMap (Terrain Map Tiles)
 - Esri World Imagery (Satellite View)
@@ -180,3 +231,145 @@ A comprehensive test harness is included to verify the AQI integration:
    ```
 
 For detailed testing instructions, see `AQI_INTEGRATION_VERIFICATION.md`.
+
+## LLM Backend Deployment
+
+### Local Development
+
+The LLM backend runs on port 3001 by default. To start it:
+
+```bash
+# Install backend dependencies (first time only)
+cd server
+npm install
+
+# Start backend
+npm run dev
+
+# Or from root directory
+npm run dev:backend
+
+# Or start both frontend and backend together
+npm run dev:full
+```
+
+### Production Deployment
+
+For production deployment, you'll need to:
+
+1. **Deploy the Backend Server:**
+   - The `server/` directory contains a standalone Express.js application
+   - Deploy to services like Heroku, Railway, Render, or AWS
+   - Set environment variable `VITE_GEMINI_API_KEY` in your hosting service
+   - Ensure the backend URL is accessible from your frontend
+
+2. **Configure Frontend:**
+   - Set `VITE_BACKEND_URL` in your `.env` to point to your deployed backend
+   - Example: `VITE_BACKEND_URL=https://your-backend.herokuapp.com`
+
+3. **Build Frontend:**
+   ```bash
+   npm run build
+   ```
+   Deploy the `dist/` folder to static hosting (Vercel, Netlify, etc.)
+
+### Environment Variables Summary
+
+| Variable | Required | Purpose | Example |
+|----------|----------|---------|---------|
+| `VITE_AQICN_TOKEN` | Optional | Real-time AQI data | `abc123...` |
+| `GEMINI_API_KEY` | Required for LLM | Conversational AI features (backend only) | `sk-proj-...` |
+| `BACKEND_PORT` | Optional | Backend server port | `3001` |
+| `VITE_BACKEND_URL` | Optional | Backend URL for frontend | `http://localhost:3001` |
+
+## Troubleshooting
+
+### LLM Features Not Working
+
+**Problem:** Chatbot doesn't respond to conversational queries
+
+**Solutions:**
+1. Check if backend server is running:
+   ```bash
+   curl http://localhost:3001/api/health
+   ```
+   Should return: `{"status":"ok","service":"DarkSkyFinder LLM Backend","openaiConfigured":true}`
+
+2. Verify Gemini API key is set in `.env`:
+   ```bash
+   grep GEMINI_API_KEY .env
+   ```
+
+3. Check browser console for errors
+4. Ensure both frontend and backend are running (`npm run dev:full`)
+
+### Backend Server Won't Start
+
+**Problem:** Error when running `npm run dev:backend`
+
+**Solutions:**
+1. Install backend dependencies:
+   ```bash
+   cd server
+   npm install
+   ```
+
+2. Check if port 3001 is already in use:
+   ```bash
+   lsof -i :3001  # On macOS/Linux
+   netstat -ano | findstr :3001  # On Windows
+   ```
+
+3. Change port in `.env`:
+   ```
+   BACKEND_PORT=3002
+   VITE_BACKEND_URL=http://localhost:3002
+   ```
+
+### Gemini API Errors
+
+**Problem:** "Rate limit exceeded" or "Invalid API key"
+
+**Solutions:**
+1. Verify API key is correct and has credits
+2. Check OpenAI account dashboard for usage limits
+3. Consider upgrading OpenAI plan if hitting rate limits
+4. The chatbot will automatically fall back to structured queries
+
+### CORS Errors
+
+**Problem:** Browser console shows CORS errors when connecting to backend
+
+**Solutions:**
+1. Ensure backend CORS is configured (already set in `server/index.js`)
+2. Check `VITE_BACKEND_URL` matches actual backend URL
+3. For production, update CORS settings to allow your frontend domain
+
+## Cost Considerations
+
+### Gemini API Costs
+
+The Stary chatbot uses **Gemini 2.0 Flash** model which is **FREE** for most use cases:
+- Free tier: 15 requests per minute (RPM), 1 million tokens per day
+- Input/Output: Free for flash models
+- Average conversation: 500-1000 tokens (FREE!)
+
+**Free tier limits:**
+- 15 RPM (requests per minute)
+- 1 million tokens per day
+- More than enough for personal/development use
+- Consider implementing request caching for common questions
+
+### Free Tier Limits
+
+- **7Timer!**: Free, no limits
+- **AQICN**: 1,000 calls/minute (free tier)
+- **Gemini**: 15 RPM, 1M tokens/day (free tier)
+
+## Contributing
+
+Contributions are welcome! Please feel free to submit a Pull Request.
+
+## License
+
+This project is open source and available under the MIT License.

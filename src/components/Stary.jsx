@@ -38,15 +38,16 @@ function Stary({ onNavigate, isVisible, onClose }) {
 
     // Add user message
     const userMsgId = Date.now();
-    setMessages(prev => [...prev, {
+    const newUserMessage = {
       id: userMsgId,
       type: 'user',
       content: userMessage
-    }]);
+    };
+    setMessages(prev => [...prev, newUserMessage]);
 
     try {
-      // Process query
-      const response = await processQuery(userMessage);
+      // Process query with conversation history
+      const response = await processQuery(userMessage, messages);
       
       // Add bot response
       setMessages(prev => [...prev, {
@@ -86,7 +87,7 @@ function Stary({ onNavigate, isVisible, onClose }) {
           }} />
 
           {/* Render additional data for analysis responses */}
-          {data && data.type === 'analysis' && (
+          {data && (data.type === 'analysis' || data.type === 'llm_with_location') && (
             <div className="analysis-details">
               {/* Suitability Score */}
               {data.data.suitability && (
@@ -228,7 +229,7 @@ function Stary({ onNavigate, isVisible, onClose }) {
               ref={inputRef}
               type="text"
               className="stary-input"
-              placeholder="Enter location or coordinates..."
+              placeholder="Ask me anything or tell me a location..."
               value={inputValue}
               onChange={(e) => setInputValue(e.target.value)}
               disabled={isLoading}
