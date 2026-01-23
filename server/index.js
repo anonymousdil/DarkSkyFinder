@@ -1,7 +1,7 @@
 import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
-import OpenAI from 'openai';
+import { GoogleGenerativeAI } from '@google/generative-ai';
 
 // Load environment variables
 dotenv.config();
@@ -13,12 +13,10 @@ const PORT = process.env.BACKEND_PORT || process.env.PORT || 3001;
 app.use(cors());
 app.use(express.json());
 
-// Initialize OpenAI client (only if API key is available)
-let openai = null;
-if (process.env.OPENAI_API_KEY) {
-  openai = new OpenAI({
-    apiKey: process.env.OPENAI_API_KEY,
-  });
+// Initialize Gemini client (only if API key is available)
+let geminiClient = null;
+if (process.env.GEMINI_API_KEY) {
+  geminiClient = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 }
 
 // System prompt for the Starry chatbot
@@ -68,7 +66,7 @@ function extractLocationInfo(response) {
 }
 
 /**
- * Process chat query with OpenAI
+ * Process chat query with Gemini
  * POST /api/chat
  * Body: { query: string, conversationHistory?: array }
  */
@@ -83,69 +81,71 @@ app.post('/api/chat', async (req, res) => {
       });
     }
 
-    // Check if OpenAI API key is configured
-    if (!process.env.OPENAI_API_KEY || !openai) {
+    // Check if Gemini API key is configured
+    if (!process.env.GEMINI_API_KEY || !geminiClient) {
       return res.status(503).json({
         success: false,
-        error: 'OpenAI API key not configured',
-        message: 'Please configure OPENAI_API_KEY in your .env file to enable LLM features.'
+        error: 'Gemini API key not configured',
+        message: 'Please configure GEMINI_API_KEY in your .env file to enable LLM features.'
       });
     }
 
-    // Build messages array for OpenAI API
-    const messages = [
-      { role: 'system', content: SYSTEM_PROMPT }
-    ];
-
+    // Build conversation context for Gemini
+    // Gemini uses a different format - we'll construct the full prompt
+    let fullPrompt = SYSTEM_PROMPT + '\n\n';
+    
     // Add conversation history (limit to last 10 messages to manage token usage)
     const recentHistory = conversationHistory.slice(-10);
-    messages.push(...recentHistory);
+    if (recentHistory.length > 0) {
+      fullPrompt += 'Previous conversation:\n';
+      recentHistory.forEach(msg => {
+        const role = msg.role === 'user' ? 'User' : 'Assistant';
+        fullPrompt += `${role}: ${msg.content}\n`;
+      });
+      fullPrompt += '\n';
+    }
 
     // Add current user query
-    messages.push({ role: 'user', content: query });
+    fullPrompt += `User: ${query}\nAssistant:`;
 
-    // Call OpenAI API
-    const completion = await openai.chat.completions.create({
-      model: 'gpt-4o-mini', // Using gpt-4o-mini for cost efficiency
-      messages: messages,
-      temperature: 0.7,
-      max_tokens: 500,
-    });
-
-    const response = completion.choices[0].message.content;
+    // Call Gemini API
+    const model = geminiClient.getGenerativeModel({ model: 'gemini-2.0-flash-exp' });
+    const result = await model.generateContent(fullPrompt);
+    const response = await result.response;
+    const responseText = response.text();
 
     // Extract location info if present
-    const locationInfo = extractLocationInfo(response);
+    const locationInfo = extractLocationInfo(responseText);
 
     // Remove JSON block from display text if present
     const displayText = locationInfo 
-      ? response.replace(/\{[^}]*"location"[^}]*\}/, '').trim()
-      : response;
+      ? responseText.replace(/\{[^}]*"location"[^}]*\}/, '').trim()
+      : responseText;
 
     res.json({
       success: true,
       response: displayText,
       locationInfo: locationInfo,
       usage: {
-        promptTokens: completion.usage.prompt_tokens,
-        completionTokens: completion.usage.completion_tokens,
-        totalTokens: completion.usage.total_tokens
+        promptTokens: 0, // Gemini doesn't provide detailed token usage in the same way
+        completionTokens: 0,
+        totalTokens: 0
       }
     });
 
   } catch (error) {
     console.error('Chat API error:', error);
 
-    // Handle specific OpenAI errors
-    if (error.status === 401) {
+    // Handle specific Gemini errors
+    if (error.status === 401 || error.message?.includes('API key')) {
       return res.status(401).json({
         success: false,
-        error: 'Invalid OpenAI API key',
-        message: 'Please check your OPENAI_API_KEY configuration.'
+        error: 'Invalid Gemini API key',
+        message: 'Please check your GEMINI_API_KEY configuration.'
       });
     }
 
-    if (error.status === 429) {
+    if (error.status === 429 || error.message?.includes('quota')) {
       return res.status(429).json({
         success: false,
         error: 'Rate limit exceeded',
@@ -168,16 +168,16 @@ app.get('/api/health', (req, res) => {
   res.json({
     status: 'ok',
     service: 'DarkSkyFinder LLM Backend',
-    openaiConfigured: !!process.env.OPENAI_API_KEY
+    geminiConfigured: !!process.env.GEMINI_API_KEY
   });
 });
 
 // Start server
 app.listen(PORT, () => {
   console.log(`🌟 DarkSkyFinder LLM Backend running on port ${PORT}`);
-  console.log(`OpenAI API configured: ${process.env.OPENAI_API_KEY ? 'Yes ✓' : 'No ✗'}`);
-  if (!process.env.OPENAI_API_KEY) {
-    console.warn('⚠️  Warning: OPENAI_API_KEY not set. LLM features will not work.');
+  console.log(`Gemini API configured: ${process.env.GEMINI_API_KEY ? 'Yes ✓' : 'No ✗'}`);
+  if (!process.env.GEMINI_API_KEY) {
+    console.warn('⚠️  Warning: GEMINI_API_KEY not set. LLM features will not work.');
   }
 });
 

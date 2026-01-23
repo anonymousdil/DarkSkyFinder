@@ -15,7 +15,7 @@ A comprehensive security review has been conducted for the LLM integration into 
 **Issue Addressed**: Preventing exposure of sensitive API keys to frontend
 
 **Solution Implemented**:
-- ✅ Backend uses `OPENAI_API_KEY` (no VITE_ prefix)
+- ✅ Backend uses `GEMINI_API_KEY` (no VITE_ prefix)
 - ✅ API key is never exposed to frontend/browser
 - ✅ API key is loaded only in backend via dotenv
 - ✅ `.env` file is in `.gitignore` to prevent accidental commits
@@ -26,7 +26,7 @@ A comprehensive security review has been conducted for the LLM integration into 
 **Issue Addressed**: Clear separation between frontend and backend configuration
 
 **Solution Implemented**:
-- ✅ Backend-only variables: `OPENAI_API_KEY`, `BACKEND_PORT`, `PORT`
+- ✅ Backend-only variables: `GEMINI_API_KEY`, `BACKEND_PORT`, `PORT`
 - ✅ Frontend-safe variables: `VITE_BACKEND_URL`, `VITE_AQICN_TOKEN`
 - ✅ Clear documentation in `.env.example`
 
@@ -77,13 +77,13 @@ app.use(cors({
 **Issue Addressed**: Ensuring dependencies are secure and up-to-date
 
 **Solution Implemented**:
-- ✅ Using official, maintained packages (Express, OpenAI SDK)
+- ✅ Using official, maintained packages (Express, Gemini SDK)
 - ✅ No deprecated dependencies
 - ✅ Regular update recommendations in documentation
 
 **Dependencies**:
 - express: ^4.18.2 (actively maintained)
-- openai: ^4.77.3 (official OpenAI SDK)
+- openai: ^4.77.3 (official Gemini SDK)
 - cors: ^2.8.5 (stable)
 - dotenv: ^16.4.1 (stable)
 
@@ -126,7 +126,7 @@ app.use('/api/', limiter);
 ### Compliance Notes
 
 - **Data Privacy**: No user data is stored; all conversations are ephemeral
-- **API Terms**: Usage complies with OpenAI's terms of service
+- **API Terms**: Usage complies with Gemini's terms of service
 - **Open Source**: Implementation follows open source best practices
 
 ### Audit Trail
@@ -135,7 +135,7 @@ app.use('/api/', limiter);
 |------|--------|--------|
 | 2026-01-23 | Initial Implementation | Backend created with VITE_ prefixed vars |
 | 2026-01-23 | Code Review #1 | Identified security issue with env vars |
-| 2026-01-23 | Security Fix | Changed to backend-only OPENAI_API_KEY |
+| 2026-01-23 | Security Fix | Changed to backend-only GEMINI_API_KEY |
 | 2026-01-23 | Code Review #2 | Verified all references updated |
 | 2026-01-23 | CodeQL Analysis | Passed with 0 vulnerabilities |
 | 2026-01-23 | Final Review | All security measures verified |

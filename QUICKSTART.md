@@ -6,7 +6,7 @@ This guide will help you get the LLM-powered Starry chatbot up and running in mi
 
 - Node.js v16 or higher
 - npm or yarn
-- OpenAI API account with credits (optional, but recommended for full features)
+- Gemini API account with credits (optional, but recommended for full features)
 
 ## Step 1: Install Dependencies
 
@@ -31,7 +31,7 @@ cp .env.example .env
 
 ```bash
 # Required for LLM conversational features
-OPENAI_API_KEY=sk-proj-your-actual-key-here
+GEMINI_API_KEY=sk-proj-your-actual-key-here
 
 # Optional for AQI data
 VITE_AQICN_TOKEN=your_aqicn_token_here
@@ -41,15 +41,14 @@ BACKEND_PORT=3001
 VITE_BACKEND_URL=http://localhost:3001
 ```
 
-### Getting Your OpenAI API Key
+### Getting Your Gemini API Key
 
-1. Go to [https://platform.openai.com/api-keys](https://platform.openai.com/api-keys)
-2. Sign in or create an account
-3. Add credits to your account (minimum $5 recommended)
-4. Click "Create new secret key"
-5. Copy the key and paste it in your `.env` file
+1. Go to [https://aistudio.google.com/app/apikey](https://aistudio.google.com/app/apikey)
+2. Sign in with your Google account
+3. Click "Create API key"
+4. Copy the key and paste it in your `.env` file
 
-**Cost**: Using GPT-4o-mini, expect ~$0.001 per conversational query (very affordable!)
+**Cost**: Gemini 2.0 Flash is **FREE** for most use cases! Free tier includes 15 requests per minute and 1 million tokens per day.
 
 ## Step 3: Start the Application
 
@@ -82,7 +81,7 @@ npm run dev:backend
 3. Click the chatbot icon (🌟 Stary) in the bottom right
 4. Try these queries:
 
-**Conversational (requires OpenAI API key):**
+**Conversational (requires Gemini API key):**
 - "What's the best time to see the Milky Way?"
 - "How does light pollution affect stargazing?"
 - "Tell me about the Northern Lights"
@@ -103,12 +102,12 @@ npm run dev:backend
 2. Check backend URL in `.env`: `VITE_BACKEND_URL=http://localhost:3001`
 3. Verify backend is responding: `curl http://localhost:3001/api/health`
 
-### "OpenAI API key not configured"
+### "Gemini API key not configured"
 
 **Problem**: Backend running but API key not set
 
 **Solution**:
-1. Check `.env` file has `OPENAI_API_KEY=sk-...`
+1. Check `.env` file has `GEMINI_API_KEY=sk-...`
 2. Restart the backend after adding the key
 3. The chatbot will still work for location queries without the key
 
@@ -135,14 +134,14 @@ npm run dev:backend
 
 ## Features Overview
 
-### Without OpenAI API Key
+### Without Gemini API Key
 - ✅ Location-based queries
 - ✅ Detailed stargazing analysis
 - ✅ Light pollution information
 - ✅ Sky conditions
 - ✅ AQI data (if configured)
 
-### With OpenAI API Key
+### With Gemini API Key
 All of the above, PLUS:
 - ✅ Free-form conversational queries
 - ✅ Astronomy questions and answers

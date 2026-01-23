@@ -10,7 +10,7 @@ This document describes the implementation of the Language Learning Model (LLM) 
 
 1. **Backend Server** (`server/index.js`)
    - Express.js server running on port 3001
-   - OpenAI GPT-4o-mini integration for natural language processing
+   - Gemini Gemini 2.0 Flash integration for natural language processing
    - RESTful API endpoints for chat and health checks
    - Graceful handling of missing API keys
 
@@ -34,7 +34,7 @@ This document describes the implementation of the Language Learning Model (LLM) 
 
 ### 1. Conversational AI Mode
 
-When OpenAI API key is configured, users can:
+When Gemini API key is configured, users can:
 - Ask general astronomy questions
 - Get stargazing tips and recommendations
 - Discuss celestial events and phenomena
@@ -120,8 +120,8 @@ Process chat query with LLM
 ```json
 {
   "success": false,
-  "error": "OpenAI API key not configured",
-  "message": "Please configure OPENAI_API_KEY in your .env file..."
+  "error": "Gemini API key not configured",
+  "message": "Please configure GEMINI_API_KEY in your .env file..."
 }
 ```
 
@@ -132,8 +132,8 @@ Process chat query with LLM
 Add to `.env` file:
 
 ```bash
-# OpenAI API Configuration
-OPENAI_API_KEY=sk-proj-your-key-here
+# Gemini API Configuration
+GEMINI_API_KEY=sk-proj-your-key-here
 
 # Backend Configuration (optional)
 BACKEND_PORT=3001
@@ -204,10 +204,10 @@ A dedicated test page is available at `/test-llm-integration.html` (development 
 - Conversation history: Limited to last 10 messages
 - Max tokens per response: 500
 
-### Cost Estimation (GPT-4o-mini)
-- Input: ~$0.15 per 1M tokens
-- Output: ~$0.60 per 1M tokens
-- **Average cost per query: $0.0005-$0.001**
+### Cost Estimation (Gemini 2.0 Flash)
+- **FREE** for most use cases
+- Free tier: 15 RPM, 1 million tokens/day
+- **Average cost per query: FREE**
 
 ### Optimization Strategies
 1. Conversation history pruning (10 messages max)
@@ -218,8 +218,8 @@ A dedicated test page is available at `/test-llm-integration.html` (development 
 ## Error Handling
 
 ### Backend Errors
-- **503**: OpenAI API key not configured
-- **401**: Invalid OpenAI API key
+- **503**: Gemini API key not configured
+- **401**: Invalid Gemini API key
 - **429**: Rate limit exceeded
 - **500**: Internal server error
 
@@ -260,7 +260,7 @@ Potential improvements:
 - express: ^4.18.2
 - cors: ^2.8.5
 - dotenv: ^16.4.1
-- openai: ^4.77.3
+- @google/generative-ai: ^0.24.1
 
 ### Frontend (additions)
 - concurrently: ^9.1.2 (dev)
@@ -277,7 +277,7 @@ Potential improvements:
 - `src/services/staryService.js` - Added LLM integration
 - `src/components/Stary.jsx` - Enhanced UI for conversations
 - `package.json` - Added scripts and dependencies
-- `.env.example` - Added OpenAI configuration
+- `.env.example` - Added Gemini configuration
 - `README.md` - Comprehensive documentation
 - `eslint.config.js` - Excluded server directory
 

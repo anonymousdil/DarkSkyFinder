@@ -65,10 +65,10 @@ npm install
      - Visit [https://aqicn.org/data-platform/token/](https://aqicn.org/data-platform/token/) and request a free API token
      - Add to `.env`: `VITE_AQICN_TOKEN=your_actual_aqicn_token_here`
    
-   - **OpenAI API** (for LLM-powered conversational chatbot):
-     - Visit [https://platform.openai.com/api-keys](https://platform.openai.com/api-keys)
-     - Create an API key (requires OpenAI account with credits)
-     - Add to `.env`: `OPENAI_API_KEY=your_openai_api_key_here`
+   - **Gemini API** (for LLM-powered conversational chatbot):
+     - Visit [https://aistudio.google.com/app/apikey](https://aistudio.google.com/app/apikey)
+     - Create an API key (requires Google Cloud account (free tier available))
+     - Add to `.env`: `GEMINI_API_KEY=your_openai_api_key_here`
      - **Note**: This is a backend-only variable and will NOT be exposed to the frontend for security
    
    - **⚠️ SECURITY NOTE**: Never commit your `.env` file with real API tokens to version control. The `.env` file is already in `.gitignore`.
@@ -131,8 +131,8 @@ The **Stary** chatbot (🌟 icon) provides two modes of interaction:
 - "Death Valley"
 - "44.4280, -110.5885" (coordinates)
 
-#### Conversational AI Mode (Requires OpenAI API Key)
-When configured with OpenAI API key, Stary can handle free-form conversations:
+#### Conversational AI Mode (Requires Gemini API Key)
+When configured with Gemini API key, Stary can handle free-form conversations:
 
 **Example Questions:**
 - "What's the best time to see the Milky Way?"
@@ -150,7 +150,7 @@ When configured with OpenAI API key, Stary can handle free-form conversations:
 - Friendly, engaging personality
 
 **Fallback Behavior:**
-If the backend is unavailable or OpenAI API is not configured, Stary gracefully falls back to structured location query mode.
+If the backend is unavailable or Gemini API is not configured, Stary gracefully falls back to structured location query mode.
 
 **API Features:**
 - AQICN (World Air Quality Index) API for real-time AQI data
@@ -182,7 +182,7 @@ No setup is required for sky viewability data.
 - Leaflet & React Leaflet
 - Axios
 - Express.js (Backend Server)
-- OpenAI GPT-4o-mini (LLM Integration)
+- OpenAI Gemini 2.0 Flash (LLM Integration)
 - OpenStreetMap (Standard Map Tiles)
 - OpenTopoMap (Terrain Map Tiles)
 - Esri World Imagery (Satellite View)
@@ -260,7 +260,7 @@ For production deployment, you'll need to:
 1. **Deploy the Backend Server:**
    - The `server/` directory contains a standalone Express.js application
    - Deploy to services like Heroku, Railway, Render, or AWS
-   - Set environment variable `VITE_OPENAI_API_KEY` in your hosting service
+   - Set environment variable `VITE_GEMINI_API_KEY` in your hosting service
    - Ensure the backend URL is accessible from your frontend
 
 2. **Configure Frontend:**
@@ -278,7 +278,7 @@ For production deployment, you'll need to:
 | Variable | Required | Purpose | Example |
 |----------|----------|---------|---------|
 | `VITE_AQICN_TOKEN` | Optional | Real-time AQI data | `abc123...` |
-| `OPENAI_API_KEY` | Required for LLM | Conversational AI features (backend only) | `sk-proj-...` |
+| `GEMINI_API_KEY` | Required for LLM | Conversational AI features (backend only) | `sk-proj-...` |
 | `BACKEND_PORT` | Optional | Backend server port | `3001` |
 | `VITE_BACKEND_URL` | Optional | Backend URL for frontend | `http://localhost:3001` |
 
@@ -295,9 +295,9 @@ For production deployment, you'll need to:
    ```
    Should return: `{"status":"ok","service":"DarkSkyFinder LLM Backend","openaiConfigured":true}`
 
-2. Verify OpenAI API key is set in `.env`:
+2. Verify Gemini API key is set in `.env`:
    ```bash
-   grep OPENAI_API_KEY .env
+   grep GEMINI_API_KEY .env
    ```
 
 3. Check browser console for errors
@@ -326,7 +326,7 @@ For production deployment, you'll need to:
    VITE_BACKEND_URL=http://localhost:3002
    ```
 
-### OpenAI API Errors
+### Gemini API Errors
 
 **Problem:** "Rate limit exceeded" or "Invalid API key"
 
@@ -347,24 +347,24 @@ For production deployment, you'll need to:
 
 ## Cost Considerations
 
-### OpenAI API Costs
+### Gemini API Costs
 
-The Stary chatbot uses **GPT-4o-mini** model for cost efficiency:
-- Input: ~$0.15 per 1M tokens
-- Output: ~$0.60 per 1M tokens
-- Average conversation: 500-1000 tokens (~$0.0005-$0.001 per query)
+The Stary chatbot uses **Gemini 2.0 Flash** model which is **FREE** for most use cases:
+- Free tier: 15 requests per minute (RPM), 1 million tokens per day
+- Input/Output: Free for flash models
+- Average conversation: 500-1000 tokens (FREE!)
 
-**Tips to minimize costs:**
-- Conversation history is limited to last 10 messages
-- Max tokens per response: 500
-- Fallback to structured queries when LLM isn't needed
+**Free tier limits:**
+- 15 RPM (requests per minute)
+- 1 million tokens per day
+- More than enough for personal/development use
 - Consider implementing request caching for common questions
 
 ### Free Tier Limits
 
 - **7Timer!**: Free, no limits
 - **AQICN**: 1,000 calls/minute (free tier)
-- **OpenAI**: Pay-as-you-go (requires credits)
+- **Gemini**: 15 RPM, 1M tokens/day (free tier)
 
 ## Contributing
 
