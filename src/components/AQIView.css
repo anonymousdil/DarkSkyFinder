@@ -243,6 +243,31 @@
   margin-bottom: 0;
 }
 
+/* Pollution Reduction Measures */
+.pollution-reduction {
+  background: rgba(45, 45, 68, 0.6);
+  border-radius: 12px;
+  padding: 1.25rem;
+  margin-bottom: 1.5rem;
+  border: 1px solid rgba(102, 126, 234, 0.2);
+}
+
+.reduction-content ul {
+  margin: 0;
+  padding-left: 1.5rem;
+  color: #e0e0e0;
+}
+
+.reduction-content li {
+  margin-bottom: 0.5rem;
+  line-height: 1.5;
+  font-size: 0.9rem;
+}
+
+.reduction-content li:last-child {
+  margin-bottom: 0;
+}
+
 /* Scrollbar styling */
 .aqi-view-panel::-webkit-scrollbar {
   width: 8px;
@@ -336,6 +361,11 @@
 
   .health-recommendations {
     padding: 1rem;
+  }
+
+  .pollution-reduction {
+    padding: 1rem;
+    margin-bottom: 1.25rem;
   }
 }
 
