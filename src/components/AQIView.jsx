@@ -258,6 +258,50 @@ function AQIView({ location, visible, onClose }) {
             </div>
           </div>
 
+          {/* Pollution Reduction Measures */}
+          <div className="pollution-reduction">
+            <div className="section-title">
+              <span className="section-icon">🌍</span>
+              Pollution Reduction Measures
+            </div>
+            <div className="reduction-content">
+              {aqiData.aqi <= 50 && (
+                <ul>
+                  <li>Maintain clean air habits like using public transport and reducing waste.</li>
+                  <li>Encourage community tree planting programs.</li>
+                </ul>
+              )}
+              {aqiData.aqi > 50 && aqiData.aqi <= 100 && (
+                <ul>
+                  <li>Use public transportation, carpool, or bike when possible.</li>
+                  <li>Conserve energy at home by using LED bulbs and efficient appliances.</li>
+                  <li>Support local clean air initiatives.</li>
+                </ul>
+              )}
+              {aqiData.aqi > 100 && aqiData.aqi <= 150 && (
+                <ul>
+                  <li>Reduce vehicle trips and avoid idling your car.</li>
+                  <li>Limit use of gas-powered equipment like lawn mowers.</li>
+                  <li>Switch to renewable energy sources when possible.</li>
+                </ul>
+              )}
+              {aqiData.aqi > 150 && aqiData.aqi <= 200 && (
+                <ul>
+                  <li>Avoid open-burning activities (e.g., burning leaves or trash).</li>
+                  <li>Use energy-efficient appliances and turn off devices when not in use.</li>
+                  <li>Advocate for better public transportation infrastructure.</li>
+                </ul>
+              )}
+              {aqiData.aqi > 200 && (
+                <ul>
+                  <li>Advocate for stricter pollution control on industries.</li>
+                  <li>Encourage widespread adoption of electric vehicles and renewable energy sources.</li>
+                  <li>Support policies that reduce industrial emissions.</li>
+                </ul>
+              )}
+            </div>
+          </div>
+
           <div className="data-source">
             <small>
               <strong>Data source:</strong> {aqiData.source}
